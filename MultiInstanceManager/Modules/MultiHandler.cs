@@ -1,5 +1,6 @@
 ﻿using Microsoft.Win32;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -14,6 +15,11 @@ using System.Windows.Forms;
 
 namespace MultiInstanceManager.Modules
 {
+    class GameInstance
+    {
+        public string account;
+        public Process process;
+    }
     class MultiHandler
     {
         [DllImport("user32.dll")]
@@ -22,12 +28,26 @@ namespace MultiInstanceManager.Modules
         [DllImport("user32.dll")]
         private static extern int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
 
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint processId);
+
         Form parent;
 
-        private IntPtr bnetLauncherHandle;
-        public MultiHandler(Form _parent)
+        private IntPtr lastWindowHandle;
+        private int processCounter;
+        private List<Process> gameProcesses;
+        private uint bnetLauncherPID;
+        private CheckedListBox accountList;
+        private Boolean firstTokenTry;
+        private byte[] token;
+        private List<GameInstance> instances;
+
+        public MultiHandler(Form _parent,CheckedListBox _accountList)
         {
             parent = _parent;
+            accountList = _accountList;
+            gameProcesses = new List<Process>();
+            instances = new List<GameInstance>();
         }
         Boolean blizzardProcessesExists()
         {
@@ -39,11 +59,17 @@ namespace MultiInstanceManager.Modules
                 return true;
             return false;
         }
+
         public void Setup(string displayName = "")
         {
-            if(blizzardProcessesExists())
+            ClearDebug();
+            // Initialize the processCounter so we know how many we're at.
+            processCounter = 0;
+
+            if (blizzardProcessesExists())
             {
                 _ = MessageBox.Show("Close all D2R/Battle.net related programs first.");
+                Setup(displayName);
                 return;
             } 
             if(displayName.Length == 0)
@@ -53,10 +79,167 @@ namespace MultiInstanceManager.Modules
             ShowToolTip("Launching battle.net to set up " + displayName);
             var launcherProcess = LaunchLauncher();
             WinWait(Constants.bnetLauncherClass);
+            SetBnetLauncherPID();
             WinWaitClose(Constants.bnetLauncherClass);
-            ShowToolTip("Launcher ready, insert credentials ;)");
+            processCounter++;
+            LogDebug("Waiting for Game Client to start");
+            ProcessWait(Constants.clientExecutableName);
+            LogDebug("Client ready, glhf");
+            // Wait for the initial token update
+            WaitForNewToken(gameProcesses[processCounter - 1]);
+            // Then we do it once more, because it may update twice
+            // WaitForNewToken(gameProcesses[processCounter - 1]);
+            // Export the received key using the name of the recipient
+            ExportToken(displayName + ".bin");
+            LogDebug("Successfully saved new token for " + displayName);
+            // Kill the Launcher & game client
+            try
+            {
+                CloseBnetLauncher();
+                CloseGameClient(gameProcesses[processCounter - 1].Id);
+            } catch (Exception ex)
+            {
+                // Not able to kill the game client, for whatever reason
+                LogDebug(ex.ToString());
+            }
+            LoadAccounts();
+        }
+        private string ComspecGetOutput(string command,string arguments)
+        {
+            Process p = new Process();
+            p.StartInfo.UseShellExecute = false;
+            p.StartInfo.RedirectStandardOutput = true;
+            p.StartInfo.FileName = command;
+            p.StartInfo.Arguments = arguments;
+            p.StartInfo.CreateNoWindow = true;
+            p.Start();
+            string output = p.StandardOutput.ReadToEnd();
+            p.WaitForExit();
+            return output;
         }
 
+        public void LaunchWithAccount(string accountName)
+        {
+            LogDebug("Launching account: '" + accountName + "'");
+            UseAccountToken(accountName);
+            var process = LaunchGame(accountName);
+            LogDebug("Process should be: " + process.Id);
+            ProcessWait(Constants.clientExecutableName);
+            // Wait for a new token
+            WaitForNewToken(process);
+            Thread.Sleep(1000);
+            // Then wait again incase it changes in any forseeable future
+            // WaitForNewToken(process);
+
+            Process exists = Process.GetProcessById(process.Id);
+            if (exists.Id == process.Id)
+            {
+                LogDebug("Process seems to be alive: " + process.Id);
+                ExportToken(accountName);
+                CloseMultiProcessHandle(process);
+                gameProcesses.Add(process);
+            }
+
+        }
+        private void CloseMultiProcessHandle(Process process)
+        {
+            var processName = '"' + process.ProcessName + ".exe" + '"';
+            LogDebug("Closing multi-process handle(s) for " + processName);
+            var handle64str = "handle64.exe";
+            var handle64opts = "-a -p " + processName + " Instances";
+            LogDebug("Running: " + handle64str + " " + handle64opts);
+            var handleData = ComspecGetOutput(handle64str,handle64opts);
+            LogDebug("Handle data: " + handleData);
+            handleData.Replace('\r', ' ');
+            var lines = handleData.Split('\n');
+            string handle = "";
+            string result = "";
+            if(lines.Length > 0)
+            {
+                LogDebug("More than 0 lines, thats good");
+                foreach(var line in lines) { 
+                    if(line.Contains("D2R.exe"))
+                    {
+                        result = line;
+                        LogDebug("Result: " + lines);
+                    }
+                }
+            } else
+            {
+                LogDebug("Could not get handle data from handle64");
+            }
+            if(result.Length > 0)
+            {
+                var data = result.Split(new string[] { ": " },StringSplitOptions.None);
+                if(data.Length > 0)
+                {
+                    LogDebug("Handle infos: " + data.ToString());
+                    handle = data[2].Substring(data[2].Length - 8,8);
+                    LogDebug("Handle: " + handle);
+                }
+                if(handle.Length > 0)
+                {
+                    LogDebug("Closing handle: " + handle);
+                    LogDebug(ComspecGetOutput("handle64.exe", " -c " + handle + " -p \"" + process.Id + "\" -y"));
+                }
+            } else
+            {
+                LogDebug("No handle infos...");
+            }
+            LogDebug("All done, next!");
+        }
+        private Process LaunchGame(string accountName)
+        {
+            string installPath = (string)Registry.GetValue(Constants.gameInstallRegKey[0], Constants.gameInstallRegKey[1], "");
+            var process =  Process.Start(installPath + "\\D2R.exe");
+            var thisInstance = new GameInstance { account = accountName, process = process };
+            instances.Add(thisInstance);
+            return process;
+        }
+        public void LoadAccounts()
+        {
+            var ePath = Application.ExecutablePath;
+            var path = System.IO.Path.GetDirectoryName(ePath);
+            accountList.Items.Clear();
+            var accounts = Directory.GetFiles(path, "*.bin");
+            foreach(var account in accounts)
+            {
+                var lastWrite = File.GetLastWriteTime(account);
+                var fileName = Path.GetFileNameWithoutExtension(account) + " | " + lastWrite.ToString();
+                accountList.Items.Add(fileName);
+            }
+        }
+        private void SetBnetLauncherPID()
+        {
+            GetWindowThreadProcessId(lastWindowHandle, out bnetLauncherPID);
+        }
+        private void CloseGameClient(int pid)
+        {
+            try
+            {
+                var target = Process.GetProcessById(pid);
+                target.Kill();
+                return;
+            }
+            catch (Exception ex)
+            {
+                return;
+            }
+
+        }
+        private void CloseBnetLauncher()
+        {
+            try
+            {
+                var target = Process.GetProcessById((int)bnetLauncherPID);
+                target.Kill();
+                return;
+            } catch (Exception ex)
+            {
+                return;
+            }
+
+        }
         private Process LaunchLauncher()
         {
             string installPath = (string)Registry.GetValue(Constants.gameInstallRegKey[0], Constants.gameInstallRegKey[1], "");
@@ -89,32 +272,114 @@ namespace MultiInstanceManager.Modules
                 Thread.Sleep(100);
                 windowHandle = GetForegroundWindow();
                 waitTime++;
-                if (waitTime >= maxWait)
-                    LogDebug("Giving up finding window");
             }
-            bnetLauncherHandle = windowHandle;
+            if (waitTime >= maxWait)
+                LogDebug("Giving up finding window");
+            else
+                lastWindowHandle = windowHandle;
             LogDebug("Found window, yeet");
         }
         private void WinWaitClose(string windowClass)
         {
-            IntPtr windowHandle = GetForegroundWindow();
-            int maxWait = 100;
+            int maxWait = 1000;
             int waitTime = 0;
-            while (HasClass(windowHandle, windowClass) && waitTime < maxWait)
+            while (HasClass(lastWindowHandle, windowClass) && waitTime < maxWait)
             {
                 LogDebug("We still waiting");
                 Thread.Sleep(100);
-                windowHandle = GetForegroundWindow();
                 waitTime++;
                 if (waitTime >= maxWait)
                     LogDebug("Giving up waiting");
             }
             LogDebug("Finally its closed");
         }
+
+        private void ProcessWait(string processName)
+        {
+            LogDebug("Waiting for process: " + processName);
+            Process[] processes = Process.GetProcessesByName(processName);
+            int maxWait = 100;
+            int waitTime = 0;
+            while(processes.Length < processCounter && waitTime < maxWait)
+            {
+                LogDebug("Still waiting for Game Client: " + processName);
+                Thread.Sleep(1000);
+                processes = Process.GetProcessesByName(processName);
+                waitTime++;
+                if (waitTime >= maxWait)
+                    LogDebug("Giving up waiting for Game Client");
+            }
+            if (processes.Length == processCounter)
+            {
+                gameProcesses.Add(processes[processCounter-1]);
+            }
+            LogDebug("Finally the Game Client is up");
+        }
+
+        private void WaitForNewToken(Process process)
+        {
+            if (!IsProcessRunning(process))
+                return;
+
+            byte[] CurrentKey = new byte[20];
+
+            CurrentKey = (byte[])Registry.GetValue(Constants.accountRegKey[0], Constants.accountRegKey[1], "");
+            var PrevKey = new byte[20];
+            if (firstTokenTry)
+            {
+                PrevKey = CurrentKey;
+                firstTokenTry = false;
+            } 
+            else
+                PrevKey = token;
+
+            while(StructuralComparisons.StructuralEqualityComparer.Equals(CurrentKey, PrevKey))
+            {
+                LogDebug("Waiting for Token to update");
+                Thread.Sleep(100);
+                if (!IsProcessRunning(process))
+                {
+                    LogDebug("Client exited, aborting..");
+                    return;
+                }
+            }
+            if(!StructuralComparisons.StructuralEqualityComparer.Equals(CurrentKey, PrevKey))
+            {
+                LogDebug("Token updated");
+                token = CurrentKey;
+            } else
+            {
+                LogDebug("Token remains the same");
+            }
+        }
+        private void ExportToken(string fileName)
+        {
+            File.WriteAllBytes(fileName, (byte[])Registry.GetValue(Constants.accountRegKey[0], Constants.accountRegKey[1], ""));
+        }
+        private void UseAccountToken(string accountName)
+        {
+            var data = File.ReadAllBytes(accountName + ".bin");
+            Registry.SetValue(Constants.accountRegKey[0], Constants.accountRegKey[1], data, RegistryValueKind.Binary);
+        }
+        private Boolean IsProcessRunning(Process process)
+        {
+            try
+            {
+                var id = Process.GetProcessById(process.Id);
+            } catch (Exception ex)
+            {
+                return false;
+            }
+            return true;
+        }
+        public void ClearDebug()
+        {
+            File.WriteAllText("debug.log", "\r\n");
+        }
         private void LogDebug(string text)
         {
             File.AppendAllText("debug.log", text + "\r\n");
-        }
+         }
     }
 
     public static class Prompt

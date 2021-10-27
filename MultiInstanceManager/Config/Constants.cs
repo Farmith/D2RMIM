@@ -9,7 +9,7 @@ namespace MultiInstanceManager
     public static class Constants
     {
         /* Executable names */
-        public static string clientExecutableName = "D2R.exe";
+        public static string clientExecutableName = "D2R";
         public static string launcherExecutableName = "Diablo II Resurrected Launcher.exe";
         public static string battleNetExecutableName = "Battle.net.exe";
         /* Account related registry keys */
