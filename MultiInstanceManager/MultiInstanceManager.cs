@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MultiInstanceManager.Modules;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -13,6 +14,7 @@ namespace MultiInstanceManager
 {
     public partial class MultiInstanceManager : Form
     {
+        MultiHandler MH;
         public MultiInstanceManager()
         {
             InitializeComponent();
@@ -21,10 +23,11 @@ namespace MultiInstanceManager
             removeButton.Click += new EventHandler(removeButton_Click);
             refreshButton.Click += new EventHandler(refreshButton_Click);
             readmeLink.Click += new EventHandler(readmeLink_Click);
+            MH = new MultiHandler(this);
         }
         private void addAccountButton_Click(object sender, System.EventArgs e)
         {
-            _ = MessageBox.Show("Add Account was clicked");
+            MH.Setup();
         }
         private void launchButton_Click(object sender, System.EventArgs e)
         {

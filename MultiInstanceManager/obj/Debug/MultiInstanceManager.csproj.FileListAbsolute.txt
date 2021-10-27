@@ -7,3 +7,4 @@ I:\Code\Farmith\D2RMIM\MultiInstanceManager\obj\Debug\MultiInstanceManager.cspro
 I:\Code\Farmith\D2RMIM\MultiInstanceManager\obj\Debug\MultiInstanceManager.csproj.CoreCompileInputs.cache
 I:\Code\Farmith\D2RMIM\MultiInstanceManager\obj\Debug\MultiInstanceManager.exe
 I:\Code\Farmith\D2RMIM\MultiInstanceManager\obj\Debug\MultiInstanceManager.pdb
+I:\Code\Farmith\D2RMIM\MultiInstanceManager\obj\Debug\MultiInstanceManager.csproj.AssemblyReference.cache

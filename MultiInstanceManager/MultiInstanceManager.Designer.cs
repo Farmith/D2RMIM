@@ -41,6 +41,8 @@ namespace MultiInstanceManager
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.addAccountButton = new System.Windows.Forms.Button();
+            this.label6 = new System.Windows.Forms.Label();
+            this.commandLineArguments = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // label1
@@ -127,7 +129,7 @@ namespace MultiInstanceManager
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(245, 267);
+            this.label5.Location = new System.Drawing.Point(245, 312);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(131, 13);
             this.label5.TabIndex = 9;
@@ -142,11 +144,29 @@ namespace MultiInstanceManager
             this.addAccountButton.Text = "Add Account";
             this.addAccountButton.UseVisualStyleBackColor = true;
             // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(16, 264);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(169, 13);
+            this.label6.TabIndex = 11;
+            this.label6.Text = "Optional command-line arguments:";
+            // 
+            // commandLineArguments
+            // 
+            this.commandLineArguments.Location = new System.Drawing.Point(19, 281);
+            this.commandLineArguments.Name = "commandLineArguments";
+            this.commandLineArguments.Size = new System.Drawing.Size(230, 20);
+            this.commandLineArguments.TabIndex = 12;
+            // 
             // MultiInstanceManager
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(388, 289);
+            this.ClientSize = new System.Drawing.Size(388, 334);
+            this.Controls.Add(this.commandLineArguments);
+            this.Controls.Add(this.label6);
             this.Controls.Add(this.addAccountButton);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.label4);
@@ -179,6 +199,8 @@ namespace MultiInstanceManager
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Button addAccountButton;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.TextBox commandLineArguments;
     }
 }
 
