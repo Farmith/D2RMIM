@@ -1,0 +1,6 @@
+MultiInstanceManager/bin/*
+MultiInstanceManager/obj/*
+*.pdb
+*.cache
+*.log
+MultiInstanceManager.exe
