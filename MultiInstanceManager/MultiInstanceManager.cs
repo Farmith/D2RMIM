@@ -24,15 +24,26 @@ namespace MultiInstanceManager
             removeButton.Click += new EventHandler(removeButton_Click);
             refreshButton.Click += new EventHandler(refreshButton_Click);
             readmeLink.Click += new EventHandler(readmeLink_Click);
+            killHandlesButton.Click += new EventHandler(killHandlesButton_Click);
+            dumpRegKeyButton.Click += new EventHandler(dumpRegKeyButton_Click);
             MH = new MultiHandler(this,accountList);
             MH.LoadAccounts();
+        }
+        private void dumpRegKeyButton_Click(object sender, EventArgs e)
+        {
+            MH.DumpCurrentRegKey();
         }
         private void addAccountButton_Click(object sender, System.EventArgs e)
         {
             MH.Setup();
         }
+        private void killHandlesButton_Click(object sender, EventArgs e)
+        {
+            MH.KillGameClientHandles();
+        }
         private void launchButton_Click(object sender, System.EventArgs e)
         {
+            MH.ResetSessions();
             if(accountList.CheckedItems.Count != 0)
             {
                 for(var x = 0; x < accountList.CheckedItems.Count; x++)
@@ -79,7 +90,7 @@ namespace MultiInstanceManager
                     {
                         var checkedItem = accountList.CheckedItems[x].ToString().Split('|');
 
-                        MH.Setup(checkedItem[0].Trim(' '));
+                        MH.Setup(checkedItem[0].Trim(' '),false);
                     }
                     catch (Exception ex)
                     {

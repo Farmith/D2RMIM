@@ -43,6 +43,8 @@ namespace MultiInstanceManager
             this.addAccountButton = new System.Windows.Forms.Button();
             this.label6 = new System.Windows.Forms.Label();
             this.commandLineArguments = new System.Windows.Forms.TextBox();
+            this.killHandlesButton = new System.Windows.Forms.Button();
+            this.dumpRegKeyButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // label1
@@ -64,7 +66,7 @@ namespace MultiInstanceManager
             // 
             // launchButton
             // 
-            this.launchButton.Location = new System.Drawing.Point(255, 180);
+            this.launchButton.Location = new System.Drawing.Point(255, 136);
             this.launchButton.Name = "launchButton";
             this.launchButton.Size = new System.Drawing.Size(114, 23);
             this.launchButton.TabIndex = 2;
@@ -73,7 +75,7 @@ namespace MultiInstanceManager
             // 
             // refreshButton
             // 
-            this.refreshButton.Location = new System.Drawing.Point(255, 209);
+            this.refreshButton.Location = new System.Drawing.Point(255, 165);
             this.refreshButton.Name = "refreshButton";
             this.refreshButton.Size = new System.Drawing.Size(114, 23);
             this.refreshButton.TabIndex = 3;
@@ -137,7 +139,7 @@ namespace MultiInstanceManager
             // 
             // addAccountButton
             // 
-            this.addAccountButton.Location = new System.Drawing.Point(255, 151);
+            this.addAccountButton.Location = new System.Drawing.Point(255, 107);
             this.addAccountButton.Name = "addAccountButton";
             this.addAccountButton.Size = new System.Drawing.Size(114, 23);
             this.addAccountButton.TabIndex = 10;
@@ -160,11 +162,31 @@ namespace MultiInstanceManager
             this.commandLineArguments.Size = new System.Drawing.Size(230, 20);
             this.commandLineArguments.TabIndex = 12;
             // 
+            // killHandlesButton
+            // 
+            this.killHandlesButton.Location = new System.Drawing.Point(255, 194);
+            this.killHandlesButton.Name = "killHandlesButton";
+            this.killHandlesButton.Size = new System.Drawing.Size(114, 23);
+            this.killHandlesButton.TabIndex = 13;
+            this.killHandlesButton.Text = "Kill Handles";
+            this.killHandlesButton.UseVisualStyleBackColor = true;
+            // 
+            // dumpRegKeyButton
+            // 
+            this.dumpRegKeyButton.Location = new System.Drawing.Point(256, 277);
+            this.dumpRegKeyButton.Name = "dumpRegKeyButton";
+            this.dumpRegKeyButton.Size = new System.Drawing.Size(113, 23);
+            this.dumpRegKeyButton.TabIndex = 14;
+            this.dumpRegKeyButton.Text = "Dump RegKey";
+            this.dumpRegKeyButton.UseVisualStyleBackColor = true;
+            // 
             // MultiInstanceManager
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(388, 334);
+            this.Controls.Add(this.dumpRegKeyButton);
+            this.Controls.Add(this.killHandlesButton);
             this.Controls.Add(this.commandLineArguments);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.addAccountButton);
@@ -201,6 +223,8 @@ namespace MultiInstanceManager
         private System.Windows.Forms.Button addAccountButton;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.TextBox commandLineArguments;
+        private System.Windows.Forms.Button killHandlesButton;
+        private System.Windows.Forms.Button dumpRegKeyButton;
     }
 }
 

@@ -51,16 +51,16 @@ namespace MultiInstanceManager.Modules
         }
         Boolean blizzardProcessesExists()
         {
-            var clients = Process.GetProcessesByName(Constants.clientExecutableName);
+            // var clients = Process.GetProcessesByName(Constants.clientExecutableName);
             var launchers = Process.GetProcessesByName(Constants.launcherExecutableName);
             var battlenets = Process.GetProcessesByName(Constants.battleNetExecutableName);
 
-            if (clients.Length > 0 || launchers.Length > 0 || battlenets.Length > 0)
+            if (/*clients.Length > 0 || */launchers.Length > 0 || battlenets.Length > 0)
                 return true;
             return false;
         }
 
-        public void Setup(string displayName = "")
+        public void Setup(string displayName = "", Boolean killProcessesWhenDone = true)
         {
             ClearDebug();
             // Initialize the processCounter so we know how many we're at.
@@ -88,15 +88,18 @@ namespace MultiInstanceManager.Modules
             // Wait for the initial token update
             WaitForNewToken(gameProcesses[processCounter - 1]);
             // Then we do it once more, because it may update twice
-            // WaitForNewToken(gameProcesses[processCounter - 1]);
+            WaitForNewToken(gameProcesses[processCounter - 1], true); // Specify that we want a 30s timeout justincase
             // Export the received key using the name of the recipient
             ExportToken(displayName + ".bin");
             LogDebug("Successfully saved new token for " + displayName);
             // Kill the Launcher & game client
             try
             {
-                CloseBnetLauncher();
-                CloseGameClient(gameProcesses[processCounter - 1].Id);
+                if (killProcessesWhenDone)
+                {
+                    CloseBnetLauncher();
+                    CloseGameClient(gameProcesses[processCounter - 1].Id);
+                }
             } catch (Exception ex)
             {
                 // Not able to kill the game client, for whatever reason
@@ -117,27 +120,53 @@ namespace MultiInstanceManager.Modules
             p.WaitForExit();
             return output;
         }
-
+        public void KillGameClientHandles()
+        {
+            var processes = Process.GetProcessesByName("D2R");
+            if (processes.Length > 0)
+            {
+                foreach (var process in processes)
+                {
+                    LogDebug("Closing handle for: " + process.Id);
+                    CloseMultiProcessHandle(process);
+                }
+            } else
+            {
+                LogDebug("No D2R processes found");
+            }
+        }
+        public void ResetSessions()
+        {
+            CloseBnetLauncher();
+            gameProcesses = new List<Process>();
+            lastWindowHandle = new IntPtr(0);
+            processCounter = 0;
+            bnetLauncherPID = 0;
+            firstTokenTry = true;
+            instances = new List<GameInstance>();
+    }
         public void LaunchWithAccount(string accountName)
         {
-            LogDebug("Launching account: '" + accountName + "'");
+            LogDebug("Launching account ("+(instances.Count+1)+"): '" + accountName + "'");
             UseAccountToken(accountName);
             var process = LaunchGame(accountName);
             LogDebug("Process should be: " + process.Id);
             ProcessWait(Constants.clientExecutableName);
             // Wait for a new token
             WaitForNewToken(process);
-            Thread.Sleep(1000);
             // Then wait again incase it changes in any forseeable future
-            // WaitForNewToken(process);
+            WaitForNewToken(process,true); // Specify that we do want the 30s timeout, just incase
 
             Process exists = Process.GetProcessById(process.Id);
             if (exists.Id == process.Id)
             {
                 LogDebug("Process seems to be alive: " + process.Id);
-                ExportToken(accountName);
+                ExportToken(accountName + ".bin");
                 CloseMultiProcessHandle(process);
                 gameProcesses.Add(process);
+            } else
+            {
+                LogDebug("Can't seem to find 'this' instance as a process?");
             }
 
         }
@@ -264,7 +293,7 @@ namespace MultiInstanceManager.Modules
         private void WinWait(string windowClass)
         {
             IntPtr windowHandle = GetForegroundWindow();
-            int maxWait = 100;
+            int maxWait = 1000;
             int waitTime = 0;
             while (!HasClass(windowHandle,windowClass) && waitTime < maxWait ) 
             {
@@ -298,12 +327,12 @@ namespace MultiInstanceManager.Modules
         {
             LogDebug("Waiting for process: " + processName);
             Process[] processes = Process.GetProcessesByName(processName);
-            int maxWait = 100;
+            int maxWait = 1000;
             int waitTime = 0;
             while(processes.Length < processCounter && waitTime < maxWait)
             {
                 LogDebug("Still waiting for Game Client: " + processName);
-                Thread.Sleep(1000);
+                Thread.Sleep(100);
                 processes = Process.GetProcessesByName(processName);
                 waitTime++;
                 if (waitTime >= maxWait)
@@ -316,7 +345,7 @@ namespace MultiInstanceManager.Modules
             LogDebug("Finally the Game Client is up");
         }
 
-        private void WaitForNewToken(Process process)
+        private void WaitForNewToken(Process process,Boolean timeout = false)
         {
             if (!IsProcessRunning(process))
                 return;
@@ -324,40 +353,53 @@ namespace MultiInstanceManager.Modules
             byte[] CurrentKey = new byte[20];
 
             CurrentKey = (byte[])Registry.GetValue(Constants.accountRegKey[0], Constants.accountRegKey[1], "");
-            var PrevKey = new byte[20];
-            if (firstTokenTry)
-            {
-                PrevKey = CurrentKey;
-                firstTokenTry = false;
-            } 
-            else
-                PrevKey = token;
+            var PrevKey = CurrentKey; //  new byte[50];
 
-            while(StructuralComparisons.StructuralEqualityComparer.Equals(CurrentKey, PrevKey))
+//            if (firstTokenTry)
+//            {
+//                PrevKey = CurrentKey;
+//                firstTokenTry = false;
+//            } 
+//            else
+//                PrevKey = token;
+
+            long startTime = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+            long elapsedTime = 0;
+            var maxWaitTime = 30000; // 15s.
+
+            while (StructuralComparisons.StructuralEqualityComparer.Equals(CurrentKey, PrevKey) && (elapsedTime < maxWaitTime))
             {
-                LogDebug("Waiting for Token to update");
-                Thread.Sleep(100);
+                LogDebug("Waiting for Token to update ("+elapsedTime+"/"+maxWaitTime+")");
                 if (!IsProcessRunning(process))
                 {
                     LogDebug("Client exited, aborting..");
                     return;
                 }
+                CurrentKey = (byte[])Registry.GetValue(Constants.accountRegKey[0], Constants.accountRegKey[1], "");
+                if(timeout == true)
+                    elapsedTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) - startTime;
             }
-            if(!StructuralComparisons.StructuralEqualityComparer.Equals(CurrentKey, PrevKey))
+            if (!StructuralComparisons.StructuralEqualityComparer.Equals(CurrentKey, PrevKey))
             {
                 LogDebug("Token updated");
-                token = CurrentKey;
+                // token = CurrentKey;
             } else
             {
                 LogDebug("Token remains the same");
             }
         }
+        public void DumpCurrentRegKey()
+        {
+            ExportToken("dump.bin");
+        }
         private void ExportToken(string fileName)
         {
+            LogDebug("Writing to file: " + fileName);
             File.WriteAllBytes(fileName, (byte[])Registry.GetValue(Constants.accountRegKey[0], Constants.accountRegKey[1], ""));
         }
         private void UseAccountToken(string accountName)
         {
+            LogDebug("Reading from file: " + accountName + ".bin");
             var data = File.ReadAllBytes(accountName + ".bin");
             Registry.SetValue(Constants.accountRegKey[0], Constants.accountRegKey[1], data, RegistryValueKind.Binary);
         }
