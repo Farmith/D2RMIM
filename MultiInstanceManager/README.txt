@@ -39,3 +39,17 @@ FAQ:
 		  A) What a pity..
 
 
+
+
+
+Version log:
+
+1.0:
+
+First "official" release of D2RMIM, pretty much works at this point
+
+Note: When first launching D2RMIM and going through setup, don't be alarmed if the game client + bnet launcher exit out once setup, just press "Launch" if you just with to use 1 single account.
+
+The closing of bnet + client is to allow multiple accounts to be setup easily without manually closing stuff down, when using "Launch" stuff doesn't get closed down arbitrarily.
+
+Note: There is a "Dump RegKey" button still on the gui in this release, this is mostly for debug-purposes tho so don't worry about it, all it does is dump the web-keys for D2R into "dump.bin", nothing more nothing less.
