@@ -109,7 +109,9 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy /Y "$(SolutionDir)$(ProjectName)\\README.txt" "$(TargetDir)README.txt"
-copy /Y "$(SolutionDir)$(ProjectName)\\handle64.exe" "$(TargetDir)handle64.exe"</PostBuildEvent>
+    <PostBuildEvent>copy /Y "$(SolutionDir)\\README.txt" "$(TargetDir)README.txt"
+copy /Y "$(SolutionDir)$(ProjectName)\\handle64.exe" "$(TargetDir)handle64.exe"
+if exist D2RMIM-Release.zip ( Del D2RMIM-Release.zip )
+powershell.exe -command Compress-Archive -Path README.txt,handle64.exe,MultiInstanceManager.exe,MultiInstanceManager.exe.config -DestinationPath D2RMIM-Release.zip</PostBuildEvent>
   </PropertyGroup>
 </Project>

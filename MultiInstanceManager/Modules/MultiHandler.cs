@@ -85,6 +85,7 @@ namespace MultiInstanceManager.Modules
             LogDebug("Waiting for Game Client to start");
             ProcessWait(Constants.clientExecutableName);
             LogDebug("Client ready, glhf");
+            CloseBnetLauncher(); // Kill the launcher, we don't need it anymore
             // Wait for the initial token update
             WaitForNewToken(gameProcesses[processCounter - 1]);
             // Then we do it once more, because it may update twice
@@ -92,12 +93,12 @@ namespace MultiInstanceManager.Modules
             // Export the received key using the name of the recipient
             ExportToken(displayName + ".bin");
             LogDebug("Successfully saved new token for " + displayName);
+            CloseMultiProcessHandle(gameProcesses.Last());
             // Kill the Launcher & game client
             try
             {
                 if (killProcessesWhenDone)
                 {
-                    CloseBnetLauncher();
                     CloseGameClient(gameProcesses[processCounter - 1].Id);
                 }
             } catch (Exception ex)
