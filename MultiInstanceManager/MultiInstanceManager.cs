@@ -90,7 +90,7 @@ namespace MultiInstanceManager
                     {
                         var checkedItem = accountList.CheckedItems[x].ToString().Split('|');
 
-                        MH.Setup(checkedItem[0].Trim(' '),false);
+                        MH.Setup(checkedItem[0].Trim(' '),true);
                     }
                     catch (Exception ex)
                     {

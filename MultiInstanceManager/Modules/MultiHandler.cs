@@ -63,13 +63,20 @@ namespace MultiInstanceManager.Modules
         public void Setup(string displayName = "", Boolean killProcessesWhenDone = true)
         {
             ClearDebug();
-            // Initialize the processCounter so we know how many we're at.
+            // Zero out everything
+            lastWindowHandle = IntPtr.Zero;
             processCounter = 0;
+            bnetLauncherPID = 0;
+            firstTokenTry = true;
+            gameProcesses = new List<Process>();
+            instances = new List<GameInstance>();
+
+            // Initialize the processCounter so we know how many we're at.
 
             if (blizzardProcessesExists())
             {
                 _ = MessageBox.Show("Close all D2R/Battle.net related programs first.");
-                Setup(displayName);
+                Setup(displayName, true);
                 return;
             } 
             if(displayName.Length == 0)
@@ -273,7 +280,9 @@ namespace MultiInstanceManager.Modules
         private Process LaunchLauncher()
         {
             string installPath = (string)Registry.GetValue(Constants.gameInstallRegKey[0], Constants.gameInstallRegKey[1], "");
-            return Process.Start(installPath + "\\Diablo II Resurrected Launcher.exe");
+            var p = Process.Start(installPath + "\\Diablo II Resurrected Launcher.exe");
+            lastWindowHandle = p.MainWindowHandle;
+            return p;
         }
         private void ShowToolTip(string toolTipText)
         {
@@ -294,7 +303,7 @@ namespace MultiInstanceManager.Modules
         private void WinWait(string windowClass)
         {
             IntPtr windowHandle = GetForegroundWindow();
-            int maxWait = 1000;
+            int maxWait = 2000;
             int waitTime = 0;
             while (!HasClass(windowHandle,windowClass) && waitTime < maxWait ) 
             {
@@ -311,7 +320,7 @@ namespace MultiInstanceManager.Modules
         }
         private void WinWaitClose(string windowClass)
         {
-            int maxWait = 1000;
+            int maxWait = 2000;
             int waitTime = 0;
             while (HasClass(lastWindowHandle, windowClass) && waitTime < maxWait)
             {
@@ -328,7 +337,7 @@ namespace MultiInstanceManager.Modules
         {
             LogDebug("Waiting for process: " + processName);
             Process[] processes = Process.GetProcessesByName(processName);
-            int maxWait = 1000;
+            int maxWait = 2000;
             int waitTime = 0;
             while(processes.Length < processCounter && waitTime < maxWait)
             {
