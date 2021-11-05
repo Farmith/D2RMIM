@@ -10,7 +10,9 @@
 > https://docs.microsoft.com/en-us/sysinternals/downloads/handle
 
 ## Donations:
-Bitcoin: 1P7Sbra6cNEDYzRQANer8SdmqyeLLQSDKL
+*	Bitcoin: 1P7Sbra6cNEDYzRQANer8SdmqyeLLQSDKL
+*	Ethereum: 0x4A16f62C9FC337606040f69a2044Da81C6ef7bcD
+*	Cardano: addr1qyers7tzkx8z4pmat0a3xg8g5dhdhguehmsnqns7dg84uzpj8puk9vvw92rh6klmzvsw3gmwmw3en0hpxp8pu6s0tcyqxkhsa6
 
 ## Preparation:
 If you have never used the accompanying handle64.exe you need to manually run that executable once, and accept the terms of use for it before beginning.
