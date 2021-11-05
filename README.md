@@ -1,4 +1,18 @@
 # ﻿Diablo II : Resurrected - Multi Instance Manager README
+
+## Credits:
+
+> Huge credits to the original work of [@Sunblood](https://github.com/Sunblood/) for creating the work upon this project is based, a very nice tool written in AutoIT
+> This project is in many ways a re-engineerd, rewritten and C# ported version of Sunblood's original work.
+> https://github.com/Sunblood/D2RML/
+
+> Mark Russinovich for creating the Handle application, without which this project probably would never have come to fruition
+> https://docs.microsoft.com/en-us/sysinternals/downloads/handle
+
+
+## Preparation:
+If you have never used the accompanying handle64.exe you need to manually run that executable once, and accept the terms of use for it before beginning.
+
 ## Tutorial:
 
 For each account you wish to use, perform the following steps:
@@ -17,6 +31,9 @@ Once you have added all your accounts (They will be visible in the 'Accounts:' l
 launch them with the "Launch" button.
 
 They will now login, one after the other by using hidden one-time keys which you generated while doing the "Add Account"-part.
+
+### Note: The one-time keys do not last forever, occasionally you will get "Could not connect to Server", in which case you need to mark the affected account(s) and press "Refresh" which sets up new one-time keys by a similar procedure to the initial setup.
+
 
 Enjoy!
 
