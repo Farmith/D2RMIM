@@ -42,13 +42,22 @@ Enjoy!
 
 FAQ:
 	
-	Does this application save my username/password in any way?
+	* What does the "Dump RegKey" button do?
+		A) it dumps (duh) the current token the gameclient has stored into dump.bin, this can be used as a backup-way of 
+			accessing the launch procedure, should the automatic way fail. The way you do it in this special case is:
+			1. Login to the game normally through battle.net launcher (without using this tool)
+			2. Start the game with the proper button
+			3. Wait untill you are logged into character-select in the game client
+			4. Press "Dump RegKey"
+			5. Rename dump.bin to a name you prefer for this particular account and start D2RMIM, you can now press Launch with the proper name.
+			
+	* Does this application save my username/password in any way?
 		- A) Not unless someone else added something to it that wasn't there originally
 
-	How does this app work?
+	* How does this app work?
 		- A) It uses one-time hashes/keys stored by the D2R client to authenticate just like it normally does
 
-	It doesnt work! (More of a statement than a question tbh)
+	* It doesnt work! (More of a statement than a question tbh)
 		- A) Your one-time keys may be outdated, if you launch battle.net normally and login to your account, you will need to refresh the tokens for the account 
 				once you want to multi-box again. use the "Refresh" button after selecting affected account(s).
 		  A) Run the program as administrator, maybe that helps
