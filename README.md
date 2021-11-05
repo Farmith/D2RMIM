@@ -69,6 +69,10 @@ FAQ:
 
 Version log:
 
+1.2: Buggfix sorting "Setting up several accounts in one flow"
+
+1.1: Minor bugfixes
+
 1.0:
 
 First "official" release of D2RMIM, pretty much works at this point
