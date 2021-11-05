@@ -9,6 +9,8 @@
 > Mark Russinovich for creating the Handle application, without which this project probably would never have come to fruition
 > https://docs.microsoft.com/en-us/sysinternals/downloads/handle
 
+## Donations:
+Bitcoin: 1P7Sbra6cNEDYzRQANer8SdmqyeLLQSDKL
 
 ## Preparation:
 If you have never used the accompanying handle64.exe you need to manually run that executable once, and accept the terms of use for it before beginning.
@@ -67,15 +69,17 @@ FAQ:
 
 
 
-Version log:
+## Version log:
 
-1.2: Buggfix sorting "Setting up several accounts in one flow"
+* 1.2 
+	- 	Buggfix sorting "Setting up several accounts in one flow", saving the tokens in a more reliable fashion.
 
-1.1: Minor bugfixes
+* 1.1
+	-	 General Bugfixes and attempts at bugfixes
 
-1.0:
+* 1.0
 
-First "official" release of D2RMIM, pretty much works at this point
+	- 	First "official" release of D2RMIM, sort-of works at this point, sometimes.
 
 Note: When first launching D2RMIM and going through setup, don't be alarmed if the game client + bnet launcher exit out once setup, just press "Launch" if you just with to use 1 single account.
 
