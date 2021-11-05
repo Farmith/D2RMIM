@@ -1,6 +1,4 @@
-:title ﻿Diablo II : Resurrected - Multi Instance Manager README</b>
-:language C#
-
+#h1 ﻿Diablo II : Resurrected - Multi Instance Manager README
 Tutorial:
 
 For each account you wish to use, perform the following steps:
