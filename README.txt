@@ -1,4 +1,5 @@
-﻿Diablo II : Resurrected - Multi Instance Manager README
+:title ﻿Diablo II : Resurrected - Multi Instance Manager README</b>
+:language C#
 
 Tutorial:
 
