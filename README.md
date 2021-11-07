@@ -71,7 +71,7 @@ FAQ:
 
 ## Version log:
 
-| 1.3
+* 1.3
 	-	Removed dependency for Handle64.exe
 
 * 1.2 
