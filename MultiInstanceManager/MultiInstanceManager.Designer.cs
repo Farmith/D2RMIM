@@ -29,6 +29,7 @@ namespace MultiInstanceManager
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MultiInstanceManager));
             this.label1 = new System.Windows.Forms.Label();
             this.accountList = new System.Windows.Forms.CheckedListBox();
@@ -45,6 +46,8 @@ namespace MultiInstanceManager
             this.commandLineArguments = new System.Windows.Forms.TextBox();
             this.killHandlesButton = new System.Windows.Forms.Button();
             this.dumpRegKeyButton = new System.Windows.Forms.Button();
+            this.forceExit = new System.Windows.Forms.CheckBox();
+            this.forceExitToolTip = new System.Windows.Forms.ToolTip(this.components);
             this.SuspendLayout();
             // 
             // label1
@@ -164,12 +167,14 @@ namespace MultiInstanceManager
             // 
             // killHandlesButton
             // 
+            this.killHandlesButton.Enabled = false;
             this.killHandlesButton.Location = new System.Drawing.Point(255, 194);
             this.killHandlesButton.Name = "killHandlesButton";
             this.killHandlesButton.Size = new System.Drawing.Size(114, 23);
             this.killHandlesButton.TabIndex = 13;
             this.killHandlesButton.Text = "Kill Handles";
             this.killHandlesButton.UseVisualStyleBackColor = true;
+            this.killHandlesButton.Visible = false;
             // 
             // dumpRegKeyButton
             // 
@@ -180,11 +185,22 @@ namespace MultiInstanceManager
             this.dumpRegKeyButton.Text = "Dump RegKey";
             this.dumpRegKeyButton.UseVisualStyleBackColor = true;
             // 
+            // forceExit
+            // 
+            this.forceExit.AutoSize = true;
+            this.forceExit.Location = new System.Drawing.Point(19, 308);
+            this.forceExit.Name = "forceExit";
+            this.forceExit.Size = new System.Drawing.Size(73, 17);
+            this.forceExit.TabIndex = 16;
+            this.forceExit.Text = "Force Exit";
+            this.forceExit.UseVisualStyleBackColor = true;
+            // 
             // MultiInstanceManager
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(388, 334);
+            this.ClientSize = new System.Drawing.Size(392, 348);
+            this.Controls.Add(this.forceExit);
             this.Controls.Add(this.dumpRegKeyButton);
             this.Controls.Add(this.killHandlesButton);
             this.Controls.Add(this.commandLineArguments);
@@ -225,6 +241,8 @@ namespace MultiInstanceManager
         private System.Windows.Forms.TextBox commandLineArguments;
         private System.Windows.Forms.Button killHandlesButton;
         private System.Windows.Forms.Button dumpRegKeyButton;
+        private System.Windows.Forms.CheckBox forceExit;
+        private System.Windows.Forms.ToolTip forceExitToolTip;
     }
 }
 

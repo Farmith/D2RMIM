@@ -71,6 +71,9 @@ FAQ:
 
 ## Version log:
 
+* 1.4
+	-	Added functionality to allow command-line arguments to the clients.
+
 * 1.3
 	-	Removed dependency for Handle64.exe
 
@@ -92,5 +95,5 @@ Note: There is a "Dump RegKey" button still on the gui in this release, this is 
 
 ## TODO:
 
-*	Implement the command-line argument part
 *	Add more configuration options
+*	Find a faster way to "refresh" accounts

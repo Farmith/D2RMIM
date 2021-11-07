@@ -58,7 +58,7 @@ namespace MultiInstanceManager.Modules
             return false;
         }
 
-        public void Setup(string displayName = "", Boolean killProcessesWhenDone = true)
+        public void Setup(string displayName = "", string cmdArgs = "", Boolean killProcessesWhenDone = true)
         {
             ClearDebug();
             // Zero out everything
@@ -73,7 +73,7 @@ namespace MultiInstanceManager.Modules
             if (blizzardProcessesExists())
             {
                 _ = MessageBox.Show("Close all D2R/Battle.net related programs first.");
-                Setup(displayName, true);
+                Setup(displayName, cmdArgs, true);
                 return;
             } 
             if(displayName.Length == 0)
@@ -140,11 +140,11 @@ namespace MultiInstanceManager.Modules
             bnetLauncherPID = 0;
             instances = new List<GameInstance>();
     }
-        public void LaunchWithAccount(string accountName)
+        public void LaunchWithAccount(string accountName,string cmdArgs = "")
         {
             LogDebug("Launching account ("+(instances.Count+1)+"): '" + accountName + "'");
             UseAccountToken(accountName);
-            var process = LaunchGame(accountName);
+            var process = LaunchGame(accountName, cmdArgs);
             LogDebug("Process should be: " + process.Id);
             ProcessWait(Constants.clientExecutableName);
             // Wait for a new token
@@ -167,10 +167,13 @@ namespace MultiInstanceManager.Modules
 
         }
        
-        private Process LaunchGame(string accountName)
+        private Process LaunchGame(string accountName, string cmdArgs = "")
         {
             string installPath = (string)Registry.GetValue(Constants.gameInstallRegKey[0], Constants.gameInstallRegKey[1], "");
-            var process =  Process.Start(installPath + "\\D2R.exe");
+            var process = new Process();
+            process.StartInfo.FileName = installPath + "\\D2R.exe";
+            process.StartInfo.Arguments = cmdArgs;
+            process.Start();
             var thisInstance = new GameInstance { account = accountName, process = process };
             instances.Add(thisInstance);
             return process;
