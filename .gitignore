@@ -3,4 +3,5 @@
 *.pdb
 *.cache
 *.log
+.vs/
 MultiInstanceManager.exe
