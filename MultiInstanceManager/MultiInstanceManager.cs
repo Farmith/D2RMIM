@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Configuration;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
@@ -26,8 +27,37 @@ namespace MultiInstanceManager
             readmeLink.Click += new EventHandler(readmeLink_Click);
             killHandlesButton.Click += new EventHandler(killHandlesButton_Click);
             dumpRegKeyButton.Click += new EventHandler(dumpRegKeyButton_Click);
+            commandLineArguments.Text = ConfigurationManager.AppSettings["cmdArgs"];
+            commandLineArguments.TextChanged += new EventHandler(commandLineArguments_Changed);
+            forceExitToolTip.SetToolTip(forceExit, "ForceExit means, kill the game client once the tokens are set when 'refreshing'");
             MH = new MultiHandler(this,accountList);
             MH.LoadAccounts();
+        }
+        public static void AddOrUpdateAppSettings(string key, string value)
+        {
+            try
+            {
+                var configFile = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+                var settings = configFile.AppSettings.Settings;
+                if (settings[key] == null)
+                {
+                    settings.Add(key, value);
+                }
+                else
+                {
+                    settings[key].Value = value;
+                }
+                configFile.Save(ConfigurationSaveMode.Modified);
+                ConfigurationManager.RefreshSection(configFile.AppSettings.SectionInformation.Name);
+            }
+            catch (ConfigurationErrorsException)
+            {
+                Console.WriteLine("Error writing app settings");
+            }
+        }
+        private void commandLineArguments_Changed(object sender, EventArgs e)
+        {
+            AddOrUpdateAppSettings("cmdArgs",commandLineArguments.Text);
         }
         private void dumpRegKeyButton_Click(object sender, EventArgs e)
         {
@@ -35,7 +65,7 @@ namespace MultiInstanceManager
         }
         private void addAccountButton_Click(object sender, System.EventArgs e)
         {
-            MH.Setup();
+            MH.Setup(null,commandLineArguments.Text);
         }
         private void killHandlesButton_Click(object sender, EventArgs e)
         {
@@ -53,7 +83,7 @@ namespace MultiInstanceManager
                     {
                         var checkedItem = accountList.CheckedItems[x].ToString().Split('|')[0].Trim(' ');
 
-                        MH.LaunchWithAccount(checkedItem);
+                        MH.LaunchWithAccount(checkedItem,commandLineArguments.Text);
                     } catch(Exception ex)
                     {
                         Debug.WriteLine(ex.ToString());
@@ -93,7 +123,7 @@ namespace MultiInstanceManager
                     {
                         var checkedItem = accountList.CheckedItems[x].ToString().Split('|');
 
-                        MH.Setup(checkedItem[0].Trim(' '),true);
+                        MH.Setup(checkedItem[0].Trim(' '), commandLineArguments.Text, true);
                     }
                     catch (Exception ex)
                     {
