@@ -93,5 +93,4 @@ Note: There is a "Dump RegKey" button still on the gui in this release, this is 
 ## TODO:
 
 *	Implement the command-line argument part
-*	Eliminate the Handle64 dependency with embedded code that does the same thing
 *	Add more configuration options
