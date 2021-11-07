@@ -139,6 +139,6 @@
   <PropertyGroup>
     <PostBuildEvent>copy /Y "$(SolutionDir)\\README.*" "$(TargetDir)"
 if exist D2RMIM-Release.zip ( Del D2RMIM-Release.zip )
-powershell.exe -command Compress-Archive -Path README.*,handle64.exe,MultiInstanceManager.exe,MultiInstanceManager.exe.config -DestinationPath D2RMIM-Release.zip</PostBuildEvent>
+powershell.exe -command Compress-Archive -Path README.*,MultiInstanceManager.exe,MultiInstanceManager.exe.config -DestinationPath D2RMIM-Release.zip</PostBuildEvent>
   </PropertyGroup>
 </Project>
