@@ -6,16 +6,14 @@
 > This project is in many ways a re-engineerd, rewritten and C# ported version of Sunblood's original work.
 > https://github.com/Sunblood/D2RML/
 
-> Mark Russinovich for creating the Handle application, without which this project probably would never have come to fruition
-> https://docs.microsoft.com/en-us/sysinternals/downloads/handle
-
 ## Donations:
 *	Bitcoin: 1P7Sbra6cNEDYzRQANer8SdmqyeLLQSDKL
 *	Ethereum: 0x4A16f62C9FC337606040f69a2044Da81C6ef7bcD
 *	Cardano: addr1qyers7tzkx8z4pmat0a3xg8g5dhdhguehmsnqns7dg84uzpj8puk9vvw92rh6klmzvsw3gmwmw3en0hpxp8pu6s0tcyqxkhsa6
 
 ## Preparation:
-If you have never used the accompanying handle64.exe you need to manually run that executable once, and accept the terms of use for it before beginning.
+~~ If you have never used the accompanying handle64.exe you need to manually run that executable once, and accept the terms of use for it before beginning. ~~
+No unneccessary preparations needed, maybe a soft drink and a sandwich?
 
 ## Tutorial:
 
@@ -73,6 +71,9 @@ FAQ:
 
 ## Version log:
 
+| 1.3
+	-	Removed dependency for Handle64.exe
+
 * 1.2 
 	- 	Buggfix sorting "Setting up several accounts in one flow", saving the tokens in a more reliable fashion.
 
@@ -88,3 +89,9 @@ Note: When first launching D2RMIM and going through setup, don't be alarmed if t
 The closing of bnet + client is to allow multiple accounts to be setup easily without manually closing stuff down, when using "Launch" stuff doesn't get closed down arbitrarily.
 
 Note: There is a "Dump RegKey" button still on the gui in this release, this is mostly for debug-purposes tho so don't worry about it, all it does is dump the web-keys for D2R into "dump.bin", nothing more nothing less.
+
+## TODO:
+
+*	Implement the command-line argument part
+*	Eliminate the Handle64 dependency with embedded code that does the same thing
+*	Add more configuration options

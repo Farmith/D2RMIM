@@ -39,7 +39,8 @@ namespace MultiInstanceManager
         }
         private void killHandlesButton_Click(object sender, EventArgs e)
         {
-            MH.KillGameClientHandles();
+            ProcessManager.CloseExternalHandles();
+            // MH.KillGameClientHandles();
         }
         private void launchButton_Click(object sender, System.EventArgs e)
         {
@@ -55,6 +56,7 @@ namespace MultiInstanceManager
                         MH.LaunchWithAccount(checkedItem);
                     } catch(Exception ex)
                     {
+                        Debug.WriteLine(ex.ToString());
                         // Something went terribly wrong.. 
                     }
                 }
@@ -74,6 +76,7 @@ namespace MultiInstanceManager
                     }
                     catch (Exception ex)
                     {
+                        Debug.WriteLine(ex);
                         // Something went terribly wrong.. 
                     }
                 }
@@ -94,7 +97,7 @@ namespace MultiInstanceManager
                     }
                     catch (Exception ex)
                     {
-                        // Something went terribly wrong.. 
+                        Debug.WriteLine(ex);
                     }
                 }
             }

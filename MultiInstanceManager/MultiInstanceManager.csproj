@@ -88,6 +88,7 @@
   <ItemGroup>
     <Compile Include="Config\Constants.cs" />
     <Compile Include="Modules\MultiHandler.cs" />
+    <Compile Include="Modules\ProcessManager.cs" />
     <Compile Include="MultiInstanceManager.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -137,7 +138,6 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy /Y "$(SolutionDir)\\README.*" "$(TargetDir)"
-copy /Y "$(SolutionDir)$(ProjectName)\\handle64.exe" "$(TargetDir)handle64.exe"
 if exist D2RMIM-Release.zip ( Del D2RMIM-Release.zip )
 powershell.exe -command Compress-Archive -Path README.*,handle64.exe,MultiInstanceManager.exe,MultiInstanceManager.exe.config -DestinationPath D2RMIM-Release.zip</PostBuildEvent>
   </PropertyGroup>

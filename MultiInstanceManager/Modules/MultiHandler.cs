@@ -38,8 +38,6 @@ namespace MultiInstanceManager.Modules
         private List<Process> gameProcesses;
         private uint bnetLauncherPID;
         private CheckedListBox accountList;
-        private Boolean firstTokenTry;
-        private byte[] token;
         private List<GameInstance> instances;
 
         public MultiHandler(Form _parent,CheckedListBox _accountList)
@@ -67,7 +65,6 @@ namespace MultiInstanceManager.Modules
             lastWindowHandle = IntPtr.Zero;
             processCounter = 0;
             bnetLauncherPID = 0;
-            firstTokenTry = true;
             gameProcesses = new List<Process>();
             instances = new List<GameInstance>();
 
@@ -92,7 +89,6 @@ namespace MultiInstanceManager.Modules
             LogDebug("Waiting for Game Client to start");
             ProcessWait(Constants.clientExecutableName);
             LogDebug("Client ready, glhf");
-            CloseBnetLauncher(); // Kill the launcher, we don't need it anymore
             // Wait for the initial token update
             WaitForNewToken(gameProcesses[processCounter - 1]);
             // Then we do it once more, because it may update twice
@@ -100,7 +96,11 @@ namespace MultiInstanceManager.Modules
             // Export the received key using the name of the recipient
             ExportToken(displayName + ".bin");
             LogDebug("Successfully saved new token for " + displayName);
-            CloseMultiProcessHandle(gameProcesses.Last());
+
+            LogDebug("Closing launcher and client mutex handles");
+            CloseBnetLauncher();
+            ProcessManager.CloseExternalHandles(); // Close all found D2R mutex handles
+            // CloseMultiProcessHandle(gameProcesses.Last());
             // Kill the Launcher & game client
             try
             {
@@ -115,19 +115,7 @@ namespace MultiInstanceManager.Modules
             }
             LoadAccounts();
         }
-        private string ComspecGetOutput(string command,string arguments)
-        {
-            Process p = new Process();
-            p.StartInfo.UseShellExecute = false;
-            p.StartInfo.RedirectStandardOutput = true;
-            p.StartInfo.FileName = command;
-            p.StartInfo.Arguments = arguments;
-            p.StartInfo.CreateNoWindow = true;
-            p.Start();
-            string output = p.StandardOutput.ReadToEnd();
-            p.WaitForExit();
-            return output;
-        }
+
         public void KillGameClientHandles()
         {
             var processes = Process.GetProcessesByName("D2R");
@@ -136,7 +124,7 @@ namespace MultiInstanceManager.Modules
                 foreach (var process in processes)
                 {
                     LogDebug("Closing handle for: " + process.Id);
-                    CloseMultiProcessHandle(process);
+                    ProcessManager.CloseExternalHandles();
                 }
             } else
             {
@@ -150,7 +138,6 @@ namespace MultiInstanceManager.Modules
             lastWindowHandle = new IntPtr(0);
             processCounter = 0;
             bnetLauncherPID = 0;
-            firstTokenTry = true;
             instances = new List<GameInstance>();
     }
         public void LaunchWithAccount(string accountName)
@@ -170,7 +157,8 @@ namespace MultiInstanceManager.Modules
             {
                 LogDebug("Process seems to be alive: " + process.Id);
                 ExportToken(accountName + ".bin");
-                CloseMultiProcessHandle(process);
+                LogDebug("Closing mutex handles");
+                ProcessManager.CloseExternalHandles(); // kill all D2R mutex handles
                 gameProcesses.Add(process);
             } else
             {
@@ -178,53 +166,7 @@ namespace MultiInstanceManager.Modules
             }
 
         }
-        private void CloseMultiProcessHandle(Process process)
-        {
-            var processName = '"' + process.ProcessName + ".exe" + '"';
-            LogDebug("Closing multi-process handle(s) for " + processName);
-            var handle64str = "handle64.exe";
-            var handle64opts = "-a -p " + processName + " Instances";
-            LogDebug("Running: " + handle64str + " " + handle64opts);
-            var handleData = ComspecGetOutput(handle64str,handle64opts);
-            LogDebug("Handle data: " + handleData);
-            handleData.Replace('\r', ' ');
-            var lines = handleData.Split('\n');
-            string handle = "";
-            string result = "";
-            if(lines.Length > 0)
-            {
-                LogDebug("More than 0 lines, thats good");
-                foreach(var line in lines) { 
-                    if(line.Contains("D2R.exe"))
-                    {
-                        result = line;
-                        LogDebug("Result: " + lines);
-                    }
-                }
-            } else
-            {
-                LogDebug("Could not get handle data from handle64");
-            }
-            if(result.Length > 0)
-            {
-                var data = result.Split(new string[] { ": " },StringSplitOptions.None);
-                if(data.Length > 0)
-                {
-                    LogDebug("Handle infos: " + data.ToString());
-                    handle = data[2].Substring(data[2].Length - 8,8);
-                    LogDebug("Handle: " + handle);
-                }
-                if(handle.Length > 0)
-                {
-                    LogDebug("Closing handle: " + handle);
-                    LogDebug(ComspecGetOutput("handle64.exe", " -c " + handle + " -p \"" + process.Id + "\" -y"));
-                }
-            } else
-            {
-                LogDebug("No handle infos...");
-            }
-            LogDebug("All done, next!");
-        }
+       
         private Process LaunchGame(string accountName)
         {
             string installPath = (string)Registry.GetValue(Constants.gameInstallRegKey[0], Constants.gameInstallRegKey[1], "");
@@ -236,7 +178,7 @@ namespace MultiInstanceManager.Modules
         public void LoadAccounts()
         {
             var ePath = Application.ExecutablePath;
-            var path = System.IO.Path.GetDirectoryName(ePath);
+            var path = Path.GetDirectoryName(ePath);
             accountList.Items.Clear();
             var accounts = Directory.GetFiles(path, "*.bin");
             foreach(var account in accounts)
@@ -260,6 +202,7 @@ namespace MultiInstanceManager.Modules
             }
             catch (Exception ex)
             {
+                Debug.WriteLine(ex);
                 return;
             }
 
@@ -273,6 +216,7 @@ namespace MultiInstanceManager.Modules
                 return;
             } catch (Exception ex)
             {
+                Debug.WriteLine(ex);
                 return;
             }
 
@@ -365,17 +309,9 @@ namespace MultiInstanceManager.Modules
             CurrentKey = (byte[])Registry.GetValue(Constants.accountRegKey[0], Constants.accountRegKey[1], "");
             var PrevKey = CurrentKey; //  new byte[50];
 
-//            if (firstTokenTry)
-//            {
-//                PrevKey = CurrentKey;
-//                firstTokenTry = false;
-//            } 
-//            else
-//                PrevKey = token;
-
             long startTime = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
             long elapsedTime = 0;
-            var maxWaitTime = 30000; // 15s.
+            var maxWaitTime = 60000; // 60s.
 
             while (StructuralComparisons.StructuralEqualityComparer.Equals(CurrentKey, PrevKey) && (elapsedTime < maxWaitTime))
             {
@@ -420,6 +356,7 @@ namespace MultiInstanceManager.Modules
                 var id = Process.GetProcessById(process.Id);
             } catch (Exception ex)
             {
+                Debug.WriteLine(ex);
                 return false;
             }
             return true;
