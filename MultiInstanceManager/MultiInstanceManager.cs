@@ -1,4 +1,6 @@
-﻿using MultiInstanceManager.Modules;
+﻿using Gma.System.MouseKeyHook;
+using MultiInstanceManager.Config;
+using MultiInstanceManager.Modules;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -17,7 +19,9 @@ namespace MultiInstanceManager
     public partial class MultiInstanceManager : Form
     {
         MultiHandler MH;
-        public MultiInstanceManager()
+        Settings settings;
+
+        public MultiInstanceManager(IKeyboardMouseEvents keyboardMouseEvents)
         {
             InitializeComponent();
             addAccountButton.Click += new EventHandler(addAccountButton_Click);
@@ -27,11 +31,41 @@ namespace MultiInstanceManager
             readmeLink.Click += new EventHandler(readmeLink_Click);
             killHandlesButton.Click += new EventHandler(killHandlesButton_Click);
             dumpRegKeyButton.Click += new EventHandler(dumpRegKeyButton_Click);
-            commandLineArguments.Text = ConfigurationManager.AppSettings["cmdArgs"];
+            try
+            {
+                commandLineArguments.Text = ConfigurationManager.AppSettings["cmdArgs"];
+            } catch (Exception e)
+            {
+                commandLineArguments.Text = "";
+            }
             commandLineArguments.TextChanged += new EventHandler(commandLineArguments_Changed);
             forceExitToolTip.SetToolTip(forceExit, "ForceExit means, kill the game client once the tokens are set when 'refreshing'");
-            MH = new MultiHandler(this,accountList);
+            MH = new MultiHandler(this, accountList);
+
+            // Prepare keybinds
+            Debug.WriteLine("Adding keybinds");
+            settings = new Settings();
+            settings.LoadWindowKeys();
+            Debug.WriteLine("Done with keybinds");
             MH.LoadAccounts();
+            keyboardMouseEvents.KeyPress += (_, args) =>
+            {
+                // Prepare usage of tab-keys between windows
+                Debug.WriteLine("Keypress: " + args.KeyChar);
+                foreach(var binding in settings.KeyToggles)
+                {
+                    Debug.WriteLine("Comparing to: " + binding.CharCode.ToString());
+                    if(char.TryParse(binding.CharCode.ToString(),out char c))
+                    {
+                        Debug.WriteLine("Character: " + c);
+                        if (args.KeyChar == c)
+                        {
+                            Debug.WriteLine("Found match: " + c + " Iterator: " + binding.ClientIterator);
+                            MH.SwapFocus(binding);
+                        }
+                    }
+                }
+            };
         }
         public static void AddOrUpdateAppSettings(string key, string value)
         {
@@ -65,7 +99,7 @@ namespace MultiInstanceManager
         }
         private void addAccountButton_Click(object sender, System.EventArgs e)
         {
-            MH.Setup(null,commandLineArguments.Text);
+            MH.Setup("",commandLineArguments.Text);
         }
         private void killHandlesButton_Click(object sender, EventArgs e)
         {
