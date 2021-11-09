@@ -58,6 +58,8 @@ namespace MultiInstanceManager.Modules
         private CheckedListBox accountList;
         private List<GameInstance> instances;
         private bool modifyWindowTitles;
+        private string gameExecutableName;
+
         public MultiHandler(Form _parent,CheckedListBox _accountList)
         {
             parent = _parent;
@@ -65,6 +67,11 @@ namespace MultiInstanceManager.Modules
             gameProcesses = new List<Process>();
             instances = new List<GameInstance>();
             modifyWindowTitles = false;
+            gameExecutableName = "D2R.exe";
+        }
+        public void SetGameExecutableName(string name)
+        {
+            gameExecutableName = name;
         }
         Boolean blizzardProcessesExists()
         {
@@ -74,6 +81,23 @@ namespace MultiInstanceManager.Modules
 
             if (/*clients.Length > 0 || */launchers.Length > 0 || battlenets.Length > 0)
                 return true;
+            return false;
+        }
+        public bool PriorityWindowFocus()
+        {
+            var clients = Process.GetProcessesByName(Constants.clientExecutableName);
+            var focusWindow = GetForegroundWindow();
+            foreach(var client in clients)
+            {
+                if(focusWindow == client.MainWindowHandle)
+                {
+                    return true;
+                }
+            }
+            if(focusWindow == Process.GetCurrentProcess().MainWindowHandle)
+            {
+                return true;
+            }
             return false;
         }
         public void ToggleWindowTitleMode(bool mode)
@@ -131,7 +155,7 @@ namespace MultiInstanceManager.Modules
             }
             return binding;
         }
-        public void Setup(string displayName = "", string cmdArgs = "", Boolean killProcessesWhenDone = true)
+        public bool Setup(string displayName = "", string cmdArgs = "", Boolean killProcessesWhenDone = true)
         {
             ClearDebug();
             // Zero out everything
@@ -146,14 +170,12 @@ namespace MultiInstanceManager.Modules
             if (blizzardProcessesExists())
             {
                 _ = MessageBox.Show("Close all D2R/Battle.net related programs first.");
-                Setup(displayName, cmdArgs, true);
-                return;
+                return Setup(displayName, cmdArgs, true);
             } 
             if(displayName.Length == 0)
             {
                 displayName = Prompt.ShowDialog("Enter desired displayname for this account:", "Add Account");
             }
-            ShowToolTip("Launching battle.net to set up " + displayName);
             var launcherProcess = LaunchLauncher();
             WinWait(Constants.bnetLauncherClass);
             SetBnetLauncherPID();
@@ -173,7 +195,9 @@ namespace MultiInstanceManager.Modules
 
             LogDebug("Closing launcher and client mutex handles");
             CloseBnetLauncher();
-            ProcessManager.CloseExternalHandles(); // Close all found D2R mutex handles
+            LogDebug("Launcher closed, killing mutex");
+            ProcessManager.CloseExternalHandles(Constants.clientExecutableName); // Close all found D2R mutex handles
+            LogDebug("Mutex killed");
             // CloseMultiProcessHandle(gameProcesses.Last());
             // Kill the Launcher & game client
             try
@@ -187,7 +211,8 @@ namespace MultiInstanceManager.Modules
                 // Not able to kill the game client, for whatever reason
                 LogDebug(ex.ToString());
             }
-            LoadAccounts();
+            LogDebug("All done, exiting setup thread");
+            return true;
         }
         private void ModifyWindowTitleName(Process process, string displayName)
         {
@@ -202,13 +227,14 @@ namespace MultiInstanceManager.Modules
 
         public void KillGameClientHandles()
         {
-            var processes = Process.GetProcessesByName("D2R");
+            var name = gameExecutableName.Substring(0, gameExecutableName.Length - 4);
+            var processes = Process.GetProcessesByName(name);
             if (processes.Length > 0)
             {
                 foreach (var process in processes)
                 {
                     LogDebug("Closing handle for: " + process.Id);
-                    ProcessManager.CloseExternalHandles();
+                    ProcessManager.CloseExternalHandles(process.ProcessName);
                 }
             } else
             {
@@ -223,15 +249,13 @@ namespace MultiInstanceManager.Modules
             processCounter = 0;
             bnetLauncherPID = 0;
             instances = new List<GameInstance>();
-    }
-        public void LaunchWithAccount(string accountName,string cmdArgs = "")
+        }
+        public bool LaunchWithAccount(string accountName,string cmdArgs = "")
         {
             LogDebug("Launching account ("+(instances.Count+1)+"): '" + accountName + "'");
             UseAccountToken(accountName);
             var process = LaunchGame(accountName, cmdArgs);
             LogDebug("Process should be: " + process.Id);
-            ProcessWait(Constants.clientExecutableName);
-            Thread.Sleep(2000);
             Debug.WriteLine("Checking if we need to mod window titles");
             ModifyWindowTitleName(process, accountName);
             Debug.WriteLine("Modding done (if requested)");
@@ -246,12 +270,14 @@ namespace MultiInstanceManager.Modules
                 LogDebug("Process seems to be alive: " + process.Id);
                 ExportToken(accountName + ".bin");
                 LogDebug("Closing mutex handles");
-                ProcessManager.CloseExternalHandles(); // kill all D2R mutex handles
+                ProcessManager.CloseExternalHandles(process.ProcessName); // kill all D2R mutex handles
                 gameProcesses.Add(process);
             } else
             {
                 LogDebug("Can't seem to find 'this' instance as a process?");
             }
+            LogDebug("All done, exiting this thread");
+            return true;
 
         }
        
@@ -259,25 +285,45 @@ namespace MultiInstanceManager.Modules
         {
             string installPath = (string)Registry.GetValue(Constants.gameInstallRegKey[0], Constants.gameInstallRegKey[1], "");
             var process = new Process();
-            process.StartInfo.FileName = installPath + "\\D2R.exe";
+            process.StartInfo.FileName = installPath + "\\" + gameExecutableName;
             process.StartInfo.Arguments = cmdArgs;
             process.Start();
             var thisInstance = new GameInstance { account = accountName, process = process };
             instances.Add(thisInstance);
+            var name = gameExecutableName.Substring(0, gameExecutableName.Length - 4);
+            var processes = Process.GetProcessesByName(name);
+            var alive = false;
+            // Sanity check to make sure the process is alive before we return it. trust me its required.
+            while (!alive)
+            {
+                foreach(var p in processes)
+                {
+                    if(p.Id == process.Id && p.MainWindowHandle != IntPtr.Zero)
+                    {
+                        alive = true;
+                    }
+                }
+                if(!alive)
+                    processes = Process.GetProcessesByName(name);
+            }
             return process;
         }
-        public void LoadAccounts()
+        private void _loadAccounts()
         {
             var ePath = Application.ExecutablePath;
             var path = Path.GetDirectoryName(ePath);
             accountList.Items.Clear();
             var accounts = Directory.GetFiles(path, "*.bin");
-            foreach(var account in accounts)
+            foreach (var account in accounts)
             {
                 var lastWrite = File.GetLastWriteTime(account);
                 var fileName = Path.GetFileNameWithoutExtension(account) + " | " + lastWrite.ToString();
                 accountList.Items.Add(fileName);
             }
+        }
+        public void LoadAccounts()
+        {
+            _loadAccounts();
         }
         private void SetBnetLauncherPID()
         {
@@ -321,13 +367,6 @@ namespace MultiInstanceManager.Modules
             var p = Process.Start(installPath + "\\Diablo II Resurrected Launcher.exe");
             lastWindowHandle = p.MainWindowHandle;
             return p;
-        }
-        private void ShowToolTip(string toolTipText)
-        {
-            System.Windows.Forms.ToolTip ToolTip1 = new System.Windows.Forms.ToolTip();
-            ToolTip1.AutoPopDelay = 5000;
-            var location = new Point(50, 50);
-            ToolTip1.Show(toolTipText,parent,50,50,5000);
         }
         private Boolean HasClass(IntPtr windowHandle, string windowClass)
         {
