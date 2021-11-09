@@ -4,4 +4,6 @@
 *.cache
 *.log
 .vs/
+packages/**/*
+!packages/repositories.config
 MultiInstanceManager.exe
