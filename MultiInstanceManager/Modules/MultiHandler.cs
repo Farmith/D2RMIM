@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -49,6 +50,17 @@ namespace MultiInstanceManager.Modules
 
         [DllImport("user32.dll")]
         static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+        
+        [DllImport("user32.dll")]
+        private static extern IntPtr GetWindowRect(IntPtr hWnd, ref Rect rect);
+        [DllImport("user32.dll")]
+        static extern bool SetCursorPos(int x, int y);
+
+        [DllImport("user32.dll")]
+        public static extern void mouse_event(int dwFlags, int dx, int dy, int cButtons, int dwExtraInfo);
+
+        public const int MOUSEEVENTF_LEFTDOWN = 0x02;
+        public const int MOUSEEVENTF_LEFTUP = 0x04;
         Form parent;
 
         private IntPtr lastWindowHandle;
@@ -59,6 +71,10 @@ namespace MultiInstanceManager.Modules
         private List<GameInstance> instances;
         private bool modifyWindowTitles;
         private string gameExecutableName;
+        private bool saveCredentials;
+        private Rectangle bounds;
+        private Color loginButtonColor = Color.FromArgb(255, 0, 116, 224);
+        private Color usernameBoxColor = Color.FromArgb(255, 16, 17, 23);
 
         public MultiHandler(Form _parent,CheckedListBox _accountList)
         {
@@ -68,6 +84,11 @@ namespace MultiInstanceManager.Modules
             instances = new List<GameInstance>();
             modifyWindowTitles = false;
             gameExecutableName = "D2R.exe";
+            saveCredentials = false;
+        }
+        public void SetCredentialMode(bool _saveCredentials = false)
+        {
+            saveCredentials = _saveCredentials;
         }
         public void SetGameExecutableName(string name)
         {
@@ -176,9 +197,35 @@ namespace MultiInstanceManager.Modules
             {
                 displayName = Prompt.ShowDialog("Enter desired displayname for this account:", "Add Account");
             }
+            var bnetCredentials = Vault.GetCredential("D2RMIM-" + displayName);
+            var username = "";
+            var password = "";
+            if(saveCredentials)
+            {
+                Debug.WriteLine("Disp: " + displayName + " User: " + bnetCredentials?.User + " Pass: <youwish>");
+                if(bnetCredentials == null || (bnetCredentials?.User?.Length < 3 || bnetCredentials?.Pass?.Length < 3)) { 
+                    // The user has input some crap into the credentials, just delete and ask again
+                    Vault.RemoveCredentials("D2RMIM-" + displayName);
+                    username = Prompt.ShowDialog("Enter your battle.net username: ", "Account Data Required");
+                    password = Prompt.ShowDialog("Enter your battle.net password: ", "Account Data Required");
+                    Vault.SetCredentials("D2RMIM-" + displayName, username, password); // Save credentials in windows credential store on local computer
+                } else
+                {
+                    Debug.WriteLine("Using saved credentials");
+                    username = bnetCredentials.User;
+                    password = bnetCredentials.Pass;
+                }
+            }
             var launcherProcess = LaunchLauncher();
             WinWait(Constants.bnetLauncherClass);
             SetBnetLauncherPID();
+            // Do some magic to enter the credentials
+            if(username.Length > 0)
+            {
+                Thread.Sleep(2000);
+                Debug.WriteLine("Finding the login boxes");
+                FillLauncherCredentials(launcherProcess,username, password);
+            }
             WinWaitClose(Constants.bnetLauncherClass);
             processCounter++;
             LogDebug("Waiting for Game Client to start");
@@ -213,6 +260,114 @@ namespace MultiInstanceManager.Modules
             }
             LogDebug("All done, exiting setup thread");
             return true;
+        }
+        private Bitmap GetScreenshot(Rect rect)
+        {
+            bounds = new Rectangle(rect.Left, rect.Top, rect.Right - rect.Left, rect.Bottom - rect.Top);
+            // var CursorPosition = new Point(Cursor.Position.X - rect.Left, Cursor.Position.Y - rect.Top);
+            var result = new Bitmap(bounds.Width, bounds.Height);
+            using (var g = Graphics.FromImage(result))
+            {
+                g.CopyFromScreen(new Point(bounds.Left, bounds.Top), Point.Empty, bounds.Size);
+            }
+
+            return result;
+        }
+        private Point FindUsernameBox()
+        {
+            var foregroundWindowsHandle = GetForegroundWindow();
+            var rect = new Rect();
+            GetWindowRect(foregroundWindowsHandle, ref rect);
+
+            var bitmap = GetScreenshot(rect);
+            var delim = bitmap.Width / 3;
+            var lineA = delim * 2;
+            var lineMax = bitmap.Height / 2;
+            var findColor = usernameBoxColor;
+            SetCursorPos(rect.Left + lineA, rect.Top+0);
+            for (var i = 0; i < lineMax; i++)
+            {
+                var color = bitmap.GetPixel(lineA, i);
+                if(color == findColor)
+                {
+                    return new Point(rect.Left+lineA, rect.Top+i);
+                }
+            }
+
+            return new Point(0, 0);
+        }
+        private Point FindLoginButton(int xline,int yline)
+        {
+            var foregroundWindowsHandle = GetForegroundWindow();
+            var rect = new Rect();
+            GetWindowRect(foregroundWindowsHandle, ref rect);
+
+            var bitmap = GetScreenshot(rect);
+            var delim = bitmap.Width / 3;
+            var lineA = delim * 2;
+            var lineMax = bitmap.Height;
+            var findColor = loginButtonColor;
+            SetCursorPos(rect.Left+lineA, rect.Top+0);
+            for (var i = 0; i < lineMax; i++)
+            {
+                var color = bitmap.GetPixel(lineA, i);
+                if (color == findColor)
+                {
+                    Debug.WriteLine("Found the color!");
+                    return new Point(rect.Left + lineA, rect.Top + i);
+                }
+                Debug.WriteLine("Color: " + color.R + ":" + color.G + ":" + color.B);
+            }
+
+            return new Point(0, 0);
+        }
+        private void FillLauncherCredentials(Process launcher, string user, string pass)
+        {
+            var where = FindUsernameBox();
+            if (where.X > 0 && where.Y > 0)
+            {
+                LeftMouseClick(where.X, where.Y+5);
+
+                // We should be in the text-box now, we hope
+                SendKeys.SendWait("^(a)");
+                foreach (char c in user) {
+                    SendKeys.SendWait(c.ToString());
+                    Thread.Sleep(5);
+                }
+                Thread.Sleep(100);
+                SendKeys.SendWait("{TAB}");
+                Debug.WriteLine("Filling out password");
+                Thread.Sleep(5);
+                foreach (char c in pass)
+                {
+                    SendKeys.SendWait(c.ToString());
+                    Thread.Sleep(5);
+                }
+                Thread.Sleep(100);
+                Debug.WriteLine("Finding login button");
+                var button = FindLoginButton(where.X, where.Y);
+                while (button.X == 0)
+                {
+                    Thread.Sleep(100);
+                    button = FindLoginButton(where.X, where.Y);
+                }
+                // Sleep a little, then tab to it
+                Debug.WriteLine("Tabbing to button!");
+                Thread.Sleep(100);
+                SendKeys.SendWait("{TAB}");
+                Thread.Sleep(15);
+                SendKeys.SendWait("{TAB}");
+                Thread.Sleep(5);
+                SendKeys.SendWait("{ENTER}");
+                // We should be logging in now!
+                Debug.WriteLine("Should be logging in now");
+            }
+        }
+        public void LeftMouseClick(int xpos, int ypos)
+        {
+            SetCursorPos(xpos, ypos);
+            mouse_event(MOUSEEVENTF_LEFTDOWN, xpos, ypos, 0, 0);
+            mouse_event(MOUSEEVENTF_LEFTUP, xpos, ypos, 0, 0);
         }
         private void ModifyWindowTitleName(Process process, string displayName)
         {

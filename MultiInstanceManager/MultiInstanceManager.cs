@@ -21,10 +21,11 @@ namespace MultiInstanceManager
     {
         MultiHandler MH;
         Settings settings;
-
+        private bool saveCredentials;
         public MultiInstanceManager(IKeyboardMouseEvents keyboardMouseEvents)
         {
             InitializeComponent();
+            saveCredentials = false; // Default to false like everywhere, just incase
             addAccountButton.Click += new EventHandler(addAccountButton_Click);
             launchButton.Click += new EventHandler(launchButton_Click);
             removeButton.Click += new EventHandler(removeButton_Click);
@@ -55,6 +56,8 @@ namespace MultiInstanceManager
             settings.LoadWindowKeys();
             Debug.WriteLine("Done with keybinds");
             MH.LoadAccounts();
+            saveCredentials = ConfigurationManager.AppSettings.Get("saveCredentials")?.ToString() == "true" ? true : false;
+            MH.SetCredentialMode(saveCredentials);
             MH.ToggleWindowTitleMode(modifyWindowTitles.Checked);
             try
             {
