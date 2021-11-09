@@ -31,6 +31,7 @@ namespace MultiInstanceManager
             readmeLink.Click += new EventHandler(readmeLink_Click);
             killHandlesButton.Click += new EventHandler(killHandlesButton_Click);
             dumpRegKeyButton.Click += new EventHandler(dumpRegKeyButton_Click);
+            
             try
             {
                 commandLineArguments.Text = ConfigurationManager.AppSettings["cmdArgs"];
@@ -39,6 +40,9 @@ namespace MultiInstanceManager
                 commandLineArguments.Text = "";
             }
             commandLineArguments.TextChanged += new EventHandler(commandLineArguments_Changed);
+            modifyWindowTitles.Checked = ConfigurationManager.AppSettings.Get("modifyWindowTitles")?.ToString() == "true" ? true : false;
+            modifyWindowTitles.CheckedChanged += new EventHandler(modifyWindowTitles_Changed);
+
             forceExitToolTip.SetToolTip(forceExit, "ForceExit means, kill the game client once the tokens are set when 'refreshing'");
             MH = new MultiHandler(this, accountList);
 
@@ -48,6 +52,7 @@ namespace MultiInstanceManager
             settings.LoadWindowKeys();
             Debug.WriteLine("Done with keybinds");
             MH.LoadAccounts();
+            MH.ToggleWindowTitleMode(modifyWindowTitles.Checked);
             keyboardMouseEvents.KeyPress += (_, args) =>
             {
                 // Prepare usage of tab-keys between windows
@@ -67,6 +72,7 @@ namespace MultiInstanceManager
                 }
             };
         }
+
         public static void AddOrUpdateAppSettings(string key, string value)
         {
             try
@@ -88,6 +94,10 @@ namespace MultiInstanceManager
             {
                 Console.WriteLine("Error writing app settings");
             }
+        }
+        public void modifyWindowTitles_Changed(object sender, EventArgs e)
+        {
+            MH.ToggleWindowTitleMode(modifyWindowTitles.Checked);
         }
         private void commandLineArguments_Changed(object sender, EventArgs e)
         {
@@ -120,7 +130,7 @@ namespace MultiInstanceManager
                         MH.LaunchWithAccount(checkedItem,commandLineArguments.Text);
                     } catch(Exception ex)
                     {
-                        Debug.WriteLine(ex.ToString());
+                        Debug.WriteLine("Launch error: " + ex.ToString());
                         // Something went terribly wrong.. 
                     }
                 }

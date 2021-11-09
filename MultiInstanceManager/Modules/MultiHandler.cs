@@ -43,7 +43,10 @@ namespace MultiInstanceManager.Modules
 
         [DllImport("user32.dll")]
         static extern bool SetForegroundWindow(IntPtr hWnd);
-        
+
+        [DllImport("user32.dll")]
+        static extern bool SetWindowText(IntPtr hWnd, string text);
+
         [DllImport("user32.dll")]
         static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
         Form parent;
@@ -54,13 +57,14 @@ namespace MultiInstanceManager.Modules
         private uint bnetLauncherPID;
         private CheckedListBox accountList;
         private List<GameInstance> instances;
-
+        private bool modifyWindowTitles;
         public MultiHandler(Form _parent,CheckedListBox _accountList)
         {
             parent = _parent;
             accountList = _accountList;
             gameProcesses = new List<Process>();
             instances = new List<GameInstance>();
+            modifyWindowTitles = false;
         }
         Boolean blizzardProcessesExists()
         {
@@ -71,6 +75,11 @@ namespace MultiInstanceManager.Modules
             if (/*clients.Length > 0 || */launchers.Length > 0 || battlenets.Length > 0)
                 return true;
             return false;
+        }
+        public void ToggleWindowTitleMode(bool mode)
+        {
+            Debug.WriteLine("Changing window title toggle to: " + mode.ToString());
+            modifyWindowTitles = mode;
         }
         public void forceForegroundWindow(IntPtr hwnd)
         {
@@ -154,6 +163,7 @@ namespace MultiInstanceManager.Modules
             ProcessWait(Constants.clientExecutableName);
             LogDebug("Client ready, glhf");
             // Wait for the initial token update
+            ModifyWindowTitleName(gameProcesses[processCounter - 1],displayName);
             WaitForNewToken(gameProcesses[processCounter - 1]);
             // Then we do it once more, because it may update twice
             WaitForNewToken(gameProcesses[processCounter - 1], true); // Specify that we want a 30s timeout justincase
@@ -178,6 +188,16 @@ namespace MultiInstanceManager.Modules
                 LogDebug(ex.ToString());
             }
             LoadAccounts();
+        }
+        private void ModifyWindowTitleName(Process process, string displayName)
+        {
+            Debug.WriteLine("Modding if needed: " + modifyWindowTitles.ToString());
+            if (modifyWindowTitles == true)
+            {
+                var newTitle = "[ " + displayName + " ] Diablo II: Resurrected";
+                Debug.WriteLine("Changing window title to: " + newTitle);
+                SetWindowText(process.MainWindowHandle, newTitle);
+            }
         }
 
         public void KillGameClientHandles()
@@ -211,6 +231,10 @@ namespace MultiInstanceManager.Modules
             var process = LaunchGame(accountName, cmdArgs);
             LogDebug("Process should be: " + process.Id);
             ProcessWait(Constants.clientExecutableName);
+            Thread.Sleep(2000);
+            Debug.WriteLine("Checking if we need to mod window titles");
+            ModifyWindowTitleName(process, accountName);
+            Debug.WriteLine("Modding done (if requested)");
             // Wait for a new token
             WaitForNewToken(process);
             // Then wait again incase it changes in any forseeable future
@@ -279,11 +303,14 @@ namespace MultiInstanceManager.Modules
             try
             {
                 var target = Process.GetProcessById((int)bnetLauncherPID);
-                target.Kill();
+                if (target.Id > 0)
+                {
+                    target.Kill();
+                }
                 return;
             } catch (Exception ex)
             {
-                Debug.WriteLine(ex);
+                Debug.WriteLine("Can't kill bnet launcher: " + ex.ToString());
                 return;
             }
 
