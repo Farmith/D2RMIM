@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using MultiInstanceManager.Structs;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -31,6 +32,9 @@ namespace MultiInstanceManager.Modules
         [DllImport("user32.dll", SetLastError = true)]
         private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint processId);
 
+        [DllImport("user32.dll")]
+        static extern bool SetForegroundWindow(IntPtr hWnd);
+
         Form parent;
 
         private IntPtr lastWindowHandle;
@@ -57,7 +61,45 @@ namespace MultiInstanceManager.Modules
                 return true;
             return false;
         }
+        public KeyToggle SwapFocus(KeyToggle binding)
+        {
+            var clientProcesses = Process.GetProcessesByName(Constants.clientExecutableName);
+            Debug.WriteLine("Process count: " + clientProcesses.Count());
 
+            // Set focus to specified window
+            if (binding.WindowHandle == IntPtr.Zero)
+            {
+                if (instances.Count == 0 || instances.Count != clientProcesses.Count())
+                {
+                    instances = new List<GameInstance>(); // TODO: This is bad, now every time ONE game client disconnects, the whole thing is effed
+                    for(var x = 0; x < clientProcesses.Count(); x++)
+                    {
+                        var i = new GameInstance();
+                        i.process = clientProcesses[x];
+                        i.account = "N/A";
+                        instances.Add(i);
+                    }
+                }
+                if (instances.Count >= binding.ClientIterator)
+                {
+                    Debug.WriteLine("Counts match for: " + binding.ClientIterator);
+                    Debug.WriteLine("Process: " + instances[binding.ClientIterator].process.Id);
+                    binding.WindowHandle = instances[binding.ClientIterator].process.MainWindowHandle;
+                }
+            }
+            if (binding.WindowHandle != IntPtr.Zero)
+            {
+                try
+                {
+                    SetForegroundWindow(binding.WindowHandle);
+                } catch (Exception e)
+                {
+                    // The window has died or been removed or something
+                    binding.WindowHandle = IntPtr.Zero;
+                }
+            }
+            return binding;
+        }
         public void Setup(string displayName = "", string cmdArgs = "", Boolean killProcessesWhenDone = true)
         {
             ClearDebug();

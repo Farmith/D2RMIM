@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,5 +20,8 @@ namespace MultiInstanceManager
         public static string gameClass = "OsWindow";
         public static string bnetLauncherClass = "Qt5QWindowIcon";
         public static string bnetClientClass = "Chrome_WidgetWin_0";
+        public static string windowKeys = "windowKeys";
+        public static string windowKey = "keyBind";
+
     }
 }

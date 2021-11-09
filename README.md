@@ -71,6 +71,13 @@ FAQ:
 
 ## Version log:
 
+* 1.4.2
+	-	Feature release, added global hotkeys (which can be disabled in the .config file) per default: numlock enabled -> numpad 0 = first client, numpad 1 = 2nd client, numpad 2 = third client
+	-	Check the changes in MultiInstanceManager.config for adding less/more hotkeys, setting them to enabled="false" disables them and enabled="true" enables them.
+
+* 1.4.1
+	-	Minor bugfix release, removed a bug from the "Add Account" button
+
 * 1.4
 	-	Added functionality to allow command-line arguments to the clients.
 
