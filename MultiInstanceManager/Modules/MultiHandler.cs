@@ -28,13 +28,24 @@ namespace MultiInstanceManager.Modules
 
         [DllImport("user32.dll")]
         private static extern int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
+        
+        [DllImport("user32.dll")]
+        private static extern int AttachThreadInput(uint Attach, uint AttachTo, bool fAttach);
 
         [DllImport("user32.dll", SetLastError = true)]
         private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint processId);
 
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern uint BringWindowToTop(IntPtr hWnd);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern uint GetCurrentThreadId();
+
         [DllImport("user32.dll")]
         static extern bool SetForegroundWindow(IntPtr hWnd);
-
+        
+        [DllImport("user32.dll")]
+        static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
         Form parent;
 
         private IntPtr lastWindowHandle;
@@ -60,6 +71,17 @@ namespace MultiInstanceManager.Modules
             if (/*clients.Length > 0 || */launchers.Length > 0 || battlenets.Length > 0)
                 return true;
             return false;
+        }
+        public void forceForegroundWindow(IntPtr hwnd)
+        {
+            uint processId = 0;
+            uint windowThreadProcessId = GetWindowThreadProcessId(GetForegroundWindow(), out processId);
+            uint currentThreadId = GetCurrentThreadId();
+            int CONST_SW_SHOW = 5;
+            AttachThreadInput(windowThreadProcessId, currentThreadId, true);
+            BringWindowToTop(hwnd);
+            ShowWindow(hwnd, CONST_SW_SHOW);
+            AttachThreadInput(windowThreadProcessId, currentThreadId, false);
         }
         public KeyToggle SwapFocus(KeyToggle binding)
         {
@@ -91,7 +113,7 @@ namespace MultiInstanceManager.Modules
             {
                 try
                 {
-                    SetForegroundWindow(binding.WindowHandle);
+                    forceForegroundWindow(binding.WindowHandle);
                 } catch (Exception e)
                 {
                     // The window has died or been removed or something
