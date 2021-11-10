@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -6,6 +7,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Threading;
 
 namespace MultiInstanceManager.Modules
 {
@@ -252,17 +254,25 @@ namespace MultiInstanceManager.Modules
 
             int bufferSize = GetHandleNameLength(handle);
 
-            IntPtr pStringBuffer = Marshal.AllocHGlobal(bufferSize);
+            Debug.WriteLine("Trying to allocate: " + bufferSize.ToString() + " bytes of memory");
+            try
+            {
+                IntPtr pStringBuffer = Marshal.AllocHGlobal(bufferSize);
 
-            NtQueryObject(handle, OBJECT_INFORMATION_CLASS.ObjectNameInformation, pStringBuffer, bufferSize, out bufferSize);
+                NtQueryObject(handle, OBJECT_INFORMATION_CLASS.ObjectNameInformation, pStringBuffer, bufferSize, out bufferSize);
 
-            CloseHandle(handle);    
+                CloseHandle(handle);
 
-            string handleName = ConvertToString(pStringBuffer);
+                string handleName = ConvertToString(pStringBuffer);
 
-            Marshal.FreeHGlobal(pStringBuffer);
+                Marshal.FreeHGlobal(pStringBuffer);
 
-            return handleName;
+                return handleName;
+            } catch (Exception e)
+            {
+                Console.WriteLine("Could not allocate memory: " + e.ToString());
+            }
+            return String.Empty;
         }
         private static string ConvertToString(IntPtr pStringBuffer)
         {
@@ -294,6 +304,64 @@ namespace MultiInstanceManager.Modules
             {
                 return (int)objInfo.NameInformationLength;
             }
+        }
+        public static bool blizzardProcessesExists()
+        {
+            var launchers = Process.GetProcessesByName(Constants.launcherExecutableName);
+            var battlenets = Process.GetProcessesByName(Constants.battleNetExecutableName);
+
+            if (launchers.Length > 0 || battlenets.Length > 0)
+                return true;
+            return false;
+        }
+        public static bool MatchProcess(Process process)
+        {
+            Process exists = Process.GetProcessById(process.Id);
+            if (exists.Id == process.Id)
+            {
+                return true;
+            }
+            return false;
+        }
+        public static Process? ProcessWait(string processName,int processCounter)
+        {
+            Process[] processes = Process.GetProcessesByName(processName);
+            int maxWait = 2000;
+            int waitTime = 0;
+            while (processes.Length < processCounter && waitTime < maxWait)
+            {
+                Thread.Sleep(100);
+                processes = Process.GetProcessesByName(processName);
+                waitTime++;
+            }
+            if (processes.Length == processCounter)
+            {
+                return processes[processCounter - 1];
+            }
+            return null;
+        }
+        public static Process? GetProcessByHandle(IntPtr handle)
+        {
+            Process process;
+            bool go = true;
+            while (go)
+            {
+                try
+                {
+                    process = Process.GetProcesses().Single(p => p.Id != 0 && p.MainWindowHandle == handle);
+                    if (process.Id > 0)
+                    {
+                        go = false;
+                        return process;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Debug.WriteLine("Need to wait a bit, process not ready");
+                    Thread.Sleep(10);
+                }
+            }
+            return null;
         }
     }
 }

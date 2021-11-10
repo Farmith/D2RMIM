@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace MultiInstanceManager.Helpers
 {
@@ -37,6 +38,16 @@ namespace MultiInstanceManager.Helpers
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern uint GetCurrentThreadId();
 
+        public static void ShowMessage(string message)
+        {
+            _ = MessageBox.Show(message);
+        }
+        public static void ModifyWindowTitleName(Process process, string displayName)
+        {
+            var newTitle = "[ " + displayName + " ] Diablo II: Resurrected";
+            Debug.WriteLine("Changing window title to: " + newTitle);
+            WindowHelper.SetWindowText(process.MainWindowHandle, newTitle);
+        }
         public static bool PriorityWindowFocus()
         {
             var clients = Process.GetProcessesByName(Constants.clientExecutableName);
@@ -65,7 +76,7 @@ namespace MultiInstanceManager.Helpers
             ShowWindow(hwnd, CONST_SW_SHOW);
             AttachThreadInput(windowThreadProcessId, currentThreadId, false);
         }
-        public static void WinWait(string windowClass)
+        public static IntPtr WinWait(string windowClass)
         {
             IntPtr windowHandle = WindowHelper.GetForegroundWindow();
             int maxWait = 2000;
@@ -76,6 +87,7 @@ namespace MultiInstanceManager.Helpers
                 windowHandle = WindowHelper.GetForegroundWindow();
                 waitTime++;
             }
+            return windowHandle;
         }
         public static void WinWaitClose(string windowClass, IntPtr handle)
         {

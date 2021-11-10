@@ -1,7 +1,9 @@
 ﻿using MultiInstanceManager.Modules;
+using System.Diagnostics;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Windows.Forms;
 
 namespace MultiInstanceManager.Helpers
 {
@@ -30,9 +32,7 @@ namespace MultiInstanceManager.Helpers
         }
         public static Point FindUsernameBox()
         {
-            var foregroundWindowsHandle = WindowHelper.GetForegroundWindow();
-            var rect = new Rect();
-            WindowHelper.GetWindowRect(foregroundWindowsHandle, ref rect);
+            var rect = GetForegroundWindowRect();
 
             var bitmap = GetScreenshot(rect);
             var delim = bitmap.Width / 3;
@@ -53,9 +53,7 @@ namespace MultiInstanceManager.Helpers
         }
         public static Point FindLoginButton(int xline, int yline)
         {
-            var foregroundWindowsHandle = WindowHelper.GetForegroundWindow();
-            var rect = new Rect();
-            WindowHelper.GetWindowRect(foregroundWindowsHandle, ref rect);
+            var rect = GetForegroundWindowRect();
 
             var bitmap = GetScreenshot(rect);
             var delim = bitmap.Width / 3;
@@ -74,12 +72,16 @@ namespace MultiInstanceManager.Helpers
 
             return new Point(0, 0);
         }
-        public static Point FindLauncherButton()
+        public static Rect GetForegroundWindowRect()
         {
             var foregroundWindowsHandle = WindowHelper.GetForegroundWindow();
             var rect = new Rect();
             WindowHelper.GetWindowRect(foregroundWindowsHandle, ref rect);
-
+            return rect;
+        }
+        public static Point FindLauncherButton()
+        {
+            var rect = GetForegroundWindowRect();
             var bitmap = GetScreenshot(rect);
             var delim = bitmap.Width / 3;
             var lineA = 150;
@@ -116,6 +118,78 @@ namespace MultiInstanceManager.Helpers
             SetCursorPos(xpos, ypos);
             mouse_event(MOUSEEVENTF_LEFTDOWN, xpos, ypos, 0, 0);
             mouse_event(MOUSEEVENTF_LEFTUP, xpos, ypos, 0, 0);
+        }
+        public static void FillLauncherCredentials(Process launcher, string user, string pass)
+        {
+            var where = AutomationHelper.FindUsernameBox();
+            if (where.X > 0 && where.Y > 0)
+            {
+                AutomationHelper.LeftMouseClick(where.X, where.Y + 5);
+
+                // We should be in the text-box now, we hope
+                SendKeys.SendWait("^(a)");
+                foreach (char c in user)
+                {
+                    SendKeys.SendWait(c.ToString());
+                    Thread.Sleep(2);
+                }
+                Thread.Sleep(100);
+                SendKeys.SendWait("{TAB}");
+                Debug.WriteLine("Filling out password");
+                Thread.Sleep(5);
+                foreach (char c in pass)
+                {
+                    SendKeys.SendWait(c.ToString());
+                    Thread.Sleep(2);
+                }
+                Thread.Sleep(100);
+                Debug.WriteLine("Finding login button");
+                var button = AutomationHelper.FindLoginButton(where.X, where.Y);
+                while (button.X == 0)
+                {
+                    Thread.Sleep(100);
+                    button = AutomationHelper.FindLoginButton(where.X, where.Y);
+                }
+                // Sleep a little, then tab to it
+                Debug.WriteLine("Tabbing to button!");
+                Thread.Sleep(100);
+                SendKeys.SendWait("{TAB}");
+                Thread.Sleep(15);
+                SendKeys.SendWait("{TAB}");
+                Thread.Sleep(5);
+                SendKeys.SendWait("{ENTER}");
+                // We should be logging in now!
+                Debug.WriteLine("Should be logging in now");
+            }
+        }
+        public static Point GetRandomPointWithinRect(Rect rect)
+        {
+            var y = new System.Random().Next(rect.Top+5, rect.Bottom-5);
+            var x = new System.Random().Next(rect.Left+5, rect.Right-5);
+            return new Point(x, y);
+        }
+        public static void ClickFreneticallyInsideWindow(CancellationToken ct, Process process,int intervalSeconds=5)
+        {
+            ct.ThrowIfCancellationRequested();
+            Thread.Sleep(10000);    // Sleep for an arbitrary, 10s to let window boot
+            var keepGoing = true;
+            while(keepGoing)
+            {
+                if (ct.IsCancellationRequested)
+                {
+                    // Clean up here, then...
+                    keepGoing = false;
+                }
+                else
+                {
+                    Debug.WriteLine("Click...");
+                    WindowHelper.forceForegroundWindow(process.MainWindowHandle);
+                    var rect = GetForegroundWindowRect();
+                    var randomLocation = GetRandomPointWithinRect(rect);
+                    AutomationHelper.LeftMouseClick(randomLocation.X, randomLocation.Y);
+                    Thread.Sleep(1000 * intervalSeconds);
+                }
+            }
         }
     }
 }

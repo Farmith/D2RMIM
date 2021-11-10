@@ -103,6 +103,7 @@
     <Compile Include="Config\WindowKeyBindElement.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Helpers\AutomationHelper.cs" />
+    <Compile Include="Helpers\CredentialHelper.cs" />
     <Compile Include="Helpers\Prompt.cs" />
     <Compile Include="Helpers\Sanity.cs" />
     <Compile Include="Helpers\WindowHelper.cs" />
@@ -120,6 +121,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Structs\Credentials.cs" />
+    <Compile Include="Structs\GameInstance.cs" />
     <Compile Include="Structs\KeyToggle.cs" />
     <EmbeddedResource Include="MultiInstanceManager.resx">
       <DependentUpon>MultiInstanceManager.cs</DependentUpon>
