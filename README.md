@@ -86,6 +86,7 @@ FAQ:
 	-	* Added auto-skipping of "videos" at the launch of the game client in Setup, Launch & Refresh-modes
 	-	* Added better closing mechanisms for launchers, client launchers, and clients.
 	-	* Added functionality to keep track of which EXE-name we are working with to kill the right thing with mutex/process handling
+	-	* Added task-functionality to launch button to follow same suite as Add and Refresh i.e block buttons untill done and not blocking UI thread
 
 * 1.5
 	-	Auto-login is working (experimental mode, let me know how it works for you)
