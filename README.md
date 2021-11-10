@@ -71,6 +71,23 @@ FAQ:
 
 ## Version log:
 
+* 1.5.1
+	-	**Buffix & Refactoring release**
+	-	Buggfixes:
+	-	* Fixed problem with "Add Account" button not listening to current settings
+	-	* Fixed problem with "Launch" button only being able to launch one client 
+	-	* Fixed problem with "Refresh" button only being able to launch once
+	-	* Fixed problem with memory leak in handle manipulation
+	-	* Fixed problem with a few blocking calls
+	-	Refactoring:
+	-	* Created a slew of new helpers and shit to clean up this mess of a project and make things readable and debug-able
+	-	* Split up window features, process features, automation features and general logic
+	-	New functionality:
+	-	* Added auto-skipping of "videos" at the launch of the game client in Setup, Launch & Refresh-modes
+	-	* Added better closing mechanisms for launchers, client launchers, and clients.
+	-	* Added functionality to keep track of which EXE-name we are working with to kill the right thing with mutex/process handling
+	-	* Added task-functionality to launch button to follow same suite as Add and Refresh i.e block buttons untill done and not blocking UI thread
+
 * 1.5
 	-	Auto-login is working (experimental mode, let me know how it works for you)
 	-		Auto-Login uses the built-in windows credential system to save credentials locally on your computer. if you don't want your credentials saved on your computer, just don't use the feature.

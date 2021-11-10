@@ -1,5 +1,6 @@
 ﻿using Gma.System.MouseKeyHook;
 using MultiInstanceManager.Config;
+using MultiInstanceManager.Helpers;
 using MultiInstanceManager.Modules;
 using System;
 using System.Collections.Generic;
@@ -39,6 +40,7 @@ namespace MultiInstanceManager
                 commandLineArguments.Text = ConfigurationManager.AppSettings["cmdArgs"];
             } catch (Exception e)
             {
+                Debug.WriteLine("Could not get cmdArgs from config: " + e.ToString());
                 commandLineArguments.Text = "";
             }
             commandLineArguments.TextChanged += new EventHandler(commandLineArguments_Changed);
@@ -68,21 +70,18 @@ namespace MultiInstanceManager
             } 
             catch (Exception e)
             {
-                Debug.WriteLine("Game name config faulty");
+                Debug.WriteLine("Game name config faulty: " + e.ToString());
             }
    
             keyboardMouseEvents.KeyPress += (_, args) =>
             {
                 // Prepare usage of tab-keys between windows
-                Debug.WriteLine("Keypress: " + args.KeyChar);
-                if (MH.PriorityWindowFocus())
+                if (WindowHelper.PriorityWindowFocus())
                 {
                     foreach (var binding in settings.KeyToggles)
                     {
-                        Debug.WriteLine("Comparing to: " + binding.CharCode.ToString());
                         if (char.TryParse(binding.CharCode.ToString(), out char c))
                         {
-                            Debug.WriteLine("Character: " + c);
                             if (args.KeyChar == c)
                             {
                                 Debug.WriteLine("Found match: " + c + " Iterator: " + binding.ClientIterator);
@@ -138,9 +137,13 @@ namespace MultiInstanceManager
         {
             MH.DumpCurrentRegKey();
         }
-        private void addAccountButton_Click(object sender, System.EventArgs e)
+        private async void addAccountButton_Click(object sender, System.EventArgs e)
         {
-            MH.Setup("",commandLineArguments.Text);
+            DisableButtons();
+            var task = Task.Factory.StartNew(() => MH.Setup("", commandLineArguments.Text));
+            var result = await task;
+            EnableButtons();
+            MH.LoadAccounts();
         }
         private void killHandlesButton_Click(object sender, EventArgs e)
         {
@@ -157,13 +160,11 @@ namespace MultiInstanceManager
                     try
                     {
                         var checkedItem = accountList.CheckedItems[x].ToString().Split('|')[0].Trim(' ');
-                        // Doing this in a thread makes sure the UI doesn't freeze
-                        // var LaunchThread = new Thread(() => MH.LaunchWithAccount(checkedItem, commandLineArguments.Text));
+                        // Doing this in a task makes sure the UI doesn't freeze
                         DisableButtons();
                         var task = Task.Factory.StartNew(() => MH.LaunchWithAccount(checkedItem, commandLineArguments.Text));
                         var result = await task;
                         EnableButtons();
-                        // MH.LaunchWithAccount(checkedItem,commandLineArguments.Text);
                     } catch(Exception ex)
                     {
                         Debug.WriteLine("Launch error: " + ex.ToString());
@@ -175,6 +176,7 @@ namespace MultiInstanceManager
         }
         private void removeButton_Click(object sender, System.EventArgs e)
         {
+            // TODO: This feature should also try to clear the Windows Credential Store of credentials.
             if (accountList.CheckedItems.Count != 0)
             {
                 for (var x = 0; x < accountList.CheckedItems.Count; x++)

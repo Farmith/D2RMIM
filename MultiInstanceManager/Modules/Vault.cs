@@ -1,4 +1,5 @@
-﻿using CredentialManagement;
+﻿#nullable enable
+using CredentialManagement;
 using MultiInstanceManager.Structs;
 
 namespace MultiInstanceManager.Modules
