@@ -21,11 +21,10 @@ namespace MultiInstanceManager
     {
         MultiHandler MH;
         Settings settings;
-        private bool saveCredentials;
+
         public MultiInstanceManager(IKeyboardMouseEvents keyboardMouseEvents)
         {
             InitializeComponent();
-            saveCredentials = false; // Default to false like everywhere, just incase
             addAccountButton.Click += new EventHandler(addAccountButton_Click);
             launchButton.Click += new EventHandler(launchButton_Click);
             removeButton.Click += new EventHandler(removeButton_Click);
@@ -46,18 +45,18 @@ namespace MultiInstanceManager
             modifyWindowTitles.Checked = ConfigurationManager.AppSettings.Get("modifyWindowTitles")?.ToString() == "true" ? true : false;
             modifyWindowTitles.CheckedChanged += new EventHandler(modifyWindowTitles_Changed);
             forceExit.Checked = ConfigurationManager.AppSettings.Get("forceExitClients")?.ToString() == "true" ? true : false;
+            saveAccounInfo.Checked = ConfigurationManager.AppSettings.Get("saveCredentials")?.ToString() == "true" ? true : false;
+            saveAccounInfo.CheckedChanged += new EventHandler(saveAccounInfo_Changed);
 
             forceExitToolTip.SetToolTip(forceExit, "ForceExit means, kill the game client once the tokens are set when 'refreshing'");
             MH = new MultiHandler(this, accountList);
-
+            MH.SetCredentialMode(saveAccounInfo.Checked);
             // Prepare keybinds
             Debug.WriteLine("Adding keybinds");
             settings = new Settings();
             settings.LoadWindowKeys();
             Debug.WriteLine("Done with keybinds");
             MH.LoadAccounts();
-            saveCredentials = ConfigurationManager.AppSettings.Get("saveCredentials")?.ToString() == "true" ? true : false;
-            MH.SetCredentialMode(saveCredentials);
             MH.ToggleWindowTitleMode(modifyWindowTitles.Checked);
             try
             {
@@ -117,6 +116,11 @@ namespace MultiInstanceManager
             {
                 Console.WriteLine("Error writing app settings");
             }
+        }
+        public void saveAccounInfo_Changed(object sender, EventArgs e)
+        {
+            AddOrUpdateAppSettings("saveCredentials", saveAccounInfo.Checked.ToString());
+            MH.SetCredentialMode(saveAccounInfo.Checked);
         }
         public void forceExit_Changed(object sender, EventArgs e)
         {

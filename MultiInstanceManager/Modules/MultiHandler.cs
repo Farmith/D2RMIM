@@ -220,13 +220,18 @@ namespace MultiInstanceManager.Modules
             WinWait(Constants.bnetLauncherClass);
             SetBnetLauncherPID();
             // Do some magic to enter the credentials
-            if(username.Length > 0)
+            if (username.Length > 0)
             {
                 Thread.Sleep(2000);
                 Debug.WriteLine("Finding the login boxes");
-                FillLauncherCredentials(launcherProcess,username, password);
+                FillLauncherCredentials(launcherProcess, username, password);
+                WinWait(Constants.bnetClientClass);
+                StartGameWithLauncherButton();
             }
-            WinWaitClose(Constants.bnetLauncherClass);
+            else
+            {
+                WinWaitClose(Constants.bnetLauncherClass);
+            }
             processCounter++;
             LogDebug("Waiting for Game Client to start");
             ProcessWait(Constants.clientExecutableName);
@@ -321,6 +326,31 @@ namespace MultiInstanceManager.Modules
 
             return new Point(0, 0);
         }
+        private Point FindLauncherButton()
+        {
+            var foregroundWindowsHandle = GetForegroundWindow();
+            var rect = new Rect();
+            GetWindowRect(foregroundWindowsHandle, ref rect);
+
+            var bitmap = GetScreenshot(rect);
+            var delim = bitmap.Width / 3;
+            var lineA = 150;
+            var lineMax = bitmap.Height -1;
+            var findColor = loginButtonColor;
+            SetCursorPos(rect.Left + lineA, rect.Top + 0);
+            for (var i = lineMax; i > 0; i--)
+            {
+                var color = bitmap.GetPixel(lineA, i);
+                if (color == findColor)
+                {
+                    Debug.WriteLine("Found the color!");
+                    return new Point(rect.Left + lineA, rect.Top + i);
+                }
+                Debug.WriteLine("Color: " + color.R + ":" + color.G + ":" + color.B);
+            }
+
+            return new Point(0, 0);
+        }
         private void FillLauncherCredentials(Process launcher, string user, string pass)
         {
             var where = FindUsernameBox();
@@ -361,6 +391,20 @@ namespace MultiInstanceManager.Modules
                 SendKeys.SendWait("{ENTER}");
                 // We should be logging in now!
                 Debug.WriteLine("Should be logging in now");
+            }
+        }
+        private void StartGameWithLauncherButton()
+        {
+            Thread.Sleep(100);
+            var button = FindLauncherButton();
+            while (button.X == 0)
+            {
+                Thread.Sleep(100);
+                button = FindLauncherButton();
+            }
+            if (button.X > 0 && button.Y > 0)
+            {
+                LeftMouseClick(button.X, button.Y - 10);
             }
         }
         public void LeftMouseClick(int xpos, int ypos)
