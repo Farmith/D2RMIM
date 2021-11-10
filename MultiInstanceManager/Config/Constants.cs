@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,6 +23,9 @@ namespace MultiInstanceManager
         public static string bnetClientClass = "Chrome_WidgetWin_0";
         public static string windowKeys = "windowKeys";
         public static string windowKey = "keyBind";
+        /* Colors */
+        public static Color loginButtonColor = Color.FromArgb(255, 0, 116, 224);
+        public static Color usernameBoxColor = Color.FromArgb(255, 16, 17, 23);
 
     }
 }

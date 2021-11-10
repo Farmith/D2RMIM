@@ -1,5 +1,6 @@
 ﻿using Gma.System.MouseKeyHook;
 using MultiInstanceManager.Config;
+using MultiInstanceManager.Helpers;
 using MultiInstanceManager.Modules;
 using System;
 using System.Collections.Generic;
@@ -39,6 +40,7 @@ namespace MultiInstanceManager
                 commandLineArguments.Text = ConfigurationManager.AppSettings["cmdArgs"];
             } catch (Exception e)
             {
+                Debug.WriteLine("Could not get cmdArgs from config: " + e.ToString());
                 commandLineArguments.Text = "";
             }
             commandLineArguments.TextChanged += new EventHandler(commandLineArguments_Changed);
@@ -68,14 +70,14 @@ namespace MultiInstanceManager
             } 
             catch (Exception e)
             {
-                Debug.WriteLine("Game name config faulty");
+                Debug.WriteLine("Game name config faulty: " + e.ToString());
             }
    
             keyboardMouseEvents.KeyPress += (_, args) =>
             {
                 // Prepare usage of tab-keys between windows
                 Debug.WriteLine("Keypress: " + args.KeyChar);
-                if (MH.PriorityWindowFocus())
+                if (WindowHelper.PriorityWindowFocus())
                 {
                     foreach (var binding in settings.KeyToggles)
                     {

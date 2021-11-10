@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using MultiInstanceManager.Helpers;
 using MultiInstanceManager.Structs;
 using System;
 using System.Collections;
@@ -24,43 +25,6 @@ namespace MultiInstanceManager.Modules
     }
     class MultiHandler
     {
-        [DllImport("user32.dll")]
-        private static extern IntPtr GetForegroundWindow();
-
-        [DllImport("user32.dll")]
-        private static extern int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
-        
-        [DllImport("user32.dll")]
-        private static extern int AttachThreadInput(uint Attach, uint AttachTo, bool fAttach);
-
-        [DllImport("user32.dll", SetLastError = true)]
-        private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint processId);
-
-        [DllImport("user32.dll", SetLastError = true)]
-        private static extern uint BringWindowToTop(IntPtr hWnd);
-
-        [DllImport("kernel32.dll", SetLastError = true)]
-        private static extern uint GetCurrentThreadId();
-
-        [DllImport("user32.dll")]
-        static extern bool SetForegroundWindow(IntPtr hWnd);
-
-        [DllImport("user32.dll")]
-        static extern bool SetWindowText(IntPtr hWnd, string text);
-
-        [DllImport("user32.dll")]
-        static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
-        
-        [DllImport("user32.dll")]
-        private static extern IntPtr GetWindowRect(IntPtr hWnd, ref Rect rect);
-        [DllImport("user32.dll")]
-        static extern bool SetCursorPos(int x, int y);
-
-        [DllImport("user32.dll")]
-        public static extern void mouse_event(int dwFlags, int dx, int dy, int cButtons, int dwExtraInfo);
-
-        public const int MOUSEEVENTF_LEFTDOWN = 0x02;
-        public const int MOUSEEVENTF_LEFTUP = 0x04;
         Form parent;
 
         private IntPtr lastWindowHandle;
@@ -72,9 +36,6 @@ namespace MultiInstanceManager.Modules
         private bool modifyWindowTitles;
         private string gameExecutableName;
         private bool saveCredentials;
-        private Rectangle bounds;
-        private Color loginButtonColor = Color.FromArgb(255, 0, 116, 224);
-        private Color usernameBoxColor = Color.FromArgb(255, 16, 17, 23);
 
         public MultiHandler(Form _parent,CheckedListBox _accountList)
         {
@@ -104,39 +65,13 @@ namespace MultiInstanceManager.Modules
                 return true;
             return false;
         }
-        public bool PriorityWindowFocus()
-        {
-            var clients = Process.GetProcessesByName(Constants.clientExecutableName);
-            var focusWindow = GetForegroundWindow();
-            foreach(var client in clients)
-            {
-                if(focusWindow == client.MainWindowHandle)
-                {
-                    return true;
-                }
-            }
-            if(focusWindow == Process.GetCurrentProcess().MainWindowHandle)
-            {
-                return true;
-            }
-            return false;
-        }
+
         public void ToggleWindowTitleMode(bool mode)
         {
             Debug.WriteLine("Changing window title toggle to: " + mode.ToString());
             modifyWindowTitles = mode;
         }
-        public void forceForegroundWindow(IntPtr hwnd)
-        {
-            uint processId = 0;
-            uint windowThreadProcessId = GetWindowThreadProcessId(GetForegroundWindow(), out processId);
-            uint currentThreadId = GetCurrentThreadId();
-            int CONST_SW_SHOW = 5;
-            AttachThreadInput(windowThreadProcessId, currentThreadId, true);
-            BringWindowToTop(hwnd);
-            ShowWindow(hwnd, CONST_SW_SHOW);
-            AttachThreadInput(windowThreadProcessId, currentThreadId, false);
-        }
+
         public KeyToggle SwapFocus(KeyToggle binding)
         {
             var clientProcesses = Process.GetProcessesByName(Constants.clientExecutableName);
@@ -167,10 +102,11 @@ namespace MultiInstanceManager.Modules
             {
                 try
                 {
-                    forceForegroundWindow(binding.WindowHandle);
+                    WindowHelper.forceForegroundWindow(binding.WindowHandle);
                 } catch (Exception e)
                 {
                     // The window has died or been removed or something
+                    Debug.WriteLine("Could not force foreground window: " + e.ToString());
                     binding.WindowHandle = IntPtr.Zero;
                 }
             }
@@ -217,7 +153,7 @@ namespace MultiInstanceManager.Modules
                 }
             }
             var launcherProcess = LaunchLauncher();
-            WinWait(Constants.bnetLauncherClass);
+            WindowHelper.WinWait(Constants.bnetLauncherClass);
             SetBnetLauncherPID();
             // Do some magic to enter the credentials
             if (username.Length > 0)
@@ -225,12 +161,12 @@ namespace MultiInstanceManager.Modules
                 Thread.Sleep(2000);
                 Debug.WriteLine("Finding the login boxes");
                 FillLauncherCredentials(launcherProcess, username, password);
-                WinWait(Constants.bnetClientClass);
-                StartGameWithLauncherButton();
+                WindowHelper.WinWait(Constants.bnetClientClass);
+                AutomationHelper.StartGameWithLauncherButton();
             }
             else
             {
-                WinWaitClose(Constants.bnetLauncherClass);
+                WindowHelper.WinWaitClose(Constants.bnetLauncherClass,launcherProcess.MainWindowHandle);
             }
             processCounter++;
             LogDebug("Waiting for Game Client to start");
@@ -266,97 +202,12 @@ namespace MultiInstanceManager.Modules
             LogDebug("All done, exiting setup thread");
             return true;
         }
-        private Bitmap GetScreenshot(Rect rect)
-        {
-            bounds = new Rectangle(rect.Left, rect.Top, rect.Right - rect.Left, rect.Bottom - rect.Top);
-            // var CursorPosition = new Point(Cursor.Position.X - rect.Left, Cursor.Position.Y - rect.Top);
-            var result = new Bitmap(bounds.Width, bounds.Height);
-            using (var g = Graphics.FromImage(result))
-            {
-                g.CopyFromScreen(new Point(bounds.Left, bounds.Top), Point.Empty, bounds.Size);
-            }
-
-            return result;
-        }
-        private Point FindUsernameBox()
-        {
-            var foregroundWindowsHandle = GetForegroundWindow();
-            var rect = new Rect();
-            GetWindowRect(foregroundWindowsHandle, ref rect);
-
-            var bitmap = GetScreenshot(rect);
-            var delim = bitmap.Width / 3;
-            var lineA = delim * 2;
-            var lineMax = bitmap.Height / 2;
-            var findColor = usernameBoxColor;
-            SetCursorPos(rect.Left + lineA, rect.Top+0);
-            for (var i = 0; i < lineMax; i++)
-            {
-                var color = bitmap.GetPixel(lineA, i);
-                if(color == findColor)
-                {
-                    return new Point(rect.Left+lineA, rect.Top+i);
-                }
-            }
-
-            return new Point(0, 0);
-        }
-        private Point FindLoginButton(int xline,int yline)
-        {
-            var foregroundWindowsHandle = GetForegroundWindow();
-            var rect = new Rect();
-            GetWindowRect(foregroundWindowsHandle, ref rect);
-
-            var bitmap = GetScreenshot(rect);
-            var delim = bitmap.Width / 3;
-            var lineA = delim * 2;
-            var lineMax = bitmap.Height;
-            var findColor = loginButtonColor;
-            SetCursorPos(rect.Left+lineA, rect.Top+0);
-            for (var i = 0; i < lineMax; i++)
-            {
-                var color = bitmap.GetPixel(lineA, i);
-                if (color == findColor)
-                {
-                    Debug.WriteLine("Found the color!");
-                    return new Point(rect.Left + lineA, rect.Top + i);
-                }
-                Debug.WriteLine("Color: " + color.R + ":" + color.G + ":" + color.B);
-            }
-
-            return new Point(0, 0);
-        }
-        private Point FindLauncherButton()
-        {
-            var foregroundWindowsHandle = GetForegroundWindow();
-            var rect = new Rect();
-            GetWindowRect(foregroundWindowsHandle, ref rect);
-
-            var bitmap = GetScreenshot(rect);
-            var delim = bitmap.Width / 3;
-            var lineA = 150;
-            var lineMax = bitmap.Height -1;
-            var findColor = loginButtonColor;
-            SetCursorPos(rect.Left + lineA, rect.Top + 0);
-            for (var i = lineMax; i > 0; i--)
-            {
-                var color = bitmap.GetPixel(lineA, i);
-                if (color == findColor)
-                {
-                    Debug.WriteLine("Found the color!");
-                    return new Point(rect.Left + lineA, rect.Top + i);
-                }
-                Debug.WriteLine("Color: " + color.R + ":" + color.G + ":" + color.B);
-            }
-
-            return new Point(0, 0);
-        }
         private void FillLauncherCredentials(Process launcher, string user, string pass)
         {
-            var where = FindUsernameBox();
+            var where = AutomationHelper.FindUsernameBox();
             if (where.X > 0 && where.Y > 0)
             {
-                LeftMouseClick(where.X, where.Y+5);
+                AutomationHelper.LeftMouseClick(where.X, where.Y+5);
 
                 // We should be in the text-box now, we hope
                 SendKeys.SendWait("^(a)");
@@ -375,11 +226,11 @@ namespace MultiInstanceManager.Modules
                 }
                 Thread.Sleep(100);
                 Debug.WriteLine("Finding login button");
-                var button = FindLoginButton(where.X, where.Y);
+                var button = AutomationHelper.FindLoginButton(where.X, where.Y);
                 while (button.X == 0)
                 {
                     Thread.Sleep(100);
-                    button = FindLoginButton(where.X, where.Y);
+                    button = AutomationHelper.FindLoginButton(where.X, where.Y);
                 }
                 // Sleep a little, then tab to it
                 Debug.WriteLine("Tabbing to button!");
@@ -393,26 +244,8 @@ namespace MultiInstanceManager.Modules
                 Debug.WriteLine("Should be logging in now");
             }
         }
-        private void StartGameWithLauncherButton()
-        {
-            Thread.Sleep(100);
-            var button = FindLauncherButton();
-            while (button.X == 0)
-            {
-                Thread.Sleep(100);
-                button = FindLauncherButton();
-            }
-            if (button.X > 0 && button.Y > 0)
-            {
-                LeftMouseClick(button.X, button.Y - 10);
-            }
-        }
-        public void LeftMouseClick(int xpos, int ypos)
-        {
-            SetCursorPos(xpos, ypos);
-            mouse_event(MOUSEEVENTF_LEFTDOWN, xpos, ypos, 0, 0);
-            mouse_event(MOUSEEVENTF_LEFTUP, xpos, ypos, 0, 0);
-        }
+
+
         private void ModifyWindowTitleName(Process process, string displayName)
         {
             Debug.WriteLine("Modding if needed: " + modifyWindowTitles.ToString());
@@ -420,7 +253,7 @@ namespace MultiInstanceManager.Modules
             {
                 var newTitle = "[ " + displayName + " ] Diablo II: Resurrected";
                 Debug.WriteLine("Changing window title to: " + newTitle);
-                SetWindowText(process.MainWindowHandle, newTitle);
+                WindowHelper.SetWindowText(process.MainWindowHandle, newTitle);
             }
         }
 
@@ -432,14 +265,11 @@ namespace MultiInstanceManager.Modules
             {
                 foreach (var process in processes)
                 {
-                    LogDebug("Closing handle for: " + process.Id);
                     ProcessManager.CloseExternalHandles(process.ProcessName);
                 }
-            } else
-            {
-                LogDebug("No D2R processes found");
             }
         }
+
         public void ResetSessions()
         {
             CloseBnetLauncher();
@@ -526,7 +356,7 @@ namespace MultiInstanceManager.Modules
         }
         private void SetBnetLauncherPID()
         {
-            GetWindowThreadProcessId(lastWindowHandle, out bnetLauncherPID);
+            WindowHelper.GetWindowThreadProcessId(lastWindowHandle, out bnetLauncherPID);
         }
         private void CloseGameClient(int pid)
         {
@@ -567,48 +397,6 @@ namespace MultiInstanceManager.Modules
             lastWindowHandle = p.MainWindowHandle;
             return p;
         }
-        private Boolean HasClass(IntPtr windowHandle, string windowClass)
-        {
-            StringBuilder lpsClassName = new StringBuilder();
-            var classes = GetClassName(windowHandle, lpsClassName, 30);
-            LogDebug("Current windowClass: " + lpsClassName.ToString() + "\r\n");
-            if (lpsClassName.ToString() == windowClass)
-                return true;
-            return false;
-        }
-        private void WinWait(string windowClass)
-        {
-            IntPtr windowHandle = GetForegroundWindow();
-            int maxWait = 2000;
-            int waitTime = 0;
-            while (!HasClass(windowHandle,windowClass) && waitTime < maxWait ) 
-            {
-                LogDebug("Could not find window of class: " + windowClass);
-                Thread.Sleep(100);
-                windowHandle = GetForegroundWindow();
-                waitTime++;
-            }
-            if (waitTime >= maxWait)
-                LogDebug("Giving up finding window");
-            else
-                lastWindowHandle = windowHandle;
-            LogDebug("Found window, yeet");
-        }
-        private void WinWaitClose(string windowClass)
-        {
-            int maxWait = 2000;
-            int waitTime = 0;
-            while (HasClass(lastWindowHandle, windowClass) && waitTime < maxWait)
-            {
-                LogDebug("We still waiting");
-                Thread.Sleep(100);
-                waitTime++;
-                if (waitTime >= maxWait)
-                    LogDebug("Giving up waiting");
-            }
-            LogDebug("Finally its closed");
-        }
-
         private void ProcessWait(string processName)
         {
             LogDebug("Waiting for process: " + processName);
@@ -701,32 +489,5 @@ namespace MultiInstanceManager.Modules
         {
             File.AppendAllText("debug.log", text + "\r\n");
          }
-    }
-
-    public static class Prompt
-    {
-        public static string ShowDialog(string text, string caption)
-        {
-            Form prompt = new Form()
-            {
-                Width = 500,
-                Height = 150,
-                FormBorderStyle = FormBorderStyle.FixedDialog,
-                Text = caption,
-                StartPosition = FormStartPosition.CenterScreen
-            };
-            Label textLabel = new Label() { Left = 50, Top = 20, Text = text };
-            textLabel.Width = TextRenderer.MeasureText(textLabel.Text, textLabel.Font).Width;
-
-            TextBox textBox = new TextBox() { Left = 50, Top = 50, Width = 400 };
-            Button confirmation = new Button() { Text = "Continue", Left = 350, Width = 100, Top = 70, DialogResult = DialogResult.OK };
-            confirmation.Click += (sender, e) => { prompt.Close(); };
-            prompt.Controls.Add(textBox);
-            prompt.Controls.Add(confirmation);
-            prompt.Controls.Add(textLabel);
-            prompt.AcceptButton = confirmation;
-
-            return prompt.ShowDialog() == DialogResult.OK ? textBox.Text : "";
-        }
     }
 }

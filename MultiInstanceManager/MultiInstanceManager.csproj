@@ -101,6 +101,11 @@
     <Compile Include="Config\Sections.cs" />
     <Compile Include="Config\Settings.cs" />
     <Compile Include="Config\WindowKeyBindElement.cs" />
+    <Compile Include="Extensions\StringExtensions.cs" />
+    <Compile Include="Helpers\AutomationHelper.cs" />
+    <Compile Include="Helpers\Prompt.cs" />
+    <Compile Include="Helpers\Sanity.cs" />
+    <Compile Include="Helpers\WindowHelper.cs" />
     <Compile Include="Interfaces\IKeyBind.cs" />
     <Compile Include="Modules\MultiHandler.cs" />
     <Compile Include="Modules\ProcessManager.cs" />

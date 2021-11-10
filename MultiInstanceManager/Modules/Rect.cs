@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MultiInstanceManager.Modules
 {
-    struct Rect
+    public struct Rect
     {
         public int Left;
         public int Top;
