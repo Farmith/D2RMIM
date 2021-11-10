@@ -49,6 +49,7 @@ namespace MultiInstanceManager
             this.forceExit = new System.Windows.Forms.CheckBox();
             this.forceExitToolTip = new System.Windows.Forms.ToolTip(this.components);
             this.modifyWindowTitles = new System.Windows.Forms.CheckBox();
+            this.saveAccounInfo = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // label1
@@ -206,11 +207,22 @@ namespace MultiInstanceManager
             this.modifyWindowTitles.Text = "Modify Window Titles";
             this.modifyWindowTitles.UseVisualStyleBackColor = true;
             // 
+            // saveAccounInfo
+            // 
+            this.saveAccounInfo.AutoSize = true;
+            this.saveAccounInfo.Location = new System.Drawing.Point(178, 308);
+            this.saveAccounInfo.Name = "saveAccounInfo";
+            this.saveAccounInfo.Size = new System.Drawing.Size(180, 17);
+            this.saveAccounInfo.TabIndex = 18;
+            this.saveAccounInfo.Text = "Save Accountinfo (Experimental)";
+            this.saveAccounInfo.UseVisualStyleBackColor = true;
+            // 
             // MultiInstanceManager
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(392, 392);
+            this.Controls.Add(this.saveAccounInfo);
             this.Controls.Add(this.modifyWindowTitles);
             this.Controls.Add(this.forceExit);
             this.Controls.Add(this.dumpRegKeyButton);
@@ -256,6 +268,7 @@ namespace MultiInstanceManager
         private System.Windows.Forms.CheckBox forceExit;
         private System.Windows.Forms.ToolTip forceExitToolTip;
         private System.Windows.Forms.CheckBox modifyWindowTitles;
+        private System.Windows.Forms.CheckBox saveAccounInfo;
     }
 }
 
