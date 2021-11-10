@@ -54,7 +54,8 @@ FAQ:
 			5. Rename dump.bin to a name you prefer for this particular account and start D2RMIM, you can now press Launch with the proper name.
 			
 	* Does this application save my username/password in any way?
-		- A) Not unless someone else added something to it that wasn't there originally
+		- A) If you choose to use the "Automation" feature, your username and password will be saved into your windows credential store, should you wish to use it, 
+			but usage of that feature is completely optional.
 
 	* How does this app work?
 		- A) It uses one-time hashes/keys stored by the D2R client to authenticate just like it normally does
