@@ -71,6 +71,12 @@ FAQ:
 
 ## Version log:
 
+* 1.5
+	-	Auto-login is working (experimental mode, let me know how it works for you)
+	-		Auto-Login uses the built-in windows credential system to save credentials locally on your computer. if you don't want your credentials saved on your computer, just don't use the feature.
+	-	Major stability improvements, UI no longer freezes while refreshing/adding accounts
+	-	Usability upgrades, buttons become grayed out if D2RMIM is in the middle of tasks, wait for the buttons to become available or restart app if need be.
+
 * 1.4.2
 	-	Feature release, added global hotkeys (which can be disabled in the .config file) per default: numlock enabled -> numpad 0 = first client, numpad 1 = 2nd client, numpad 2 = third client
 	-	Check the changes in MultiInstanceManager.config for adding less/more hotkeys, setting them to enabled="false" disables them and enabled="true" enables them.
