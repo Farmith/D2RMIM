@@ -112,10 +112,9 @@ namespace MultiInstanceManager.Modules
         #endregion
 
         public static uint NAMEDPIPEMASK = 0x0012019F;
-        public static string PROCESS_NAME = "D2R";
         public static string MUTEX_STRING = "Instances";
 
-        public static bool CloseExternalHandles()
+        public static bool CloseExternalHandles(string name)
         {
             bool success = false;
 
@@ -123,7 +122,7 @@ namespace MultiInstanceManager.Modules
 
             foreach (Process i in processList)
             {
-                if (i.ProcessName.Equals(PROCESS_NAME, StringComparison.OrdinalIgnoreCase))
+                if (i.ProcessName.Equals(name, StringComparison.OrdinalIgnoreCase))
                 {
                     if (KillHandle(i, MUTEX_STRING))
                     {

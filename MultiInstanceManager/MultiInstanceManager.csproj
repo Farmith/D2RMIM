@@ -71,7 +71,13 @@
     <ErrorReport>prompt</ErrorReport>
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>D2R_102-6-blue.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CredentialManagement, Version=1.0.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CredentialManagement.1.0.2\lib\net35\CredentialManagement.dll</HintPath>
+    </Reference>
     <Reference Include="Gma.System.MouseKeyHook, Version=5.6.130.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MouseKeyHook.5.6.0\lib\net40\Gma.System.MouseKeyHook.dll</HintPath>
     </Reference>
@@ -98,6 +104,8 @@
     <Compile Include="Interfaces\IKeyBind.cs" />
     <Compile Include="Modules\MultiHandler.cs" />
     <Compile Include="Modules\ProcessManager.cs" />
+    <Compile Include="Modules\Rect.cs" />
+    <Compile Include="Modules\Vault.cs" />
     <Compile Include="MultiInstanceManager.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -106,6 +114,7 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Structs\Credentials.cs" />
     <Compile Include="Structs\KeyToggle.cs" />
     <EmbeddedResource Include="MultiInstanceManager.resx">
       <DependentUpon>MultiInstanceManager.cs</DependentUpon>
@@ -145,6 +154,9 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="D2R_102-6-blue.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

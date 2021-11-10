@@ -48,6 +48,8 @@ namespace MultiInstanceManager
             this.dumpRegKeyButton = new System.Windows.Forms.Button();
             this.forceExit = new System.Windows.Forms.CheckBox();
             this.forceExitToolTip = new System.Windows.Forms.ToolTip(this.components);
+            this.modifyWindowTitles = new System.Windows.Forms.CheckBox();
+            this.saveAccounInfo = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // label1
@@ -99,9 +101,9 @@ namespace MultiInstanceManager
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(16, 13);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(309, 13);
+            this.label2.Size = new System.Drawing.Size(305, 13);
             this.label2.TabIndex = 5;
-            this.label2.Text = "This application has the ability to launch severan D2R instances";
+            this.label2.Text = "This application has the ability to launch several D2R instances";
             // 
             // label3
             // 
@@ -134,7 +136,7 @@ namespace MultiInstanceManager
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(245, 312);
+            this.label5.Location = new System.Drawing.Point(242, 367);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(131, 13);
             this.label5.TabIndex = 9;
@@ -188,18 +190,40 @@ namespace MultiInstanceManager
             // forceExit
             // 
             this.forceExit.AutoSize = true;
-            this.forceExit.Location = new System.Drawing.Point(19, 308);
+            this.forceExit.Location = new System.Drawing.Point(19, 331);
             this.forceExit.Name = "forceExit";
             this.forceExit.Size = new System.Drawing.Size(73, 17);
             this.forceExit.TabIndex = 16;
             this.forceExit.Text = "Force Exit";
             this.forceExit.UseVisualStyleBackColor = true;
             // 
+            // modifyWindowTitles
+            // 
+            this.modifyWindowTitles.AutoSize = true;
+            this.modifyWindowTitles.Location = new System.Drawing.Point(19, 308);
+            this.modifyWindowTitles.Name = "modifyWindowTitles";
+            this.modifyWindowTitles.Size = new System.Drawing.Size(127, 17);
+            this.modifyWindowTitles.TabIndex = 17;
+            this.modifyWindowTitles.Text = "Modify Window Titles";
+            this.modifyWindowTitles.UseVisualStyleBackColor = true;
+            // 
+            // saveAccounInfo
+            // 
+            this.saveAccounInfo.AutoSize = true;
+            this.saveAccounInfo.Location = new System.Drawing.Point(178, 308);
+            this.saveAccounInfo.Name = "saveAccounInfo";
+            this.saveAccounInfo.Size = new System.Drawing.Size(180, 17);
+            this.saveAccounInfo.TabIndex = 18;
+            this.saveAccounInfo.Text = "Save Accountinfo (Experimental)";
+            this.saveAccounInfo.UseVisualStyleBackColor = true;
+            // 
             // MultiInstanceManager
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(392, 348);
+            this.ClientSize = new System.Drawing.Size(392, 392);
+            this.Controls.Add(this.saveAccounInfo);
+            this.Controls.Add(this.modifyWindowTitles);
             this.Controls.Add(this.forceExit);
             this.Controls.Add(this.dumpRegKeyButton);
             this.Controls.Add(this.killHandlesButton);
@@ -243,6 +267,8 @@ namespace MultiInstanceManager
         private System.Windows.Forms.Button dumpRegKeyButton;
         private System.Windows.Forms.CheckBox forceExit;
         private System.Windows.Forms.ToolTip forceExitToolTip;
+        private System.Windows.Forms.CheckBox modifyWindowTitles;
+        private System.Windows.Forms.CheckBox saveAccounInfo;
     }
 }
 
