@@ -229,12 +229,30 @@ namespace MultiInstanceManager.Modules
             {
                 WindowHelper.ModifyWindowTitleName(process, accountName);
             }
+            // Add a way to abort the frenetic clicking
+            LogDebug("Clicking away");
+            Debug.WriteLine("Clicking away");
+            var freneticClickingCTS = new CancellationTokenSource();
+            CancellationToken freneticClickingCT = freneticClickingCTS.Token;
+
+            var task = Task.Factory.StartNew(() => AutomationHelper.ClickFreneticallyInsideWindow(freneticClickingCT, process, 2), freneticClickingCTS.Token);
             // Wait for a new token
             WaitForNewToken(process);
             // Then wait again incase it changes in any forseeable future
             WaitForNewToken(process,true); // Specify that we do want the 30s timeout, just incase
+            try
+            {
+                freneticClickingCTS.Cancel();
+            }
+            catch (OperationCanceledException e)
+            {
+                Debug.WriteLine("Clicking canceled: " + e);
+            }
+            finally
+            {
+                freneticClickingCTS.Dispose();
+            }
 
-            
             if (ProcessManager.MatchProcess(process))
             {
                 LogDebug("Process seems to be alive: " + process.Id);

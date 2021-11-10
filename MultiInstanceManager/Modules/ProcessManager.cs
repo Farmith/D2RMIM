@@ -357,7 +357,7 @@ namespace MultiInstanceManager.Modules
                 }
                 catch (Exception e)
                 {
-                    Debug.WriteLine("Need to wait a bit, process not ready");
+                    Debug.WriteLine("Need to wait a bit, process not ready: " + e.Message.ToString());
                     Thread.Sleep(10);
                 }
             }
