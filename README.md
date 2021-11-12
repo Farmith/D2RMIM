@@ -13,6 +13,7 @@
 
 ## Discord:
 
+If you want to chat about the app, have feature requests you wish to brainstorm or just feel like saying hi feel free to join the discord channel.
 https://discord.gg/jTYH5Wgz
 
 ## Preparation:
