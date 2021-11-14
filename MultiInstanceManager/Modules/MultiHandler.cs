@@ -142,13 +142,13 @@ namespace MultiInstanceManager.Modules
             processCounter++;
             Log.Debug("Waiting for Game Client to start");
             var clientExecutable = ProcessManager.ProcessWait(Constants.clientExecutableName,processCounter);
-            var keeptrying = true;
             Log.Debug("Client ready, glhf");
             // Wait for the initial token update
             if (modifyWindowTitles)
             {
                 WindowHelper.ModifyWindowTitleName(clientExecutable, displayName);
                 clientExecutable.Refresh();
+                // This should only be done if the user explicitly asks for it:
                 Log.Debug("Handle: " + clientExecutable.MainWindowHandle.ToString());
                 WindowHelper.SetWindowApplicationId(clientExecutable.MainWindowHandle, "D2R" + displayName);
             }
@@ -232,6 +232,9 @@ namespace MultiInstanceManager.Modules
             if(modifyWindowTitles)
             {
                 WindowHelper.ModifyWindowTitleName(process, accountName);
+                // This should only be done if the user explicitly asks for it:
+                Log.Debug("Handle: " + process.MainWindowHandle.ToString());
+                WindowHelper.SetWindowApplicationId(process.MainWindowHandle, "D2R" + accountName);
             }
             // Add a way to abort the frenetic clicking
             Log.Debug("Clicking away");
@@ -302,14 +305,11 @@ namespace MultiInstanceManager.Modules
         }
         private void _loadAccounts()
         {
-            var ePath = Application.ExecutablePath;
-            var path = Path.GetDirectoryName(ePath);
+            var accounts = FileHelper.GetAccountsByFolder();
             accountList.Items.Clear();
-            var accounts = Directory.GetFiles(path, "*.bin");
             foreach (var account in accounts)
             {
-                var lastWrite = File.GetLastWriteTime(account);
-                var fileName = Path.GetFileNameWithoutExtension(account) + " | " + lastWrite.ToString();
+                var fileName = account.AccountName + " | " + account.LastWriteTime.ToString();
                 accountList.Items.Add(fileName);
             }
         }

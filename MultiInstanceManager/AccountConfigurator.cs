@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -15,15 +16,27 @@ namespace MultiInstanceManager
 {
     public partial class AccountConfiguration : Form
     {
+        private List<AccountBinary> Accounts;
         public AccountConfiguration()
         {
             InitializeComponent();
             resetRegion();
+            FillAccounts();
             selectAccount.SelectedIndexChanged += new EventHandler(selectAccount_SelectedIndexChanged);
 
             // These below may not be neccessary because: Save Button
             useDefaultGame.CheckedChanged += new EventHandler(useDefaultGame_CheckedChanged);
             skipIntroVideos.CheckedChanged += new EventHandler(skipIntroVideos_CheckedChanged);
+            hotKeyKey.KeyDown += hotKeyKey_KeyDown;
+        }
+        private void FillAccounts()
+        {
+            selectAccount.Items.Clear();
+            Accounts = FileHelper.GetAccountsByFolder();
+            foreach(var account in Accounts)
+            {
+                selectAccount.Items.Add(account.AccountName);
+            }
         }
         private void SaveConfiguration()
         {
@@ -80,6 +93,47 @@ namespace MultiInstanceManager
             selectedRegion.Items.Add("Americas");
             selectedRegion.Items.Add("Asia");
         }
+        private void hotKeyKey_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode < Keys.NumPad0 || e.KeyCode > Keys.NumPad9)
+            {
+                Debug.WriteLine("Key is a keypad press");
+                // Keypad, only supported for now.
+                switch(e.KeyCode)
+                {
+                    case Keys.NumPad0:
+                        hotKeyKey.Text = "Numpad.0";
+                        break;
+                    case Keys.NumPad1:
+                        hotKeyKey.Text = "Numpad.1";
+                        break;
+                    case Keys.NumPad2:
+                        hotKeyKey.Text = "Numpad.2";
+                        break;
+                    case Keys.NumPad3:
+                        hotKeyKey.Text = "Numpad.3";
+                        break;
+                    case Keys.NumPad4:
+                        hotKeyKey.Text = "Numpad.4";
+                        break;
+                    case Keys.NumPad5:
+                        hotKeyKey.Text = "Numpad.5";
+                        break;
+                    case Keys.NumPad6:
+                        hotKeyKey.Text = "Numpad.6";
+                        break;
+                    case Keys.NumPad7:
+                        hotKeyKey.Text = "Numpad.7";
+                        break;
+                    case Keys.NumPad8:
+                        hotKeyKey.Text = "Numpad.8";
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
         private void checkBox4_CheckedChanged(object sender, EventArgs e)
         {
 
@@ -97,7 +151,11 @@ namespace MultiInstanceManager
 
         private void useDefaultGame_CheckedChanged(object sender, EventArgs e)
         {
-
+            if (useDefaultGame.Checked)
+            {
+                installationPath.Text = (string)Registry.GetValue(Constants.gameInstallRegKey[0], Constants.gameInstallRegKey[1], "");
+                gameExecutableName.Text = Constants.clientExecutableName + Constants.executableFileExt;
+            }
         }
 
         private void skipIntroVideos_CheckedChanged(object sender, EventArgs e)

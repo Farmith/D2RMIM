@@ -22,7 +22,7 @@ namespace MultiInstanceManager
     {
         MultiHandler MH;
         Settings settings;
-
+        AccountConfiguration accountConfig;
         public MultiInstanceManager(IKeyboardMouseEvents keyboardMouseEvents)
         {
             InitializeComponent();
@@ -48,6 +48,14 @@ namespace MultiInstanceManager
             forceExit.Checked = ConfigurationManager.AppSettings.Get("forceExitClients")?.ToString() == "true" ? true : false;
             saveAccounInfo.Checked = ConfigurationManager.AppSettings.Get("saveCredentials")?.ToString() == "true" ? true : false;
             saveAccounInfo.CheckedChanged += new EventHandler(saveAccounInfo_Changed);
+
+            /*
+             * Account configuration stuff
+             * 
+             */
+            configureAccountsButton.Click += new EventHandler(configureAccountsButton_Click);
+            accountConfig = new AccountConfiguration();
+            accountConfig.Disposed += new EventHandler(accountConfig_Disposed);
 
             forceExitToolTip.SetToolTip(forceExit, "ForceExit means, kill the game client once the tokens are set when 'refreshing'");
             MH = new MultiHandler(this, accountList);
@@ -115,6 +123,17 @@ namespace MultiInstanceManager
                 Console.WriteLine("Error writing app settings");
             }
         }
+        public void accountConfig_Disposed(object sender, EventArgs e)
+        {
+            accountConfig = new AccountConfiguration();
+            accountConfig.Disposed += new EventHandler(accountConfig_Disposed);
+            configureAccountsButton.Enabled = true;
+        }
+        public void configureAccountsButton_Click(object sender, EventArgs e)
+        {
+            configureAccountsButton.Enabled = false;
+            accountConfig.Show();
+        }
         public void saveAccounInfo_Changed(object sender, EventArgs e)
         {
             AddOrUpdateAppSettings("saveCredentials", saveAccounInfo.Checked.ToString());
@@ -143,11 +162,6 @@ namespace MultiInstanceManager
             var result = await task;
             EnableButtons();
             MH.LoadAccounts();
-        }
-        private void killHandlesButton_Click(object sender, EventArgs e)
-        {
-            // ProcessManager.CloseExternalHandles(ConfigurationManager.AppSettings.Get("gameExecutableName")?.ToString());
-            // MH.KillGameClientHandles();
         }
         private async void launchButton_Click(object sender, System.EventArgs e)
         {

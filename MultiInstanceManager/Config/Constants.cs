@@ -27,13 +27,6 @@ namespace MultiInstanceManager
         /* Colors */
         public static Color loginButtonColor = Color.FromArgb(255, 0, 116, 224);
         public static Color usernameBoxColor = Color.FromArgb(255, 16, 17, 23);
-        /* formats */
-        public static string PropertyKeyFormatString = "{0}, {1}";
 
-        /* property strings */
-        public static string PropVariantUnsupportedType = "Cannot be cast to unsupported type.";
-        public static string PropVariantMultiDimArray = "Multi-dimensional SafeArrays not supported.";
-        public static string PropVariantNullString = "String argument cannot be null or empty.";
-        public static string PropVariantTypeNotSupported = "This Value type is not supported.";
     }
 }
