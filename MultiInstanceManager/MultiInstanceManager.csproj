@@ -118,11 +118,9 @@
     <Compile Include="Helpers\CredentialHelper.cs" />
     <Compile Include="Helpers\Log.cs" />
     <Compile Include="Helpers\Prompt.cs" />
-    <Compile Include="Helpers\PropVariantNativeMethods.cs" />
     <Compile Include="Helpers\Sanity.cs" />
     <Compile Include="Helpers\WindowHelper.cs" />
     <Compile Include="Interfaces\IKeyBind.cs" />
-    <Compile Include="Interfaces\IPropertyStore.cs" />
     <Compile Include="Modules\MultiHandler.cs" />
     <Compile Include="Modules\ProcessManager.cs" />
     <Compile Include="Modules\Rect.cs" />
@@ -141,8 +139,6 @@
     <Compile Include="Structs\HotKey.cs" />
     <Compile Include="Structs\LaunchSettings.cs" />
     <Compile Include="Structs\KeyToggle.cs" />
-    <Compile Include="Structs\PropertyKey.cs" />
-    <Compile Include="Structs\PropVariant.cs" />
     <EmbeddedResource Include="AccountConfigurator.resx">
       <DependentUpon>AccountConfigurator.cs</DependentUpon>
     </EmbeddedResource>

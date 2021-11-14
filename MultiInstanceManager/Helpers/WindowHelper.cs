@@ -41,16 +41,25 @@ namespace MultiInstanceManager.Helpers
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern uint GetCurrentThreadId();
         
-        [DllImport("shell32.dll", SetLastError = true)]
-        static extern int SHGetPropertyStoreForWindow(IntPtr handle, ref Guid riid, out IPropertyStore propertyStore);
-
         public static void ShowMessage(string message)
         {
             _ = MessageBox.Show(message);
         }
-        public static void SetWindowApplicationId(IntPtr handle,string applicationId)
+        public static void SetWindowApplicationId(IntPtr handle,string applicationId,bool noretry = false)
         {
-            TaskbarManager.Instance.SetApplicationIdForSpecificWindow(handle, applicationId);
+            try
+            {
+                TaskbarManager.Instance.SetApplicationIdForSpecificWindow(handle, applicationId);
+            } catch (Exception e)
+            {
+                Log.Debug("Can not modify AppID: " + e.ToString());
+                if (!noretry)
+                {
+                    Log.Debug("Trying again in 5s");
+                    Thread.Sleep(5000);
+                    SetWindowApplicationId(handle, applicationId, true);
+                }
+            }
         }
 
         public static void ModifyWindowTitleName(Process process, string displayName)

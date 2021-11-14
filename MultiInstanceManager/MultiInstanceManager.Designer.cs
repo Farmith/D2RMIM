@@ -214,7 +214,6 @@ namespace MultiInstanceManager
             this.configureAccountsButton.TabIndex = 19;
             this.configureAccountsButton.Text = "Configure";
             this.configureAccountsButton.UseVisualStyleBackColor = true;
-            this.configureAccountsButton.Click += new System.EventHandler(this.configureAccountsButton_Click);
             // 
             // MultiInstanceManager
             // 

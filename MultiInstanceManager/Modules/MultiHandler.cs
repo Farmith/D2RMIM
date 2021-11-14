@@ -142,11 +142,15 @@ namespace MultiInstanceManager.Modules
             processCounter++;
             Log.Debug("Waiting for Game Client to start");
             var clientExecutable = ProcessManager.ProcessWait(Constants.clientExecutableName,processCounter);
+            var keeptrying = true;
             Log.Debug("Client ready, glhf");
             // Wait for the initial token update
             if (modifyWindowTitles)
             {
                 WindowHelper.ModifyWindowTitleName(clientExecutable, displayName);
+                clientExecutable.Refresh();
+                Log.Debug("Handle: " + clientExecutable.MainWindowHandle.ToString());
+                WindowHelper.SetWindowApplicationId(clientExecutable.MainWindowHandle, "D2R" + displayName);
             }
             // Add a way to abort the frenetic clicking
             Log.Debug("Clicking away");
@@ -272,7 +276,6 @@ namespace MultiInstanceManager.Modules
         private Process LaunchGame(string accountName, string cmdArgs = "")
         {
             string installPath = (string)Registry.GetValue(Constants.gameInstallRegKey[0], Constants.gameInstallRegKey[1], "");
-            Log.Debug("InstallPath: " + installPath);
             var process = new Process();
             process.StartInfo.FileName = installPath + "\\" + gameExecutableName;
             process.StartInfo.Arguments = cmdArgs;
