@@ -20,6 +20,9 @@ namespace MultiInstanceManager
         private bool hotKeyPressRegistered = false;
         private string hotKeyPressString = "";
         private Keys? modifier = null;
+        private Keys? hotkey = null;
+        private HotKey _HotKey;
+        private Account _Account;
 
         public AccountConfiguration()
         {
@@ -34,6 +37,30 @@ namespace MultiInstanceManager
             hotKeyKey.KeyDown += hotKeyKey_KeyDown;
             hotKeyKey.KeyPress += hotKeyKey_KeyPress;
             hotKeyKey.KeyUp += hotKeyKey_KeyUp;
+
+            saveConfig.Click += SaveConfiguration;
+        }
+        private void LoadAccount()
+        {
+            _Account = FileHelper.LoadAccountConfiguration(selectAccount.SelectedItem.ToString());
+            if (_Account != null)
+            {
+                modifyWindowTitles.Checked = _Account.ModifyWindowtitles;
+                skipIntroVideos.Checked = _Account.SkipCinematics;
+                enableHotkeys.Checked = _Account.WindowHotKey.Enabled;
+                var extraMod = "";
+                if (_Account.WindowHotKey.ModifierKey.ToString().Length > 0)
+                {
+                    extraMod = _Account.WindowHotKey.ModifierKey.ToString() + "+";
+                }
+                currentHotKey.Text = extraMod + "[" + _Account.WindowHotKey.Key.ToString() + "]";
+                gameExecutableName.Text = _Account.GameExecutable;
+                installationPath.Text = _Account.InstallationPath;
+                useDefaultGame.Checked = _Account.UseDefaultGameInstallation;
+            } else
+            {
+                Console.WriteLine("Previous config is null");
+            }
         }
         private void FillAccounts()
         {
@@ -44,11 +71,11 @@ namespace MultiInstanceManager
                 selectAccount.Items.Add(account.AccountName);
             }
         }
-        private void SaveConfiguration()
+        private void SaveConfiguration(object sender, EventArgs e)
         {
             Account config = new Account();
 
-            config.DisplayName = selectAccount.SelectedIndex.ToString();
+            config.DisplayName = selectAccount.SelectedItem.ToString();
             if (!useDefaultGame.Checked) {
                 config.InstallationPath = installationPath.Text;
                 config.GameExecutable = gameExecutableName.Text;
@@ -57,7 +84,7 @@ namespace MultiInstanceManager
                 try
                 {
                     config.InstallationPath = (string)Registry.GetValue(Constants.gameInstallRegKey[0], Constants.gameInstallRegKey[1], "");
-                } catch (Exception e)
+                } catch (Exception ex)
                 {
                     Log.Debug("Can not find installation in registry: " + e.ToString());
                     config.InstallationPath = "";
@@ -81,11 +108,9 @@ namespace MultiInstanceManager
 
             config.SkipCinematics = skipIntroVideos.Checked;
             config.ModifyWindowtitles = modifyWindowTitles.Checked;
+            config.WindowHotKey = _HotKey;
 
-            HotKey windowHotKey = new HotKey();
-            var mod = "";
-            // windowHotKey.ModifierKey = hotKeyModifier.SelectedIndex.ToString();
-            windowHotKey.Key = hotKeyKey.Text.ToCharArray().First();
+            FileHelper.SaveAccountConfiguration(config);
 
         }
         private void resetRegion()
@@ -205,6 +230,8 @@ namespace MultiInstanceManager
                 hotKeyPressString = _hotkey;
                 if(hotKeyPressString.Length > 0)
                 {
+                    hotkey = e.KeyCode;
+                    _HotKey = new HotKey { ModifierKey = modifier, Key = e.KeyCode, Enabled = true };
                     hotKeyPressRegistered = true;
                 }
             }
@@ -245,7 +272,7 @@ namespace MultiInstanceManager
 
         private void selectAccount_SelectedIndexChanged(object sender, EventArgs e)
         {
-
+            LoadAccount();
         }
 
         private void useDefaultGame_CheckedChanged(object sender, EventArgs e)

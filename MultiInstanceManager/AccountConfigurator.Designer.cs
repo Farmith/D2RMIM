@@ -60,7 +60,7 @@ namespace MultiInstanceManager
             this.label10 = new System.Windows.Forms.Label();
             this.label9 = new System.Windows.Forms.Label();
             this.enableHotkeys = new System.Windows.Forms.CheckBox();
-            this.button2 = new System.Windows.Forms.Button();
+            this.saveConfig = new System.Windows.Forms.Button();
             this.currentHotKey = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -355,14 +355,14 @@ namespace MultiInstanceManager
             this.enableHotkeys.Text = "Enable Hotkey (Global)";
             this.enableHotkeys.UseVisualStyleBackColor = true;
             // 
-            // button2
+            // saveConfig
             // 
-            this.button2.Location = new System.Drawing.Point(319, 12);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(75, 23);
-            this.button2.TabIndex = 5;
-            this.button2.Text = "Save";
-            this.button2.UseVisualStyleBackColor = true;
+            this.saveConfig.Location = new System.Drawing.Point(319, 12);
+            this.saveConfig.Name = "saveConfig";
+            this.saveConfig.Size = new System.Drawing.Size(75, 23);
+            this.saveConfig.TabIndex = 5;
+            this.saveConfig.Text = "Save";
+            this.saveConfig.UseVisualStyleBackColor = true;
             // 
             // currentHotKey
             // 
@@ -377,7 +377,7 @@ namespace MultiInstanceManager
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(409, 471);
-            this.Controls.Add(this.button2);
+            this.Controls.Add(this.saveConfig);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.selectAccount);
             this.Controls.Add(this.label8);
@@ -424,7 +424,7 @@ namespace MultiInstanceManager
         private System.Windows.Forms.CheckBox enableHotkeys;
         private System.Windows.Forms.TextBox hotKeyKey;
         private System.Windows.Forms.Label label10;
-        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button saveConfig;
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.TextBox windowXposition;
         private System.Windows.Forms.Label label12;
