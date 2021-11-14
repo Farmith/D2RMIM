@@ -79,10 +79,13 @@ namespace MultiInstanceManager
             {
                 Debug.WriteLine("Game name config faulty: " + e.ToString());
             }
-   
+//            keyboardMouseEvents.OnCombination()
             keyboardMouseEvents.KeyPress += (_, args) =>
             {
+                Debug.WriteLine("Complete info: ");
+                Debug.WriteLine("Mod: " + Control.ModifierKeys.ToString());
                 // Prepare usage of tab-keys between windows
+                /*
                 if (WindowHelper.PriorityWindowFocus())
                 {
                     foreach (var binding in settings.KeyToggles)
@@ -98,6 +101,7 @@ namespace MultiInstanceManager
                         }
                     }
                 }
+                */
             };
         }
 

@@ -31,12 +31,20 @@ namespace MultiInstanceManager
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AccountConfiguration));
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.useDefaultGame = new System.Windows.Forms.CheckBox();
             this.gameExecutableName = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
             this.installationPath = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.label12 = new System.Windows.Forms.Label();
+            this.windowYposition = new System.Windows.Forms.TextBox();
+            this.label11 = new System.Windows.Forms.Label();
+            this.windowXposition = new System.Windows.Forms.TextBox();
+            this.gameLaunchArgs = new System.Windows.Forms.TextBox();
+            this.postLaunchCmd = new System.Windows.Forms.TextBox();
+            this.preLaunchCmd = new System.Windows.Forms.TextBox();
             this.selectedRegion = new System.Windows.Forms.ComboBox();
             this.label7 = new System.Windows.Forms.Label();
             this.modifyWindowTitles = new System.Windows.Forms.CheckBox();
@@ -47,21 +55,13 @@ namespace MultiInstanceManager
             this.label3 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
             this.selectAccount = new System.Windows.Forms.ComboBox();
-            this.preLaunchCmd = new System.Windows.Forms.TextBox();
-            this.postLaunchCmd = new System.Windows.Forms.TextBox();
-            this.gameLaunchArgs = new System.Windows.Forms.TextBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.enableHotkeys = new System.Windows.Forms.CheckBox();
-            this.label9 = new System.Windows.Forms.Label();
-            this.hotKeyModifier = new System.Windows.Forms.ComboBox();
-            this.label10 = new System.Windows.Forms.Label();
             this.hotKeyKey = new System.Windows.Forms.TextBox();
+            this.label10 = new System.Windows.Forms.Label();
+            this.label9 = new System.Windows.Forms.Label();
+            this.enableHotkeys = new System.Windows.Forms.CheckBox();
             this.button2 = new System.Windows.Forms.Button();
-            this.windowXposition = new System.Windows.Forms.TextBox();
-            this.label11 = new System.Windows.Forms.Label();
-            this.label12 = new System.Windows.Forms.Label();
-            this.windowYposition = new System.Windows.Forms.TextBox();
-            this.useDefaultGame = new System.Windows.Forms.CheckBox();
+            this.currentHotKey = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -81,6 +81,17 @@ namespace MultiInstanceManager
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Game Details";
+            // 
+            // useDefaultGame
+            // 
+            this.useDefaultGame.AutoSize = true;
+            this.useDefaultGame.Location = new System.Drawing.Point(286, 90);
+            this.useDefaultGame.Name = "useDefaultGame";
+            this.useDefaultGame.Size = new System.Drawing.Size(82, 17);
+            this.useDefaultGame.TabIndex = 5;
+            this.useDefaultGame.Text = "Use Default";
+            this.useDefaultGame.UseVisualStyleBackColor = true;
+            this.useDefaultGame.CheckedChanged += new System.EventHandler(this.useDefaultGame_CheckedChanged);
             // 
             // gameExecutableName
             // 
@@ -146,6 +157,60 @@ namespace MultiInstanceManager
             this.groupBox2.TabIndex = 1;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Launch Settings";
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(284, 103);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(17, 13);
+            this.label12.TabIndex = 14;
+            this.label12.Text = "Y:";
+            // 
+            // windowYposition
+            // 
+            this.windowYposition.Location = new System.Drawing.Point(307, 100);
+            this.windowYposition.Name = "windowYposition";
+            this.windowYposition.Size = new System.Drawing.Size(47, 20);
+            this.windowYposition.TabIndex = 13;
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(190, 103);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(17, 13);
+            this.label11.TabIndex = 12;
+            this.label11.Text = "X:";
+            // 
+            // windowXposition
+            // 
+            this.windowXposition.Location = new System.Drawing.Point(213, 100);
+            this.windowXposition.Name = "windowXposition";
+            this.windowXposition.Size = new System.Drawing.Size(47, 20);
+            this.windowXposition.TabIndex = 11;
+            this.windowXposition.TextChanged += new System.EventHandler(this.textBox6_TextChanged);
+            // 
+            // gameLaunchArgs
+            // 
+            this.gameLaunchArgs.Location = new System.Drawing.Point(176, 71);
+            this.gameLaunchArgs.Name = "gameLaunchArgs";
+            this.gameLaunchArgs.Size = new System.Drawing.Size(181, 20);
+            this.gameLaunchArgs.TabIndex = 10;
+            // 
+            // postLaunchCmd
+            // 
+            this.postLaunchCmd.Location = new System.Drawing.Point(176, 45);
+            this.postLaunchCmd.Name = "postLaunchCmd";
+            this.postLaunchCmd.Size = new System.Drawing.Size(181, 20);
+            this.postLaunchCmd.TabIndex = 9;
+            // 
+            // preLaunchCmd
+            // 
+            this.preLaunchCmd.Location = new System.Drawing.Point(176, 19);
+            this.preLaunchCmd.Name = "preLaunchCmd";
+            this.preLaunchCmd.Size = new System.Drawing.Size(181, 20);
+            this.preLaunchCmd.TabIndex = 8;
             // 
             // selectedRegion
             // 
@@ -240,32 +305,11 @@ namespace MultiInstanceManager
             this.selectAccount.TabIndex = 3;
             this.selectAccount.SelectedIndexChanged += new System.EventHandler(this.selectAccount_SelectedIndexChanged);
             // 
-            // preLaunchCmd
-            // 
-            this.preLaunchCmd.Location = new System.Drawing.Point(176, 19);
-            this.preLaunchCmd.Name = "preLaunchCmd";
-            this.preLaunchCmd.Size = new System.Drawing.Size(181, 20);
-            this.preLaunchCmd.TabIndex = 8;
-            // 
-            // postLaunchCmd
-            // 
-            this.postLaunchCmd.Location = new System.Drawing.Point(176, 45);
-            this.postLaunchCmd.Name = "postLaunchCmd";
-            this.postLaunchCmd.Size = new System.Drawing.Size(181, 20);
-            this.postLaunchCmd.TabIndex = 9;
-            // 
-            // gameLaunchArgs
-            // 
-            this.gameLaunchArgs.Location = new System.Drawing.Point(176, 71);
-            this.gameLaunchArgs.Name = "gameLaunchArgs";
-            this.gameLaunchArgs.Size = new System.Drawing.Size(181, 20);
-            this.gameLaunchArgs.TabIndex = 10;
-            // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.currentHotKey);
             this.groupBox3.Controls.Add(this.hotKeyKey);
             this.groupBox3.Controls.Add(this.label10);
-            this.groupBox3.Controls.Add(this.hotKeyModifier);
             this.groupBox3.Controls.Add(this.label9);
             this.groupBox3.Controls.Add(this.enableHotkeys);
             this.groupBox3.Location = new System.Drawing.Point(13, 366);
@@ -274,6 +318,32 @@ namespace MultiInstanceManager
             this.groupBox3.TabIndex = 4;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Hot Key";
+            // 
+            // hotKeyKey
+            // 
+            this.hotKeyKey.Location = new System.Drawing.Point(248, 53);
+            this.hotKeyKey.MaxLength = 40;
+            this.hotKeyKey.Name = "hotKeyKey";
+            this.hotKeyKey.Size = new System.Drawing.Size(120, 20);
+            this.hotKeyKey.TabIndex = 4;
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(172, 56);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(70, 13);
+            this.label10.TabIndex = 3;
+            this.label10.Text = "New HotKey:";
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(160, 23);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(82, 13);
+            this.label9.TabIndex = 1;
+            this.label9.Text = "Current HotKey:";
             // 
             // enableHotkeys
             // 
@@ -285,40 +355,6 @@ namespace MultiInstanceManager
             this.enableHotkeys.Text = "Enable Hotkey (Global)";
             this.enableHotkeys.UseVisualStyleBackColor = true;
             // 
-            // label9
-            // 
-            this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(152, 23);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(67, 13);
-            this.label9.TabIndex = 1;
-            this.label9.Text = "Modifier key:";
-            // 
-            // hotKeyModifier
-            // 
-            this.hotKeyModifier.FormattingEnabled = true;
-            this.hotKeyModifier.Location = new System.Drawing.Point(225, 20);
-            this.hotKeyModifier.Name = "hotKeyModifier";
-            this.hotKeyModifier.Size = new System.Drawing.Size(121, 21);
-            this.hotKeyModifier.TabIndex = 2;
-            // 
-            // label10
-            // 
-            this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(146, 56);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(74, 13);
-            this.label10.TabIndex = 3;
-            this.label10.Text = "Standard Key:";
-            // 
-            // hotKeyKey
-            // 
-            this.hotKeyKey.Location = new System.Drawing.Point(226, 53);
-            this.hotKeyKey.MaxLength = 1;
-            this.hotKeyKey.Name = "hotKeyKey";
-            this.hotKeyKey.Size = new System.Drawing.Size(120, 20);
-            this.hotKeyKey.TabIndex = 4;
-            // 
             // button2
             // 
             this.button2.Location = new System.Drawing.Point(319, 12);
@@ -328,49 +364,13 @@ namespace MultiInstanceManager
             this.button2.Text = "Save";
             this.button2.UseVisualStyleBackColor = true;
             // 
-            // windowXposition
+            // currentHotKey
             // 
-            this.windowXposition.Location = new System.Drawing.Point(213, 100);
-            this.windowXposition.Name = "windowXposition";
-            this.windowXposition.Size = new System.Drawing.Size(47, 20);
-            this.windowXposition.TabIndex = 11;
-            this.windowXposition.TextChanged += new System.EventHandler(this.textBox6_TextChanged);
-            // 
-            // label11
-            // 
-            this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(190, 103);
-            this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(17, 13);
-            this.label11.TabIndex = 12;
-            this.label11.Text = "X:";
-            // 
-            // label12
-            // 
-            this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(284, 103);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(17, 13);
-            this.label12.TabIndex = 14;
-            this.label12.Text = "Y:";
-            // 
-            // windowYposition
-            // 
-            this.windowYposition.Location = new System.Drawing.Point(307, 100);
-            this.windowYposition.Name = "windowYposition";
-            this.windowYposition.Size = new System.Drawing.Size(47, 20);
-            this.windowYposition.TabIndex = 13;
-            // 
-            // useDefaultGame
-            // 
-            this.useDefaultGame.AutoSize = true;
-            this.useDefaultGame.Location = new System.Drawing.Point(286, 90);
-            this.useDefaultGame.Name = "useDefaultGame";
-            this.useDefaultGame.Size = new System.Drawing.Size(82, 17);
-            this.useDefaultGame.TabIndex = 5;
-            this.useDefaultGame.Text = "Use Default";
-            this.useDefaultGame.UseVisualStyleBackColor = true;
-            this.useDefaultGame.CheckedChanged += new System.EventHandler(this.useDefaultGame_CheckedChanged);
+            this.currentHotKey.Enabled = false;
+            this.currentHotKey.Location = new System.Drawing.Point(248, 20);
+            this.currentHotKey.Name = "currentHotKey";
+            this.currentHotKey.Size = new System.Drawing.Size(120, 20);
+            this.currentHotKey.TabIndex = 5;
             // 
             // AccountConfiguration
             // 
@@ -420,7 +420,6 @@ namespace MultiInstanceManager
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.ComboBox selectAccount;
         private System.Windows.Forms.GroupBox groupBox3;
-        private System.Windows.Forms.ComboBox hotKeyModifier;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.CheckBox enableHotkeys;
         private System.Windows.Forms.TextBox hotKeyKey;
@@ -431,5 +430,6 @@ namespace MultiInstanceManager
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.TextBox windowYposition;
         private System.Windows.Forms.CheckBox useDefaultGame;
+        private System.Windows.Forms.TextBox currentHotKey;
     }
 }

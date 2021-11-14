@@ -17,6 +17,10 @@ namespace MultiInstanceManager
     public partial class AccountConfiguration : Form
     {
         private List<AccountBinary> Accounts;
+        private bool hotKeyPressRegistered = false;
+        private string hotKeyPressString = "";
+        private Keys? modifier = null;
+
         public AccountConfiguration()
         {
             InitializeComponent();
@@ -28,6 +32,8 @@ namespace MultiInstanceManager
             useDefaultGame.CheckedChanged += new EventHandler(useDefaultGame_CheckedChanged);
             skipIntroVideos.CheckedChanged += new EventHandler(skipIntroVideos_CheckedChanged);
             hotKeyKey.KeyDown += hotKeyKey_KeyDown;
+            hotKeyKey.KeyPress += hotKeyKey_KeyPress;
+            hotKeyKey.KeyUp += hotKeyKey_KeyUp;
         }
         private void FillAccounts()
         {
@@ -78,9 +84,6 @@ namespace MultiInstanceManager
 
             HotKey windowHotKey = new HotKey();
             var mod = "";
-            switch (hotKeyModifier.Text)
-            {
-            }
             // windowHotKey.ModifierKey = hotKeyModifier.SelectedIndex.ToString();
             windowHotKey.Key = hotKeyKey.Text.ToCharArray().First();
 
@@ -95,45 +98,141 @@ namespace MultiInstanceManager
         }
         private void hotKeyKey_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode < Keys.NumPad0 || e.KeyCode > Keys.NumPad9)
+            Debug.WriteLine("Key: " + e.KeyCode.ToString());
+            
+
+            switch(Control.ModifierKeys)
             {
+                case Keys.Alt:
+                    modifier = Control.ModifierKeys;
+                    break;
+                case Keys.Shift:
+                    modifier = Control.ModifierKeys;
+                    break;
+                case Keys.LShiftKey:
+                    modifier = Control.ModifierKeys;
+                    break;
+                case Keys.RShiftKey:
+                    modifier = Control.ModifierKeys;
+                    break;
+                case Keys.Control:
+                    modifier = Control.ModifierKeys;
+                    break;
+                default:
+                    modifier = null;
+                    break;
+
+            }
+            if (Control.ModifierKeys == modifier)
+            {
+                Debug.WriteLine("Modifier handled: " + modifier.ToString());
+            } else
+            {
+                Debug.WriteLine("Modifier not handled: " + Control.ModifierKeys.ToString());
+            }
+            if (e.KeyCode > Keys.NumPad0 || e.KeyCode < Keys.NumPad9)
+            {
+                Debug.WriteLine("Current modifier: " + modifier.ToString());
                 Debug.WriteLine("Key is a keypad press");
                 // Keypad, only supported for now.
+                var _hotkey = "";
                 switch(e.KeyCode)
                 {
                     case Keys.NumPad0:
-                        hotKeyKey.Text = "Numpad.0";
+                        _hotkey = "Numpad.0";
                         break;
                     case Keys.NumPad1:
-                        hotKeyKey.Text = "Numpad.1";
+                        _hotkey = "Numpad.1";
                         break;
                     case Keys.NumPad2:
-                        hotKeyKey.Text = "Numpad.2";
+                        _hotkey = "Numpad.2";
                         break;
                     case Keys.NumPad3:
-                        hotKeyKey.Text = "Numpad.3";
+                        _hotkey = "Numpad.3";
                         break;
                     case Keys.NumPad4:
-                        hotKeyKey.Text = "Numpad.4";
+                        _hotkey = "Numpad.4";
                         break;
                     case Keys.NumPad5:
-                        hotKeyKey.Text = "Numpad.5";
+                        _hotkey = "Numpad.5";
                         break;
                     case Keys.NumPad6:
-                        hotKeyKey.Text = "Numpad.6";
+                        _hotkey = "Numpad.6";
                         break;
                     case Keys.NumPad7:
-                        hotKeyKey.Text = "Numpad.7";
+                        _hotkey = "Numpad.7";
                         break;
                     case Keys.NumPad8:
-                        hotKeyKey.Text = "Numpad.8";
+                        _hotkey = "Numpad.8";
+                        break;
+                    case Keys.Insert:
+                        _hotkey = "Numpad.Insert";
+                        break;
+                    case Keys.Delete:
+                        _hotkey = "Numpad.Delete";
+                        break;
+                    case Keys.End:
+                        _hotkey = "Numpad.End";
+                        break;
+                    case Keys.Down:
+                        _hotkey = "Numpad.Down";
+                        break;
+                    case Keys.PageDown:
+                        _hotkey = "Numpad.Pgdn";
+                        break;
+                    case Keys.Left:
+                        _hotkey = "Numpad.Left";
+                        break;
+                    case Keys.Clear:
+                        _hotkey = "Numpad.Clear";
+                        break;
+                    case Keys.Home:
+                        _hotkey = "Numpad.Home";
+                        break;
+                    case Keys.Up:
+                        _hotkey = "Numpad.Up";
+                        break;
+                    case Keys.PageUp:
+                        _hotkey = "Numpad.Pgup";
+                        break;
+                    case Keys.Right:
+                        _hotkey = "Numpad.Right";
                         break;
                     default:
                         break;
                 }
+                Debug.WriteLine("New hotkey: " + _hotkey + " Modifier: " + modifier.ToString());
+                hotKeyPressString = _hotkey;
+                if(hotKeyPressString.Length > 0)
+                {
+                    hotKeyPressRegistered = true;
+                }
             }
         }
+        private void hotKeyKey_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            e.Handled = true;
+        }
+        private void hotKeyKey_KeyUp(object sender, System.Windows.Forms.KeyEventArgs e)
+        {
+            // Check for the flag being set in the KeyDown event.
 
+            if (hotKeyPressRegistered == true && e.Modifiers == Keys.None)
+            {
+                var newText = "";
+                // Stop the character from being entered into the control since it is non-numerical.
+                if (modifier.ToString().Length > 0)
+                    newText = modifier.ToString() + "+";
+                currentHotKey.Text = newText + "["+hotKeyPressString+"]";
+                hotKeyKey.Text = "";
+                hotKeyPressRegistered = false;
+            } else
+            {
+                Debug.WriteLine("Still borked...");
+            }
+
+
+        }
         private void checkBox4_CheckedChanged(object sender, EventArgs e)
         {
 
