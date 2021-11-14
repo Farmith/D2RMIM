@@ -94,7 +94,7 @@ namespace MultiInstanceManager.Modules
         }
         public bool Setup(string displayName = "", string cmdArgs = "", Boolean killProcessesWhenDone = true)
         {
-            ClearDebug();
+            Log.Clear();
             // Zero out everything
             lastWindowHandle = IntPtr.Zero;
             processCounter = 0;
@@ -140,16 +140,16 @@ namespace MultiInstanceManager.Modules
                 WindowHelper.WinWaitClose(Constants.bnetLauncherClass,launcherProcess.MainWindowHandle);
             }
             processCounter++;
-            LogDebug("Waiting for Game Client to start");
+            Log.Debug("Waiting for Game Client to start");
             var clientExecutable = ProcessManager.ProcessWait(Constants.clientExecutableName,processCounter);
-            LogDebug("Client ready, glhf");
+            Log.Debug("Client ready, glhf");
             // Wait for the initial token update
             if (modifyWindowTitles)
             {
                 WindowHelper.ModifyWindowTitleName(clientExecutable, displayName);
             }
             // Add a way to abort the frenetic clicking
-            LogDebug("Clicking away");
+            Log.Debug("Clicking away");
             Debug.WriteLine("Clicking away");
             var freneticClickingCTS = new CancellationTokenSource();
             CancellationToken freneticClickingCT = freneticClickingCTS.Token;
@@ -173,13 +173,13 @@ namespace MultiInstanceManager.Modules
             }
             // Export the received key using the name of the recipient
             ExportToken(displayName + ".bin");
-            LogDebug("Successfully saved new token for " + displayName);
+            Log.Debug("Successfully saved new token for " + displayName);
 
-            LogDebug("Closing launcher and client mutex handles");
+            Log.Debug("Closing launcher and client mutex handles");
             CloseBnetLauncher(launcherProcess);
-            LogDebug("Launcher closed, killing mutex");
+            Log.Debug("Launcher closed, killing mutex");
             ProcessManager.CloseExternalHandles(clientExecutable.ProcessName); // Close all found D2R mutex handles
-            LogDebug("Mutex killed");
+            Log.Debug("Mutex killed");
             // CloseMultiProcessHandle(gameProcesses.Last());
             // Kill the Launcher & game client
             try
@@ -191,9 +191,9 @@ namespace MultiInstanceManager.Modules
             } catch (Exception ex)
             {
                 // Not able to kill the game client, for whatever reason
-                LogDebug(ex.ToString());
+                Log.Debug(ex.ToString());
             }
-            LogDebug("All done, exiting setup thread");
+            Log.Debug("All done, exiting setup thread");
             return true;
         }
 
@@ -221,16 +221,16 @@ namespace MultiInstanceManager.Modules
         }
         public bool LaunchWithAccount(string accountName,string cmdArgs = "")
         {
-            LogDebug("Launching account ("+(instances.Count+1)+"): '" + accountName + "'");
+            Log.Debug("Launching account ("+(instances.Count+1)+"): '" + accountName + "'");
             UseAccountToken(accountName);
             var process = LaunchGame(accountName, cmdArgs);
-            LogDebug("Process should be: " + process.Id);
+            Log.Debug("Process should be: " + process.Id);
             if(modifyWindowTitles)
             {
                 WindowHelper.ModifyWindowTitleName(process, accountName);
             }
             // Add a way to abort the frenetic clicking
-            LogDebug("Clicking away");
+            Log.Debug("Clicking away");
             Debug.WriteLine("Clicking away");
             var freneticClickingCTS = new CancellationTokenSource();
             CancellationToken freneticClickingCT = freneticClickingCTS.Token;
@@ -255,16 +255,16 @@ namespace MultiInstanceManager.Modules
 
             if (ProcessManager.MatchProcess(process))
             {
-                LogDebug("Process seems to be alive: " + process.Id);
+                Log.Debug("Process seems to be alive: " + process.Id);
                 ExportToken(accountName + ".bin");
-                LogDebug("Closing mutex handles");
+                Log.Debug("Closing mutex handles");
                 ProcessManager.CloseExternalHandles(process.ProcessName); // kill all D2R mutex handles
                 gameProcesses.Add(process);
             } else
             {
-                LogDebug("Can't seem to find 'this' instance as a process?");
+                Log.Debug("Can't seem to find 'this' instance as a process?");
             }
-            LogDebug("All done, exiting this thread");
+            Log.Debug("All done, exiting this thread");
             return true;
 
         }
@@ -272,6 +272,7 @@ namespace MultiInstanceManager.Modules
         private Process LaunchGame(string accountName, string cmdArgs = "")
         {
             string installPath = (string)Registry.GetValue(Constants.gameInstallRegKey[0], Constants.gameInstallRegKey[1], "");
+            Log.Debug("InstallPath: " + installPath);
             var process = new Process();
             process.StartInfo.FileName = installPath + "\\" + gameExecutableName;
             process.StartInfo.Arguments = cmdArgs;
@@ -393,10 +394,10 @@ namespace MultiInstanceManager.Modules
 
             while (StructuralComparisons.StructuralEqualityComparer.Equals(CurrentKey, PrevKey) && (elapsedTime < maxWaitTime))
             {
-                LogDebug("Waiting for Token to update ("+elapsedTime+"/"+maxWaitTime+")");
+                Log.Debug("Waiting for Token to update ("+elapsedTime+"/"+maxWaitTime+")");
                 if (!IsProcessRunning(process))
                 {
-                    LogDebug("Client exited, aborting..");
+                    Log.Debug("Client exited, aborting..");
                     return;
                 }
                 CurrentKey = (byte[])Registry.GetValue(Constants.accountRegKey[0], Constants.accountRegKey[1], "");
@@ -405,11 +406,11 @@ namespace MultiInstanceManager.Modules
             }
             if (!StructuralComparisons.StructuralEqualityComparer.Equals(CurrentKey, PrevKey))
             {
-                LogDebug("Token updated");
+                Log.Debug("Token updated");
                 // token = CurrentKey;
             } else
             {
-                LogDebug("Token remains the same");
+                Log.Debug("Token remains the same");
             }
         }
         public void DumpCurrentRegKey()
@@ -418,12 +419,12 @@ namespace MultiInstanceManager.Modules
         }
         private void ExportToken(string fileName)
         {
-            LogDebug("Writing to file: " + fileName);
+            Log.Debug("Writing to file: " + fileName);
             File.WriteAllBytes(fileName, (byte[])Registry.GetValue(Constants.accountRegKey[0], Constants.accountRegKey[1], ""));
         }
         private void UseAccountToken(string accountName)
         {
-            LogDebug("Reading from file: " + accountName + ".bin");
+            Log.Debug("Reading from file: " + accountName + ".bin");
             var data = File.ReadAllBytes(accountName + ".bin");
             Registry.SetValue(Constants.accountRegKey[0], Constants.accountRegKey[1], data, RegistryValueKind.Binary);
         }
@@ -439,13 +440,5 @@ namespace MultiInstanceManager.Modules
             }
             return true;
         }
-        public void ClearDebug()
-        {
-            File.WriteAllText("debug.log", "\r\n");
-        }
-        private void LogDebug(string text)
-        {
-            File.AppendAllText("debug.log", text + "\r\n");
-         }
     }
 }

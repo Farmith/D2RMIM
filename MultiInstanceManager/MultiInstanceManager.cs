@@ -22,6 +22,7 @@ namespace MultiInstanceManager
     {
         MultiHandler MH;
         Settings settings;
+        AccountConfiguration accountConfigForm;
 
         public MultiInstanceManager(IKeyboardMouseEvents keyboardMouseEvents)
         {
@@ -31,9 +32,9 @@ namespace MultiInstanceManager
             removeButton.Click += new EventHandler(removeButton_Click);
             refreshButton.Click += new EventHandler(refreshButton_Click);
             readmeLink.Click += new EventHandler(readmeLink_Click);
-            killHandlesButton.Click += new EventHandler(killHandlesButton_Click);
             dumpRegKeyButton.Click += new EventHandler(dumpRegKeyButton_Click);
             forceExit.CheckedChanged += new EventHandler(forceExit_Changed);
+            configureAccountsButton.Click += new EventHandler(configureAccountsButton_Click);
             
             try
             {
@@ -51,6 +52,10 @@ namespace MultiInstanceManager
             saveAccounInfo.CheckedChanged += new EventHandler(saveAccounInfo_Changed);
 
             forceExitToolTip.SetToolTip(forceExit, "ForceExit means, kill the game client once the tokens are set when 'refreshing'");
+
+            accountConfigForm = new AccountConfiguration();
+            accountConfigForm.Disposed += new EventHandler(accountConfigForm_Disposed);
+
             MH = new MultiHandler(this, accountList);
             MH.SetCredentialMode(saveAccounInfo.Checked);
             // Prepare keybinds
@@ -93,7 +98,12 @@ namespace MultiInstanceManager
                 }
             };
         }
-
+        public void accountConfigForm_Disposed(object sender, EventArgs e)
+        {
+            accountConfigForm = new AccountConfiguration();
+            accountConfigForm.Disposed += new EventHandler(accountConfigForm_Disposed);
+            configureAccountsButton.Enabled = true;
+        }
         public static void AddOrUpdateAppSettings(string key, string value)
         {
             try
@@ -144,11 +154,6 @@ namespace MultiInstanceManager
             var result = await task;
             EnableButtons();
             MH.LoadAccounts();
-        }
-        private void killHandlesButton_Click(object sender, EventArgs e)
-        {
-            // ProcessManager.CloseExternalHandles(ConfigurationManager.AppSettings.Get("gameExecutableName")?.ToString());
-            // MH.KillGameClientHandles();
         }
         private async void launchButton_Click(object sender, System.EventArgs e)
         {
@@ -212,7 +217,7 @@ namespace MultiInstanceManager
         }
         private async void refreshButton_Click(object sender, System.EventArgs e)
         {
-            MH.ClearDebug();
+            Log.Clear();
             if (accountList.CheckedItems.Count != 0)
             {
                 for (var x = 0; x < accountList.CheckedItems.Count; x++)
@@ -238,6 +243,12 @@ namespace MultiInstanceManager
             var ePath = Application.ExecutablePath;
             var path = System.IO.Path.GetDirectoryName(ePath);
             Process.Start(path + "\\README.txt");
+        }
+
+        private void configureAccountsButton_Click(object sender, EventArgs e)
+        {
+            configureAccountsButton.Enabled = false;
+            accountConfigForm.Show();
         }
     }
 }

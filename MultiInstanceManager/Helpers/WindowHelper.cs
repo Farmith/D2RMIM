@@ -1,4 +1,7 @@
-﻿using MultiInstanceManager.Modules;
+﻿using Microsoft.WindowsAPICodePack.Taskbar;
+using MultiInstanceManager.Interfaces;
+using MultiInstanceManager.Modules;
+using MultiInstanceManager.Structs;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -37,11 +40,19 @@ namespace MultiInstanceManager.Helpers
 
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern uint GetCurrentThreadId();
+        
+        [DllImport("shell32.dll", SetLastError = true)]
+        static extern int SHGetPropertyStoreForWindow(IntPtr handle, ref Guid riid, out IPropertyStore propertyStore);
 
         public static void ShowMessage(string message)
         {
             _ = MessageBox.Show(message);
         }
+        public static void SetWindowApplicationId(IntPtr handle,string applicationId)
+        {
+            TaskbarManager.Instance.SetApplicationIdForSpecificWindow(handle, applicationId);
+        }
+
         public static void ModifyWindowTitleName(Process process, string displayName)
         {
             var newTitle = "[ " + displayName + " ] Diablo II: Resurrected";
