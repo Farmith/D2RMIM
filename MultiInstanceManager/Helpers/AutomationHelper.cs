@@ -1,4 +1,5 @@
 ﻿using MultiInstanceManager.Modules;
+using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Runtime.InteropServices;
@@ -14,9 +15,17 @@ namespace MultiInstanceManager.Helpers
 
         [DllImport("user32.dll")]
         public static extern void mouse_event(int dwFlags, int dx, int dy, int cButtons, int dwExtraInfo);
+        
+        [DllImport("User32.dll")]
+        public static extern int SendMessage(IntPtr hWnd, int uMsg, int wParam, int lParam);
+        [DllImport("User32.dll")]
+        public static extern IntPtr PostMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
 
         public const int MOUSEEVENTF_LEFTDOWN = 0x02;
         public const int MOUSEEVENTF_LEFTUP = 0x04;
+        public const int WM_KEYDOWN = 0x100; // 0x0100;
+        public const int WM_KEYUP = 0x101; // 0x0101;
+        public const int VK_SPACE = 0x20;
 
         public static Bitmap GetScreenshot(Rect rect)
         {
@@ -168,10 +177,32 @@ namespace MultiInstanceManager.Helpers
             var x = new System.Random().Next(rect.Left+5, rect.Right-5);
             return new Point(x, y);
         }
+        /*
+         * I always wanted you to spam, into Space Man...
+         */
+        public static void SpaceMan(CancellationToken ct, Process process, int intervalSeconds=5)
+        {
+            ct.ThrowIfCancellationRequested();
+            var keepGoing = true;
+            while(keepGoing)
+            {
+                if(ct.IsCancellationRequested)
+                {
+                    keepGoing = false;
+                } else
+                {
+                    Debug.WriteLine("Space, man..");
+                    PostMessage(process.MainWindowHandle, WM_KEYDOWN, (IntPtr)VK_SPACE, (IntPtr)(0));
+                    Thread.Sleep(new Random().Next(100, 500));
+                    PostMessage(process.MainWindowHandle, WM_KEYUP, (IntPtr)VK_SPACE, (IntPtr)(0));
+                    Thread.Sleep(new Random().Next(100, 500));
+                }
+            }
+        }
         public static void ClickFreneticallyInsideWindow(CancellationToken ct, Process process,int intervalSeconds=5)
         {
             ct.ThrowIfCancellationRequested();
-            Thread.Sleep(10000);    // Sleep for an arbitrary, 10s to let window boot
+            // Thread.Sleep(10000);    // Sleep for an arbitrary, 10s to let window boot
             var keepGoing = true;
             while(keepGoing)
             {

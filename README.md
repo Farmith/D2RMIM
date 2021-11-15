@@ -90,6 +90,7 @@ FAQ:
 	-	* Added new functionality to process/configure 'command-line arguments' on a per-client basis.
 	-	* Added new functionality to select client position on screen on a per-client basis.
 	-	* Added new functionality to select/configure client Realm on a per-client basis.
+	-	* Added new functionality to process/configure D2R Client 'Settings.config' on a per-client basis.
 	
 	-	Improvements:
 	-	* Added completely new functionality for handling a per-client based hotkey system that allows modifier keys: ctrl, shift, alt.

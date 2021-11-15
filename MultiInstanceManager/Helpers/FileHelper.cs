@@ -63,8 +63,8 @@ namespace MultiInstanceManager.Helpers
             // Copy the "standard" or old file to temp:
             if (File.Exists(inJson))
             {
-                File.Copy(inJson, storeJson);
-                File.Copy(outJson, inJson);
+                File.Copy(inJson, storeJson,true);
+                File.Copy(outJson, inJson,true);
             }
         }
         public static void SaveAccountConfiguration(Account account)

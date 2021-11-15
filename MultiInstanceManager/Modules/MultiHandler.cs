@@ -158,7 +158,8 @@ namespace MultiInstanceManager.Modules
             var freneticClickingCTS = new CancellationTokenSource();
             CancellationToken freneticClickingCT = freneticClickingCTS.Token;
 
-            var task = Task.Factory.StartNew(() => AutomationHelper.ClickFreneticallyInsideWindow(freneticClickingCT, clientExecutable, 2),freneticClickingCTS.Token );
+            // var task = Task.Factory.StartNew(() => AutomationHelper.ClickFreneticallyInsideWindow(freneticClickingCT, clientExecutable, 2), freneticClickingCTS.Token);
+            var task = Task.Factory.StartNew(() => AutomationHelper.SpaceMan(freneticClickingCT, clientExecutable, 2), freneticClickingCTS.Token);
             WaitForNewToken(clientExecutable);
             // Then we do it once more, because it may update twice
             WaitForNewToken(clientExecutable, true); // Specify that we want a 30s timeout justincase
@@ -254,7 +255,8 @@ namespace MultiInstanceManager.Modules
             var freneticClickingCTS = new CancellationTokenSource();
             CancellationToken freneticClickingCT = freneticClickingCTS.Token;
 
-            var task = Task.Factory.StartNew(() => AutomationHelper.ClickFreneticallyInsideWindow(freneticClickingCT, process, 2), freneticClickingCTS.Token);
+            // var task = Task.Factory.StartNew(() => AutomationHelper.ClickFreneticallyInsideWindow(freneticClickingCT, process, 2), freneticClickingCTS.Token);
+            var task = Task.Factory.StartNew(() => AutomationHelper.SpaceMan(freneticClickingCT, process, 2), freneticClickingCTS.Token);
             // Wait for a new token
             WaitForNewToken(process);
             // Then wait again incase it changes in any forseeable future
