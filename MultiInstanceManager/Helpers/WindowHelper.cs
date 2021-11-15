@@ -40,10 +40,50 @@ namespace MultiInstanceManager.Helpers
 
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern uint GetCurrentThreadId();
-        
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool SetWindowPos(IntPtr hWnd,IntPtr hWndInsertAfter, int X, int Y, int cx, int cy,SetWindowPosFlags uFlags);
+
+        #region flags
+        [Flags()]
+        private enum SetWindowPosFlags : uint
+        {
+            SynchronousWindowPosition = 0x4000,
+            DeferErase = 0x2000,
+            DrawFrame = 0x0020,
+            FrameChanged = 0x0020,
+            HideWindow = 0x0080,
+            DoNotActivate = 0x0010,
+            DoNotCopyBits = 0x0100,
+            IgnoreMove = 0x0002,
+            DoNotChangeOwnerZOrder = 0x0200,
+            DoNotRedraw = 0x0008,
+            DoNotReposition = 0x0200,
+            DoNotSendChangingEvent = 0x0400,
+            IgnoreResize = 0x0001,
+            IgnoreZOrder = 0x0004,
+            ShowWindow = 0x0040,
+        }
+        #endregion
         public static void ShowMessage(string message)
         {
             _ = MessageBox.Show(message);
+        }
+        public static void SetWindowPosition(IntPtr handle, int x, int y,int w=-1, int h=-1)
+        {
+            // Set the window's position.
+            var rect = new Rect();
+            GetWindowRect(handle, ref rect);
+            if (w == -1)
+            {
+                w = rect.Right - rect.Left;
+            }
+            if (h == -1)
+            {
+                h = rect.Bottom - rect.Top;
+            }
+            SetWindowPos(handle, IntPtr.Zero,
+                x, y, w, h, 0);
         }
         public static void SetWindowApplicationId(IntPtr handle,string applicationId,bool noretry = false)
         {
