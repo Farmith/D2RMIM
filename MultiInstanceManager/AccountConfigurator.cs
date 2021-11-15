@@ -130,7 +130,8 @@ namespace MultiInstanceManager
             if (!useDefaultGame.Checked) {
                 config.InstallationPath = installationPath.Text;
                 config.GameExecutable = gameExecutableName.Text;
-            } else
+            } 
+            else
             {
                 try
                 {
@@ -148,7 +149,8 @@ namespace MultiInstanceManager
             launchSettings.PostLaunchCommands = postLaunchCmd.Text;
             launchSettings.LaunchArguments = gameLaunchArgs.Text;
 
-            config.Region = selectedRegion.SelectedItem.ToString();
+            if(selectedRegion.SelectedIndex > 0)
+                config.Region = selectedRegion.SelectedItem.ToString();
 
             if(int.TryParse(windowXposition.Text,out int x))
             {
@@ -165,10 +167,10 @@ namespace MultiInstanceManager
             config.WindowHotKey = _HotKey;
             config.SeparateJsonSettings = separateJsonSettings.Checked;
             config.SeparateTaskbarIcons = separateTaskbarItems.Checked;
-            if (_Account.SeparateJsonSettings)
+            if (config.SeparateJsonSettings)
             {
                 // Make sure there is a JSON file to use for Settings.
-                FileHelper.CreateJSONSettings(_Account.DisplayName);
+                FileHelper.CreateJSONSettings(config.DisplayName);
             }
             FileHelper.SaveAccountConfiguration(config);
 
