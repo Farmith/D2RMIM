@@ -150,6 +150,7 @@ namespace MultiInstanceManager.Modules
         }
         private static IntPtr GetAllHandles()
         {
+            int initialSize = 0x10000;
             int bufferSize = 0x10000;  
             int actualSize;            
                         
@@ -162,7 +163,7 @@ namespace MultiInstanceManager.Modules
             {
                 Marshal.FreeHGlobal(pSysInfoBuffer);
 
-                bufferSize = bufferSize * 2;
+                bufferSize = bufferSize + initialSize; // * 2;
 
                 pSysInfoBuffer = Marshal.AllocHGlobal(bufferSize);
 
@@ -255,7 +256,7 @@ namespace MultiInstanceManager.Modules
 
             int bufferSize = GetHandleNameLength(handle);
 
-            // Debug.WriteLine("Trying to allocate: " + bufferSize.ToString() + " bytes of memory");
+            Debug.WriteLine("Trying to allocate: " + bufferSize.ToString() + " bytes of memory");
             try
             {
                 IntPtr pStringBuffer = Marshal.AllocHGlobal(bufferSize);

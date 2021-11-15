@@ -60,10 +60,13 @@ namespace MultiInstanceManager.Modules
         {
             var activeWindow = activeWindows.Find(x => x.Account.DisplayName == account.DisplayName);
             if (activeWindow == null)
+            {
+                Log.Debug("Active window is null for: " + account.DisplayName);
                 return new ActiveWindow();
+            }
 
-            var clientProcesses = Process.GetProcessesByName(Constants.clientExecutableName);
-            Debug.WriteLine("Process count: " + clientProcesses.Count());
+            var clientProcesses = Process.GetProcessesByName(activeWindow.Account.GameExecutable);
+            Debug.WriteLine("Game Process count: " + clientProcesses.Count());
 
             // Set focus to specified window
             /*
@@ -91,6 +94,7 @@ namespace MultiInstanceManager.Modules
 
             if (activeWindow.Process.MainWindowHandle != IntPtr.Zero)
             {
+                Log.Debug("We found a handle to this game client..");
                 try
                 {
                     WindowHelper.forceForegroundWindow(activeWindow.Process.MainWindowHandle);
@@ -216,19 +220,6 @@ namespace MultiInstanceManager.Modules
             Log.Debug("All done, exiting setup thread");
             return true;
         }
-
-        public void KillGameClientHandles()
-        {
-            var name = gameExecutableName.Substring(0, gameExecutableName.Length - 4);
-            var processes = Process.GetProcessesByName(name);
-            if (processes.Length > 0)
-            {
-                foreach (var process in processes)
-                {
-                    ProcessManager.CloseExternalHandles(process.ProcessName);
-                }
-            }
-        }
         public List<Account> GetAllAccounts()
         {
             return accountStore;
@@ -247,6 +238,23 @@ namespace MultiInstanceManager.Modules
             Log.Debug("Launching account ("+(instances.Count+1)+"): '" + accountName + "'");
             Account? account = FileHelper.LoadAccountConfiguration(accountName);
 
+            if(account != null && account.Region.Length > 0)
+            {
+                switch(account.Region)
+                {
+                    case "Europe":
+                        ChangeRealm("EU");
+                        break;
+                    case "Americas":
+                        ChangeRealm("US");
+                        break;
+                    case "Asia":
+                        ChangeRealm("KR");
+                        break;
+                    default:
+                        break;
+                }
+            }
             UseAccountToken(accountName);
             cmdArgs = account?.LaunchOptions.LaunchArguments.Length > 0 ? account.LaunchOptions.LaunchArguments : "";
             // Check if we need to do some magic with the Settings.json
@@ -425,6 +433,10 @@ namespace MultiInstanceManager.Modules
             var p = Process.Start(installPath + "\\Diablo II Resurrected Launcher.exe");
             lastWindowHandle = p.MainWindowHandle;
             return p;
+        }
+        private void ChangeRealm(string realm)
+        {
+            Registry.SetValue(Constants.clientRegionKey[0], Constants.clientRegionKey[1], realm, RegistryValueKind.String);
         }
         private void WaitForNewToken(Process process,Boolean timeout = false)
         {
