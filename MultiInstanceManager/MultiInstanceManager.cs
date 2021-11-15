@@ -84,6 +84,8 @@ namespace MultiInstanceManager
             foreach (var a in store)
             {
                 var bind = a.WindowHotKey;
+                if (bind == null)
+                    continue;
                 var hotkey = (Keys)bind.Key | (Keys)bind.ModifierKey;
                 hotkeyCollection.RegisterHotkey(hotkey, (e) =>
                 {
