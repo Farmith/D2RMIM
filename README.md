@@ -10,6 +10,7 @@
 *	Bitcoin: 1P7Sbra6cNEDYzRQANer8SdmqyeLLQSDKL
 *	Ethereum: 0x4A16f62C9FC337606040f69a2044Da81C6ef7bcD
 *	Cardano: addr1qyers7tzkx8z4pmat0a3xg8g5dhdhguehmsnqns7dg84uzpj8puk9vvw92rh6klmzvsw3gmwmw3en0hpxp8pu6s0tcyqxkhsa6
+*	FG: D2JSP Forum Gold Donations Welcometo [Farmith](https://forums.d2jsp.org/user.php?i=1261112)
 
 ## Discord:
 
@@ -76,6 +77,38 @@ FAQ:
 
 
 ## Version log:
+
+* 1.6
+	-	** Major Revamp **
+	
+	-	Buggfixes:
+	-	* Fixed problem where setup of new accounts would take longer than needed, by removing handle-kill from procedure.
+	-	* Fixed a hotkey problem that hotkeys were in numlock mode and were sending "drink potion" and other bad things to other clients.
+	-	* Fixed a problem where setting window-title would sometimes fail because the handle wasn't yet created properly.
+
+	-	New features:
+	-	* Added new UI/functionality to configure accounts on a per-account basis (Configure-button)
+	-	* Added new functionality to enable/disable grouping of client windows in the taskbar on a per-client basis.
+	-	* Added new functionality to manually choose installationpath/executable name of battle.net/D2R on a per-client basis.
+	-	* Added new functionality to process/configure pre-launch commands to be executed before the client on a per-client basis.
+	-		* Currently disabled
+	-	* Added new functionality to process/configure post-launch commands to be executed after the client on a per-client basis.
+	-		* Currently disabled
+	-	* Added new functionality to process/configure 'command-line arguments' on a per-client basis.
+	-	* Added new functionality to select client position on screen on a per-client basis.
+	-	* Added new functionality to select/configure client Realm on a per-client basis.
+	-	* Added new functionality to process/configure D2R Client 'Settings.config' on a per-client basis.
+	
+	-	Improvements:
+	-	* Added completely new functionality for handling a per-client based hotkey system that allows modifier keys: ctrl, shift, alt.
+	-	* Added more Log functionality to catch unforseen errors.
+	-	* Faster "skip intro videos" method added
+	-	* Skip-intro videos now on a per-client basis configuration + uses other methods of skipping them to not lock up mouse.
+	-	* Faster and more secure way of keeping track of handles.
+
+	-	ToDo:
+	-	* Window positioner needs a "width" and "height" system to allow inactive windows to not take up so much space/resources, 
+			this task is in a "long term"-watch	state as it needs many things to fall into place first.
 
 * 1.5.1
 	-	**Buffix & Refactoring release**

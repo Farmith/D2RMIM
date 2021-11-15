@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Threading;
+using MultiInstanceManager.Helpers;
 
 namespace MultiInstanceManager.Modules
 {
@@ -149,6 +150,7 @@ namespace MultiInstanceManager.Modules
         }
         private static IntPtr GetAllHandles()
         {
+            int initialSize = 0x10000;
             int bufferSize = 0x10000;  
             int actualSize;            
                         
@@ -161,7 +163,7 @@ namespace MultiInstanceManager.Modules
             {
                 Marshal.FreeHGlobal(pSysInfoBuffer);
 
-                bufferSize = bufferSize * 2;
+                bufferSize = bufferSize + initialSize; // * 2;
 
                 pSysInfoBuffer = Marshal.AllocHGlobal(bufferSize);
 
@@ -316,10 +318,17 @@ namespace MultiInstanceManager.Modules
         }
         public static bool MatchProcess(Process process)
         {
-            Process exists = Process.GetProcessById(process.Id);
-            if (exists.Id == process.Id)
+            try
             {
-                return true;
+                Process exists = Process.GetProcessById(process.Id);
+                if (exists.Id == process.Id)
+                {
+                    return true;
+                }
+            } catch (Exception ex)
+            {
+                Log.Debug("Process has died prematurely");
+                Log.Debug(ex.ToString());
             }
             return false;
         }
@@ -336,7 +345,22 @@ namespace MultiInstanceManager.Modules
             }
             if (processes.Length == processCounter)
             {
-                return processes[processCounter - 1];
+                var process = processes[processCounter - 1];
+                var keeptrying = true;
+                while (!process.HasExited && keeptrying)
+                {
+                    process.Refresh();
+                    if (process.MainWindowHandle != IntPtr.Zero)
+                    {
+                        keeptrying = false;
+                    }
+                    else
+                    {
+                        // We sleep for 5 ms untill we find a MainWindowHandle
+                        Thread.Sleep(5);
+                    }
+                }
+                return process;
             }
             return null;
         }

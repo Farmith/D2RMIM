@@ -44,12 +44,12 @@ namespace MultiInstanceManager
             this.addAccountButton = new System.Windows.Forms.Button();
             this.label6 = new System.Windows.Forms.Label();
             this.commandLineArguments = new System.Windows.Forms.TextBox();
-            this.killHandlesButton = new System.Windows.Forms.Button();
             this.dumpRegKeyButton = new System.Windows.Forms.Button();
             this.forceExit = new System.Windows.Forms.CheckBox();
             this.forceExitToolTip = new System.Windows.Forms.ToolTip(this.components);
             this.modifyWindowTitles = new System.Windows.Forms.CheckBox();
             this.saveAccounInfo = new System.Windows.Forms.CheckBox();
+            this.configureAccountsButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // label1
@@ -71,7 +71,7 @@ namespace MultiInstanceManager
             // 
             // launchButton
             // 
-            this.launchButton.Location = new System.Drawing.Point(255, 136);
+            this.launchButton.Location = new System.Drawing.Point(255, 165);
             this.launchButton.Name = "launchButton";
             this.launchButton.Size = new System.Drawing.Size(114, 23);
             this.launchButton.TabIndex = 2;
@@ -80,7 +80,7 @@ namespace MultiInstanceManager
             // 
             // refreshButton
             // 
-            this.refreshButton.Location = new System.Drawing.Point(255, 165);
+            this.refreshButton.Location = new System.Drawing.Point(255, 194);
             this.refreshButton.Name = "refreshButton";
             this.refreshButton.Size = new System.Drawing.Size(114, 23);
             this.refreshButton.TabIndex = 3;
@@ -167,17 +167,6 @@ namespace MultiInstanceManager
             this.commandLineArguments.Size = new System.Drawing.Size(230, 20);
             this.commandLineArguments.TabIndex = 12;
             // 
-            // killHandlesButton
-            // 
-            this.killHandlesButton.Enabled = false;
-            this.killHandlesButton.Location = new System.Drawing.Point(255, 194);
-            this.killHandlesButton.Name = "killHandlesButton";
-            this.killHandlesButton.Size = new System.Drawing.Size(114, 23);
-            this.killHandlesButton.TabIndex = 13;
-            this.killHandlesButton.Text = "Kill Handles";
-            this.killHandlesButton.UseVisualStyleBackColor = true;
-            this.killHandlesButton.Visible = false;
-            // 
             // dumpRegKeyButton
             // 
             this.dumpRegKeyButton.Location = new System.Drawing.Point(256, 277);
@@ -217,16 +206,25 @@ namespace MultiInstanceManager
             this.saveAccounInfo.Text = "Save Accountinfo (Experimental)";
             this.saveAccounInfo.UseVisualStyleBackColor = true;
             // 
+            // configureAccountsButton
+            // 
+            this.configureAccountsButton.Location = new System.Drawing.Point(256, 136);
+            this.configureAccountsButton.Name = "configureAccountsButton";
+            this.configureAccountsButton.Size = new System.Drawing.Size(113, 23);
+            this.configureAccountsButton.TabIndex = 19;
+            this.configureAccountsButton.Text = "Configure";
+            this.configureAccountsButton.UseVisualStyleBackColor = true;
+            // 
             // MultiInstanceManager
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(392, 392);
+            this.Controls.Add(this.configureAccountsButton);
             this.Controls.Add(this.saveAccounInfo);
             this.Controls.Add(this.modifyWindowTitles);
             this.Controls.Add(this.forceExit);
             this.Controls.Add(this.dumpRegKeyButton);
-            this.Controls.Add(this.killHandlesButton);
             this.Controls.Add(this.commandLineArguments);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.addAccountButton);
@@ -263,12 +261,12 @@ namespace MultiInstanceManager
         private System.Windows.Forms.Button addAccountButton;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.TextBox commandLineArguments;
-        private System.Windows.Forms.Button killHandlesButton;
         private System.Windows.Forms.Button dumpRegKeyButton;
         private System.Windows.Forms.CheckBox forceExit;
         private System.Windows.Forms.ToolTip forceExitToolTip;
         private System.Windows.Forms.CheckBox modifyWindowTitles;
         private System.Windows.Forms.CheckBox saveAccounInfo;
+        private System.Windows.Forms.Button configureAccountsButton;
     }
 }
 

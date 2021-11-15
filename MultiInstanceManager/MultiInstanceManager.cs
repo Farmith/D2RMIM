@@ -1,20 +1,14 @@
-﻿using Gma.System.MouseKeyHook;
+﻿using Dfust.Hotkeys;
 using MultiInstanceManager.Config;
 using MultiInstanceManager.Helpers;
 using MultiInstanceManager.Modules;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Configuration;
-using System.Data;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static Dfust.Hotkeys.Enums;
 
 namespace MultiInstanceManager
 {
@@ -22,8 +16,8 @@ namespace MultiInstanceManager
     {
         MultiHandler MH;
         Settings settings;
-
-        public MultiInstanceManager(IKeyboardMouseEvents keyboardMouseEvents)
+        AccountConfiguration accountConfig;
+        public MultiInstanceManager()
         {
             InitializeComponent();
             addAccountButton.Click += new EventHandler(addAccountButton_Click);
@@ -31,7 +25,6 @@ namespace MultiInstanceManager
             removeButton.Click += new EventHandler(removeButton_Click);
             refreshButton.Click += new EventHandler(refreshButton_Click);
             readmeLink.Click += new EventHandler(readmeLink_Click);
-            killHandlesButton.Click += new EventHandler(killHandlesButton_Click);
             dumpRegKeyButton.Click += new EventHandler(dumpRegKeyButton_Click);
             forceExit.CheckedChanged += new EventHandler(forceExit_Changed);
             
@@ -49,6 +42,14 @@ namespace MultiInstanceManager
             forceExit.Checked = ConfigurationManager.AppSettings.Get("forceExitClients")?.ToString() == "true" ? true : false;
             saveAccounInfo.Checked = ConfigurationManager.AppSettings.Get("saveCredentials")?.ToString() == "true" ? true : false;
             saveAccounInfo.CheckedChanged += new EventHandler(saveAccounInfo_Changed);
+
+            /*
+             * Account configuration stuff
+             * 
+             */
+            configureAccountsButton.Click += new EventHandler(configureAccountsButton_Click);
+            accountConfig = new AccountConfiguration();
+            accountConfig.Disposed += new EventHandler(accountConfig_Disposed);
 
             forceExitToolTip.SetToolTip(forceExit, "ForceExit means, kill the game client once the tokens are set when 'refreshing'");
             MH = new MultiHandler(this, accountList);
@@ -72,26 +73,25 @@ namespace MultiInstanceManager
             {
                 Debug.WriteLine("Game name config faulty: " + e.ToString());
             }
-   
-            keyboardMouseEvents.KeyPress += (_, args) =>
+            
+            /*
+             * HotKey stuffs
+             * 
+             */
+
+            var hotkeyCollection = new HotkeyCollection(Scope.Global);
+            var store = MH.GetAllAccounts();
+            foreach (var a in store)
             {
-                // Prepare usage of tab-keys between windows
-                if (WindowHelper.PriorityWindowFocus())
+                var bind = a.WindowHotKey;
+                var hotkey = (Keys)bind.Key | (Keys)bind.ModifierKey;
+                hotkeyCollection.RegisterHotkey(hotkey, (e) =>
                 {
-                    foreach (var binding in settings.KeyToggles)
-                    {
-                        if (char.TryParse(binding.CharCode.ToString(), out char c))
-                        {
-                            if (args.KeyChar == c)
-                            {
-                                Debug.WriteLine("Found match: " + c + " Iterator: " + binding.ClientIterator);
-                                MH.SwapFocus(binding);
-                                args.Handled = true;
-                            }
-                        }
-                    }
-                }
-            };
+                    Debug.WriteLine("Found recipient for hotkey: " + bind.Key.ToString() + " mod: " + bind.ModifierKey.ToString());
+                    Debug.WriteLine("Account: " + a.DisplayName);
+                    MH.SwapFocus(a);
+                });
+            }
         }
 
         public static void AddOrUpdateAppSettings(string key, string value)
@@ -115,6 +115,17 @@ namespace MultiInstanceManager
             {
                 Console.WriteLine("Error writing app settings");
             }
+        }
+        public void accountConfig_Disposed(object sender, EventArgs e)
+        {
+            accountConfig = new AccountConfiguration();
+            accountConfig.Disposed += new EventHandler(accountConfig_Disposed);
+            configureAccountsButton.Enabled = true;
+        }
+        public void configureAccountsButton_Click(object sender, EventArgs e)
+        {
+            configureAccountsButton.Enabled = false;
+            accountConfig.Show();
         }
         public void saveAccounInfo_Changed(object sender, EventArgs e)
         {
@@ -144,11 +155,6 @@ namespace MultiInstanceManager
             var result = await task;
             EnableButtons();
             MH.LoadAccounts();
-        }
-        private void killHandlesButton_Click(object sender, EventArgs e)
-        {
-            // ProcessManager.CloseExternalHandles(ConfigurationManager.AppSettings.Get("gameExecutableName")?.ToString());
-            // MH.KillGameClientHandles();
         }
         private async void launchButton_Click(object sender, System.EventArgs e)
         {
@@ -212,7 +218,7 @@ namespace MultiInstanceManager
         }
         private async void refreshButton_Click(object sender, System.EventArgs e)
         {
-            MH.ClearDebug();
+            Log.Clear();
             if (accountList.CheckedItems.Count != 0)
             {
                 for (var x = 0; x < accountList.CheckedItems.Count; x++)
@@ -239,5 +245,6 @@ namespace MultiInstanceManager
             var path = System.IO.Path.GetDirectoryName(ePath);
             Process.Start(path + "\\README.txt");
         }
+
     }
 }
