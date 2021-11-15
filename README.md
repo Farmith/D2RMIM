@@ -86,7 +86,9 @@ FAQ:
 	-	* Added new functionality to enable/disable grouping of client windows in the taskbar on a per-client basis.
 	-	* Added new functionality to manually choose installationpath/executable name of battle.net/D2R on a per-client basis.
 	-	* Added new functionality to process/configure pre-launch commands to be executed before the client on a per-client basis.
+	-		* Currently disabled
 	-	* Added new functionality to process/configure post-launch commands to be executed after the client on a per-client basis.
+	-		* Currently disabled
 	-	* Added new functionality to process/configure 'command-line arguments' on a per-client basis.
 	-	* Added new functionality to select client position on screen on a per-client basis.
 	-	* Added new functionality to select/configure client Realm on a per-client basis.
