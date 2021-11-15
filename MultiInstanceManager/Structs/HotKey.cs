@@ -11,11 +11,11 @@ namespace MultiInstanceManager.Structs
     [ProtoContract]
     public class HotKey
     {
-        [ProtoMember(20)]
+        [ProtoMember(1)]
         public Keys? ModifierKey { get; set; }
-        [ProtoMember(21)]
+        [ProtoMember(2)]
         public Keys? Key { get; set; }
-        [ProtoMember(22)]
+        [ProtoMember(3)]
         public bool Enabled { get; set; }
     }
 }

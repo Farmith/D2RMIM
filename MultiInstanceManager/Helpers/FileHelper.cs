@@ -32,47 +32,23 @@ namespace MultiInstanceManager.Helpers
         {
             //            var model = RuntimeTypeModel.Create();
             Console.WriteLine("Displ: " + account.DisplayName);
-            var clone = new Account();
-            using (var ms = new MemoryStream())
-            {
-                Serializer.Serialize(ms, account);
-                ms.Position = 0;
-                Console.WriteLine("Bytes: " + ms.Length);
-                clone = (Account)Serializer.Deserialize<Account>(ms);
-                Console.WriteLine("Test: " + clone.DisplayName);
-                using (FileStream file = new FileStream(account.DisplayName + ".bincnf", FileMode.Create, FileAccess.Write))
-                {
-                    byte[] bytes = new byte[ms.Length];
-                    ms.Read(bytes, 0, (int)ms.Length);
-                    file.Write(bytes, 0, bytes.Length);
-                    ms.Close();
-                }
-            }
+            var filename = account.DisplayName + ".bincnf";
 
+            using (var file = File.Create(filename))
+            {
+                Serializer.Serialize(file, account);
+            }
         }
         public static Account? LoadAccountConfiguration(string DisplayName)
         {
             var filename = DisplayName + ".bincnf";
+            var account = new Account();
             if (File.Exists(filename))
             {
-                using (FileStream file = new FileStream(filename, FileMode.Open))
+                using (var file = File.OpenRead(filename))
                 {
-                    using (MemoryStream ms = new MemoryStream())
-                    {
-                        try
-                        {
-                            file.CopyTo(ms);
-                            ms.Position = 0;
-                            Console.WriteLine("Bytes: " + ms.Length);
-                            Console.WriteLine("Found an account");
-                            return (Account)Serializer.Deserialize<Account>(ms);
-                        }
-                        catch (Exception ex)
-                        {
-                            Log.Debug("Can not read previous config for: " + DisplayName);
-                            Log.Debug(ex.ToString());
-                        }
-                    }
+                    account = Serializer.Deserialize<Account>(file);
+                    return account;
                 }
             }
             return null;

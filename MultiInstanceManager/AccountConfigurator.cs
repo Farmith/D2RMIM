@@ -29,6 +29,7 @@ namespace MultiInstanceManager
             InitializeComponent();
             resetRegion();
             FillAccounts();
+            DefaultSettings();
             selectAccount.SelectedIndexChanged += new EventHandler(selectAccount_SelectedIndexChanged);
 
             // These below may not be neccessary because: Save Button
@@ -40,27 +41,67 @@ namespace MultiInstanceManager
 
             saveConfig.Click += SaveConfiguration;
         }
+        private void DefaultSettings()
+        {
+            currentHotKey.Text = "";
+            skipIntroVideos.Checked = false;
+            modifyWindowTitles.Checked = false;
+            useDefaultGame.Checked = false;
+            enableHotkeys.Checked = false;
+            separateTaskbarItems.Checked = false;
+            gameExecutableName.Text = "";
+            installationPath.Text = "";
+            preLaunchCmd.Text = "";
+            postLaunchCmd.Text = "";
+            gameLaunchArgs.Text = "";
+            windowXposition.Text = "";
+            windowYposition.Text = "";
+            resetRegion();
+        }
         private void LoadAccount()
         {
+            DefaultSettings();
             _Account = FileHelper.LoadAccountConfiguration(selectAccount.SelectedItem.ToString());
             if (_Account != null)
             {
                 modifyWindowTitles.Checked = _Account.ModifyWindowtitles;
                 skipIntroVideos.Checked = _Account.SkipCinematics;
-                enableHotkeys.Checked = _Account.WindowHotKey.Enabled;
-                var extraMod = "";
-                if (_Account.WindowHotKey.ModifierKey.ToString().Length > 0)
+                if (_Account.WindowHotKey != null)
                 {
-                    extraMod = _Account.WindowHotKey.ModifierKey.ToString() + "+";
+                    enableHotkeys.Checked = _Account.WindowHotKey.Enabled;
+                    var extraMod = "";
+                    if (_Account.WindowHotKey.ModifierKey.ToString().Length > 0)
+                    {
+                        extraMod = _Account.WindowHotKey.ModifierKey.ToString() + "+";
+                    }
+                    currentHotKey.Text = extraMod + "[" + _Account.WindowHotKey.Key.ToString() + "]";
                 }
-                currentHotKey.Text = extraMod + "[" + _Account.WindowHotKey.Key.ToString() + "]";
                 gameExecutableName.Text = _Account.GameExecutable;
                 installationPath.Text = _Account.InstallationPath;
                 useDefaultGame.Checked = _Account.UseDefaultGameInstallation;
+                separateTaskbarItems.Checked = _Account.SeparateTaskbarIcons;
+                windowXposition.Text = _Account.LaunchOptions.WindowX.ToString();
+                windowYposition.Text = _Account.LaunchOptions.WindowY.ToString();
+                gameLaunchArgs.Text = _Account.LaunchOptions.LaunchArguments;
+                preLaunchCmd.Text = _Account.LaunchOptions.PreLaunchCommands;
+                postLaunchCmd.Text = _Account.LaunchOptions.PostLaunchCommands;
+                SelecteRegion(_Account.Region);
             } else
             {
                 Console.WriteLine("Previous config is null");
             }
+        }
+        private void SelecteRegion(string region)
+        {
+            for(int i = 0; i < selectedRegion.Items.Count; i++)
+            {
+                if(selectedRegion.Items[i].ToString().CompareTo(region) == 0)
+                {
+                    selectedRegion.SelectedIndex = i;
+                    return;
+                }
+            }
+            selectedRegion.SelectedIndex = -1;
         }
         private void FillAccounts()
         {
@@ -95,6 +136,8 @@ namespace MultiInstanceManager
             launchSettings.PreLaunchCommands = preLaunchCmd.Text;
             launchSettings.PostLaunchCommands = postLaunchCmd.Text;
             launchSettings.LaunchArguments = gameLaunchArgs.Text;
+
+            config.Region = selectedRegion.SelectedItem.ToString();
 
             if(int.TryParse(windowXposition.Text,out int x))
             {

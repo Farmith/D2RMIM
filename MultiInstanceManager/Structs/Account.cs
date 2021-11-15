@@ -12,7 +12,6 @@ namespace MultiInstanceManager.Structs
     {
         [ProtoMember(1)]
         public string DisplayName { get; set; }
-
         [ProtoMember(2)]
         public bool SkipCinematics { get; set; }
         [ProtoMember(3)]
@@ -23,7 +22,6 @@ namespace MultiInstanceManager.Structs
         public string InstallationPath { get; set; }
         [ProtoMember(6)]
         public string GameExecutable { get; set; }
-
         [ProtoMember(7)]
         public LaunchSettings LaunchOptions { get; set; }
 
@@ -33,5 +31,7 @@ namespace MultiInstanceManager.Structs
         public HotKey WindowHotKey { get; set; }
         [ProtoMember(10)]
         public bool UseDefaultGameInstallation { get; set; }
+        [ProtoMember(11)]
+        public bool SeparateTaskbarIcons { get; set; }
     }
 }

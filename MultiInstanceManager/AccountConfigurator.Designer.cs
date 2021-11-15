@@ -62,6 +62,7 @@ namespace MultiInstanceManager
             this.enableHotkeys = new System.Windows.Forms.CheckBox();
             this.saveConfig = new System.Windows.Forms.Button();
             this.currentHotKey = new System.Windows.Forms.TextBox();
+            this.separateTaskbarItems = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -105,9 +106,9 @@ namespace MultiInstanceManager
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(9, 73);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(122, 13);
+            this.label2.Size = new System.Drawing.Size(191, 13);
             this.label2.TabIndex = 3;
-            this.label2.Text = "Game Executable Name";
+            this.label2.Text = "Game Executable Name (Without .exe)";
             // 
             // button1
             // 
@@ -136,6 +137,7 @@ namespace MultiInstanceManager
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.separateTaskbarItems);
             this.groupBox2.Controls.Add(this.label12);
             this.groupBox2.Controls.Add(this.windowYposition);
             this.groupBox2.Controls.Add(this.label11);
@@ -372,6 +374,16 @@ namespace MultiInstanceManager
             this.currentHotKey.Size = new System.Drawing.Size(120, 20);
             this.currentHotKey.TabIndex = 5;
             // 
+            // separateTaskbarItems
+            // 
+            this.separateTaskbarItems.AutoSize = true;
+            this.separateTaskbarItems.Location = new System.Drawing.Point(172, 164);
+            this.separateTaskbarItems.Name = "separateTaskbarItems";
+            this.separateTaskbarItems.Size = new System.Drawing.Size(140, 17);
+            this.separateTaskbarItems.TabIndex = 15;
+            this.separateTaskbarItems.Text = "Separate Taskbar Icons";
+            this.separateTaskbarItems.UseVisualStyleBackColor = true;
+            // 
             // AccountConfiguration
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -431,5 +443,6 @@ namespace MultiInstanceManager
         private System.Windows.Forms.TextBox windowYposition;
         private System.Windows.Forms.CheckBox useDefaultGame;
         private System.Windows.Forms.TextBox currentHotKey;
+        private System.Windows.Forms.CheckBox separateTaskbarItems;
     }
 }
