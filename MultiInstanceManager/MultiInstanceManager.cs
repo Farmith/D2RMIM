@@ -22,7 +22,7 @@ namespace MultiInstanceManager
     {
         MultiHandler MH;
         Settings settings;
-
+        AccountConfiguration accountConfig;
         public MultiInstanceManager(IKeyboardMouseEvents keyboardMouseEvents)
         {
             InitializeComponent();
@@ -31,7 +31,6 @@ namespace MultiInstanceManager
             removeButton.Click += new EventHandler(removeButton_Click);
             refreshButton.Click += new EventHandler(refreshButton_Click);
             readmeLink.Click += new EventHandler(readmeLink_Click);
-            killHandlesButton.Click += new EventHandler(killHandlesButton_Click);
             dumpRegKeyButton.Click += new EventHandler(dumpRegKeyButton_Click);
             forceExit.CheckedChanged += new EventHandler(forceExit_Changed);
             
@@ -49,6 +48,14 @@ namespace MultiInstanceManager
             forceExit.Checked = ConfigurationManager.AppSettings.Get("forceExitClients")?.ToString() == "true" ? true : false;
             saveAccounInfo.Checked = ConfigurationManager.AppSettings.Get("saveCredentials")?.ToString() == "true" ? true : false;
             saveAccounInfo.CheckedChanged += new EventHandler(saveAccounInfo_Changed);
+
+            /*
+             * Account configuration stuff
+             * 
+             */
+            configureAccountsButton.Click += new EventHandler(configureAccountsButton_Click);
+            accountConfig = new AccountConfiguration();
+            accountConfig.Disposed += new EventHandler(accountConfig_Disposed);
 
             forceExitToolTip.SetToolTip(forceExit, "ForceExit means, kill the game client once the tokens are set when 'refreshing'");
             MH = new MultiHandler(this, accountList);
@@ -72,10 +79,13 @@ namespace MultiInstanceManager
             {
                 Debug.WriteLine("Game name config faulty: " + e.ToString());
             }
-   
+//            keyboardMouseEvents.OnCombination()
             keyboardMouseEvents.KeyPress += (_, args) =>
             {
+                Debug.WriteLine("Complete info: ");
+                Debug.WriteLine("Mod: " + Control.ModifierKeys.ToString());
                 // Prepare usage of tab-keys between windows
+                /*
                 if (WindowHelper.PriorityWindowFocus())
                 {
                     foreach (var binding in settings.KeyToggles)
@@ -91,6 +101,7 @@ namespace MultiInstanceManager
                         }
                     }
                 }
+                */
             };
         }
 
@@ -115,6 +126,17 @@ namespace MultiInstanceManager
             {
                 Console.WriteLine("Error writing app settings");
             }
+        }
+        public void accountConfig_Disposed(object sender, EventArgs e)
+        {
+            accountConfig = new AccountConfiguration();
+            accountConfig.Disposed += new EventHandler(accountConfig_Disposed);
+            configureAccountsButton.Enabled = true;
+        }
+        public void configureAccountsButton_Click(object sender, EventArgs e)
+        {
+            configureAccountsButton.Enabled = false;
+            accountConfig.Show();
         }
         public void saveAccounInfo_Changed(object sender, EventArgs e)
         {
@@ -144,11 +166,6 @@ namespace MultiInstanceManager
             var result = await task;
             EnableButtons();
             MH.LoadAccounts();
-        }
-        private void killHandlesButton_Click(object sender, EventArgs e)
-        {
-            // ProcessManager.CloseExternalHandles(ConfigurationManager.AppSettings.Get("gameExecutableName")?.ToString());
-            // MH.KillGameClientHandles();
         }
         private async void launchButton_Click(object sender, System.EventArgs e)
         {
@@ -212,7 +229,7 @@ namespace MultiInstanceManager
         }
         private async void refreshButton_Click(object sender, System.EventArgs e)
         {
-            MH.ClearDebug();
+            Log.Clear();
             if (accountList.CheckedItems.Count != 0)
             {
                 for (var x = 0; x < accountList.CheckedItems.Count; x++)

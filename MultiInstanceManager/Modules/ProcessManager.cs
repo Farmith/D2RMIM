@@ -336,7 +336,22 @@ namespace MultiInstanceManager.Modules
             }
             if (processes.Length == processCounter)
             {
-                return processes[processCounter - 1];
+                var process = processes[processCounter - 1];
+                var keeptrying = true;
+                while (!process.HasExited && keeptrying)
+                {
+                    process.Refresh();
+                    if (process.MainWindowHandle != IntPtr.Zero)
+                    {
+                        keeptrying = false;
+                    }
+                    else
+                    {
+                        // We sleep for 5 ms untill we find a MainWindowHandle
+                        Thread.Sleep(5);
+                    }
+                }
+                return process;
             }
             return null;
         }

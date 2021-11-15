@@ -1,4 +1,7 @@
-﻿using MultiInstanceManager.Modules;
+﻿using Microsoft.WindowsAPICodePack.Taskbar;
+using MultiInstanceManager.Interfaces;
+using MultiInstanceManager.Modules;
+using MultiInstanceManager.Structs;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -37,11 +40,28 @@ namespace MultiInstanceManager.Helpers
 
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern uint GetCurrentThreadId();
-
+        
         public static void ShowMessage(string message)
         {
             _ = MessageBox.Show(message);
         }
+        public static void SetWindowApplicationId(IntPtr handle,string applicationId,bool noretry = false)
+        {
+            try
+            {
+                TaskbarManager.Instance.SetApplicationIdForSpecificWindow(handle, applicationId);
+            } catch (Exception e)
+            {
+                Log.Debug("Can not modify AppID: " + e.ToString());
+                if (!noretry)
+                {
+                    Log.Debug("Trying again in 5s");
+                    Thread.Sleep(5000);
+                    SetWindowApplicationId(handle, applicationId, true);
+                }
+            }
+        }
+
         public static void ModifyWindowTitleName(Process process, string displayName)
         {
             var newTitle = "[ " + displayName + " ] Diablo II: Resurrected";
