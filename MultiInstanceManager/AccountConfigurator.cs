@@ -68,6 +68,9 @@ namespace MultiInstanceManager
                 skipIntroVideos.Checked = _Account.SkipCinematics;
                 if (_Account.WindowHotKey != null)
                 {
+                    _HotKey = _Account.WindowHotKey;
+                    modifier = _HotKey.ModifierKey;
+                    hotkey = _HotKey.Key;
                     enableHotkeys.Checked = _Account.WindowHotKey.Enabled;
                     var extraMod = "";
                     if (_Account.WindowHotKey.ModifierKey.ToString().Length > 0)

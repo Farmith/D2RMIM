@@ -182,8 +182,8 @@ namespace MultiInstanceManager.Modules
             Log.Debug("Closing launcher and client mutex handles");
             CloseBnetLauncher(launcherProcess);
             Log.Debug("Launcher closed, killing mutex");
-            ProcessManager.CloseExternalHandles(clientExecutable.ProcessName); // Close all found D2R mutex handles
-            Log.Debug("Mutex killed");
+            // ProcessManager.CloseExternalHandles(clientExecutable.ProcessName); // Don't need to close mutexes when setting up anymore
+            // Log.Debug("Mutex killed");
             // CloseMultiProcessHandle(gameProcesses.Last());
             // Kill the Launcher & game client
             try
@@ -226,15 +226,21 @@ namespace MultiInstanceManager.Modules
         public bool LaunchWithAccount(string accountName,string cmdArgs = "")
         {
             Log.Debug("Launching account ("+(instances.Count+1)+"): '" + accountName + "'");
+            Account account = FileHelper.LoadAccountConfiguration(accountName);
             UseAccountToken(accountName);
             var process = LaunchGame(accountName, cmdArgs);
             Log.Debug("Process should be: " + process.Id);
-            if(modifyWindowTitles)
+            if(account.ModifyWindowtitles)
             {
                 WindowHelper.ModifyWindowTitleName(process, accountName);
-                // This should only be done if the user explicitly asks for it:
+            }
+            if(account.SeparateTaskbarIcons)
+            {
                 Log.Debug("Handle: " + process.MainWindowHandle.ToString());
                 WindowHelper.SetWindowApplicationId(process.MainWindowHandle, "D2R" + accountName);
+            }
+            if(account.LaunchOptions.WindowX != 0 || account.LaunchOptions.WindowY != 0) {
+                WindowHelper.SetWindowPosition(process.MainWindowHandle, account.LaunchOptions.WindowX, account.LaunchOptions.WindowY);
             }
             // Add a way to abort the frenetic clicking
             Log.Debug("Clicking away");
@@ -263,6 +269,10 @@ namespace MultiInstanceManager.Modules
             if (ProcessManager.MatchProcess(process))
             {
                 Log.Debug("Process seems to be alive: " + process.Id);
+                if (account.LaunchOptions.WindowX != 0 || account.LaunchOptions.WindowY != 0)
+                {
+                    WindowHelper.SetWindowPosition(process.MainWindowHandle, account.LaunchOptions.WindowX, account.LaunchOptions.WindowY);
+                }
                 ExportToken(accountName + ".bin");
                 Log.Debug("Closing mutex handles");
                 ProcessManager.CloseExternalHandles(process.ProcessName); // kill all D2R mutex handles
