@@ -12,6 +12,11 @@
 *	Cardano: addr1qyers7tzkx8z4pmat0a3xg8g5dhdhguehmsnqns7dg84uzpj8puk9vvw92rh6klmzvsw3gmwmw3en0hpxp8pu6s0tcyqxkhsa6
 *	FG: D2JSP Forum Gold Donations Welcometo [Farmith](https://forums.d2jsp.org/user.php?i=1261112)
 
+## Discord:
+
+If you want to chat about the app, have feature requests you wish to brainstorm or just feel like saying hi feel free to join the discord channel.
+https://discord.gg/jTYH5Wgz
+
 ## Preparation:
 ~~If you have never used the accompanying handle64.exe you need to manually run that executable once, and accept the terms of use for it before beginning.~~
 No unneccessary preparations needed, maybe a soft drink and a sandwich?
@@ -86,7 +91,9 @@ FAQ:
 	-	* Added new functionality to enable/disable grouping of client windows in the taskbar on a per-client basis.
 	-	* Added new functionality to manually choose installationpath/executable name of battle.net/D2R on a per-client basis.
 	-	* Added new functionality to process/configure pre-launch commands to be executed before the client on a per-client basis.
+	-		* Currently disabled
 	-	* Added new functionality to process/configure post-launch commands to be executed after the client on a per-client basis.
+	-		* Currently disabled
 	-	* Added new functionality to process/configure 'command-line arguments' on a per-client basis.
 	-	* Added new functionality to select client position on screen on a per-client basis.
 	-	* Added new functionality to select/configure client Realm on a per-client basis.
