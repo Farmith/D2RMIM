@@ -35,11 +35,18 @@ namespace MultiInstanceManager
             // These below may not be neccessary because: Save Button
             useDefaultGame.CheckedChanged += new EventHandler(useDefaultGame_CheckedChanged);
             skipIntroVideos.CheckedChanged += new EventHandler(skipIntroVideos_CheckedChanged);
+            // this.OnShown += AccountConfiguration_Shown;
             hotKeyKey.KeyDown += hotKeyKey_KeyDown;
             hotKeyKey.KeyPress += hotKeyKey_KeyPress;
             hotKeyKey.KeyUp += hotKeyKey_KeyUp;
 
             saveConfig.Click += SaveConfiguration;
+        }
+        public void OnShown(object sender, EventArgs e)
+        {
+            resetRegion();
+            FillAccounts();
+            DefaultSettings();
         }
         private void DefaultSettings()
         {
