@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿#nullable enable
+using Microsoft.Win32;
 using MultiInstanceManager.Helpers;
 using MultiInstanceManager.Structs;
 using System;
@@ -26,7 +27,8 @@ namespace MultiInstanceManager.Modules
         private bool modifyWindowTitles;
         private string gameExecutableName;
         private bool saveCredentials;
-
+        private List<Account> accountStore;
+        private List<ActiveWindow> activeWindows;
         public MultiHandler(Form _parent,CheckedListBox _accountList)
         {
             parent = _parent;
@@ -36,6 +38,8 @@ namespace MultiInstanceManager.Modules
             modifyWindowTitles = false;
             gameExecutableName = Constants.clientExecutableName + Constants.executableFileExt;
             saveCredentials = false;
+            accountStore = new List<Account>();
+            activeWindows = new List<ActiveWindow>();
         }
         public void SetCredentialMode(bool _saveCredentials = false)
         {
@@ -52,13 +56,18 @@ namespace MultiInstanceManager.Modules
             modifyWindowTitles = mode;
         }
 
-        public KeyToggle SwapFocus(KeyToggle binding)
+        public ActiveWindow SwapFocus(Account account)
         {
+            var activeWindow = activeWindows.Find(x => x.Account.DisplayName == account.DisplayName);
+            if (activeWindow == null)
+                return new ActiveWindow();
+
             var clientProcesses = Process.GetProcessesByName(Constants.clientExecutableName);
             Debug.WriteLine("Process count: " + clientProcesses.Count());
 
             // Set focus to specified window
-            if (binding.WindowHandle == IntPtr.Zero)
+            /*
+            if (activeWindow.Process.MainWindowHandle == IntPtr.Zero)
             {
                 if (instances.Count == 0 || instances.Count != clientProcesses.Count())
                 {
@@ -78,19 +87,21 @@ namespace MultiInstanceManager.Modules
                     binding.WindowHandle = instances[binding.ClientIterator].process.MainWindowHandle;
                 }
             }
-            if (binding.WindowHandle != IntPtr.Zero)
+            */
+
+            if (activeWindow.Process.MainWindowHandle != IntPtr.Zero)
             {
                 try
                 {
-                    WindowHelper.forceForegroundWindow(binding.WindowHandle);
+                    WindowHelper.forceForegroundWindow(activeWindow.Process.MainWindowHandle);
                 } catch (Exception e)
                 {
                     // The window has died or been removed or something
                     Debug.WriteLine("Could not force foreground window: " + e.ToString());
-                    binding.WindowHandle = IntPtr.Zero;
+                    activeWindows.Remove(activeWindow);
                 }
             }
-            return binding;
+            return activeWindow;
         }
         public bool Setup(string displayName = "", string cmdArgs = "", Boolean killProcessesWhenDone = true)
         {
@@ -115,13 +126,14 @@ namespace MultiInstanceManager.Modules
             {
                 displayName = Prompt.ShowDialog("Enter desired displayname for this account:", "Add Account");
             }
-            Credentials bNetCredentials = new Credentials(null,null);
+            Credentials? bNetCredentials = new Credentials(null,null);
             if (saveCredentials)
             {
                 Debug.WriteLine("Fixing credentials");
                 bNetCredentials = CredentialHelper.GetVaultCredentials(displayName);
+                if(bNetCredentials != null)
+                    Debug.WriteLine("User: " + bNetCredentials.User);
             }
-            Debug.WriteLine("User: " + bNetCredentials.User);
             var launcherProcess = LaunchLauncher();
             WindowHelper.WinWait(Constants.bnetLauncherClass);
             SetBnetLauncherPID(launcherProcess);
@@ -142,6 +154,8 @@ namespace MultiInstanceManager.Modules
             processCounter++;
             Log.Debug("Waiting for Game Client to start");
             var clientExecutable = ProcessManager.ProcessWait(Constants.clientExecutableName,processCounter);
+            if (clientExecutable == null)
+                return false;
             Log.Debug("Client ready, glhf");
             // Wait for the initial token update
             if (modifyWindowTitles)
@@ -181,7 +195,8 @@ namespace MultiInstanceManager.Modules
             Log.Debug("Successfully saved new token for " + displayName);
 
             Log.Debug("Closing launcher and client mutex handles");
-            CloseBnetLauncher(launcherProcess);
+            if(launcherProcess != null)
+                CloseBnetLauncher(launcherProcess);
             Log.Debug("Launcher closed, killing mutex");
             // ProcessManager.CloseExternalHandles(clientExecutable.ProcessName); // Don't need to close mutexes when setting up anymore
             // Log.Debug("Mutex killed");
@@ -214,7 +229,10 @@ namespace MultiInstanceManager.Modules
                 }
             }
         }
-
+        public List<Account> GetAllAccounts()
+        {
+            return accountStore;
+        }
         public void ResetSessions()
         {
             CloseBnetLaunchers();
@@ -227,26 +245,27 @@ namespace MultiInstanceManager.Modules
         public bool LaunchWithAccount(string accountName,string cmdArgs = "")
         {
             Log.Debug("Launching account ("+(instances.Count+1)+"): '" + accountName + "'");
-            Account account = FileHelper.LoadAccountConfiguration(accountName);
+            Account? account = FileHelper.LoadAccountConfiguration(accountName);
+
             UseAccountToken(accountName);
-            cmdArgs = account.LaunchOptions.LaunchArguments.Length > 0 ? account.LaunchOptions.LaunchArguments : "";
+            cmdArgs = account?.LaunchOptions.LaunchArguments.Length > 0 ? account.LaunchOptions.LaunchArguments : "";
             // Check if we need to do some magic with the Settings.json
-            if (account.SeparateJsonSettings)
+            if (account != null && account.SeparateJsonSettings)
             {
                 FileHelper.ReplaceJSONSettingsFile(account.DisplayName);
             }
             var process = LaunchGame(accountName, cmdArgs);
             Log.Debug("Process should be: " + process.Id);
-            if(account.ModifyWindowtitles)
+            if(account != null && account.ModifyWindowtitles)
             {
                 WindowHelper.ModifyWindowTitleName(process, accountName);
             }
-            if(account.SeparateTaskbarIcons)
+            if(account != null && account.SeparateTaskbarIcons)
             {
                 Log.Debug("Handle: " + process.MainWindowHandle.ToString());
                 WindowHelper.SetWindowApplicationId(process.MainWindowHandle, "D2R" + accountName);
             }
-            if(account.LaunchOptions.WindowX != 0 || account.LaunchOptions.WindowY != 0) {
+            if(account != null && (account.LaunchOptions.WindowX != 0 || account.LaunchOptions.WindowY != 0)) {
                 WindowHelper.SetWindowPosition(process.MainWindowHandle, account.LaunchOptions.WindowX, account.LaunchOptions.WindowY);
             }
             // Add a way to abort the frenetic clicking
@@ -277,13 +296,15 @@ namespace MultiInstanceManager.Modules
             if (ProcessManager.MatchProcess(process))
             {
                 Log.Debug("Process seems to be alive: " + process.Id);
-                if (account.LaunchOptions.WindowX != 0 || account.LaunchOptions.WindowY != 0)
+                if (account != null && (account.LaunchOptions.WindowX != 0 || account.LaunchOptions.WindowY != 0))
                 {
                     WindowHelper.SetWindowPosition(process.MainWindowHandle, account.LaunchOptions.WindowX, account.LaunchOptions.WindowY);
                 }
                 ExportToken(accountName + ".bin");
                 Log.Debug("Closing mutex handles");
+                activeWindows.Add(new ActiveWindow { Process = process, Account = account });
                 ProcessManager.CloseExternalHandles(process.ProcessName); // kill all D2R mutex handles
+                Thread.Sleep(500); // Small delay added
                 gameProcesses.Add(process);
             } else
             {
@@ -327,9 +348,13 @@ namespace MultiInstanceManager.Modules
         {
             var accounts = FileHelper.GetAccountsByFolder();
             accountList.Items.Clear();
+            accountStore.Clear();
             foreach (var account in accounts)
             {
                 var fileName = account.AccountName + " | " + account.LastWriteTime.ToString();
+                Account? a = FileHelper.LoadAccountConfiguration(account.AccountName);
+                if(a != null)
+                    accountStore.Add(a);
                 accountList.Items.Add(fileName);
             }
         }

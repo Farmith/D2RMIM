@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Threading;
+using MultiInstanceManager.Helpers;
 
 namespace MultiInstanceManager.Modules
 {
@@ -254,7 +255,7 @@ namespace MultiInstanceManager.Modules
 
             int bufferSize = GetHandleNameLength(handle);
 
-            Debug.WriteLine("Trying to allocate: " + bufferSize.ToString() + " bytes of memory");
+            // Debug.WriteLine("Trying to allocate: " + bufferSize.ToString() + " bytes of memory");
             try
             {
                 IntPtr pStringBuffer = Marshal.AllocHGlobal(bufferSize);
@@ -316,10 +317,17 @@ namespace MultiInstanceManager.Modules
         }
         public static bool MatchProcess(Process process)
         {
-            Process exists = Process.GetProcessById(process.Id);
-            if (exists.Id == process.Id)
+            try
             {
-                return true;
+                Process exists = Process.GetProcessById(process.Id);
+                if (exists.Id == process.Id)
+                {
+                    return true;
+                }
+            } catch (Exception ex)
+            {
+                Log.Debug("Process has died prematurely");
+                Log.Debug(ex.ToString());
             }
             return false;
         }

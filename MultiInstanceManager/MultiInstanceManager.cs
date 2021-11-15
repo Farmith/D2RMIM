@@ -1,20 +1,14 @@
-﻿using Gma.System.MouseKeyHook;
+﻿using Dfust.Hotkeys;
 using MultiInstanceManager.Config;
 using MultiInstanceManager.Helpers;
 using MultiInstanceManager.Modules;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Configuration;
-using System.Data;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static Dfust.Hotkeys.Enums;
 
 namespace MultiInstanceManager
 {
@@ -23,7 +17,7 @@ namespace MultiInstanceManager
         MultiHandler MH;
         Settings settings;
         AccountConfiguration accountConfig;
-        public MultiInstanceManager(IKeyboardMouseEvents keyboardMouseEvents)
+        public MultiInstanceManager()
         {
             InitializeComponent();
             addAccountButton.Click += new EventHandler(addAccountButton_Click);
@@ -79,30 +73,25 @@ namespace MultiInstanceManager
             {
                 Debug.WriteLine("Game name config faulty: " + e.ToString());
             }
-//            keyboardMouseEvents.OnCombination()
-            keyboardMouseEvents.KeyPress += (_, args) =>
+            
+            /*
+             * HotKey stuffs
+             * 
+             */
+
+            var hotkeyCollection = new HotkeyCollection(Scope.Global);
+            var store = MH.GetAllAccounts();
+            foreach (var a in store)
             {
-                Debug.WriteLine("Complete info: ");
-                Debug.WriteLine("Mod: " + Control.ModifierKeys.ToString());
-                // Prepare usage of tab-keys between windows
-                /*
-                if (WindowHelper.PriorityWindowFocus())
+                var bind = a.WindowHotKey;
+                var hotkey = (Keys)bind.Key | (Keys)bind.ModifierKey;
+                hotkeyCollection.RegisterHotkey(hotkey, (e) =>
                 {
-                    foreach (var binding in settings.KeyToggles)
-                    {
-                        if (char.TryParse(binding.CharCode.ToString(), out char c))
-                        {
-                            if (args.KeyChar == c)
-                            {
-                                Debug.WriteLine("Found match: " + c + " Iterator: " + binding.ClientIterator);
-                                MH.SwapFocus(binding);
-                                args.Handled = true;
-                            }
-                        }
-                    }
-                }
-                */
-            };
+                    Debug.WriteLine("Found recipient for hotkey: " + bind.Key.ToString() + " mod: " + bind.ModifierKey.ToString());
+                    Debug.WriteLine("Account: " + a.DisplayName);
+                    MH.SwapFocus(a);
+                });
+            }
         }
 
         public static void AddOrUpdateAppSettings(string key, string value)
