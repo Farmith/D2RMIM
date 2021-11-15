@@ -88,6 +88,13 @@ namespace MultiInstanceManager
                 gameLaunchArgs.Text = _Account.LaunchOptions.LaunchArguments;
                 preLaunchCmd.Text = _Account.LaunchOptions.PreLaunchCommands;
                 postLaunchCmd.Text = _Account.LaunchOptions.PostLaunchCommands;
+                separateJsonSettings.Checked = _Account.SeparateJsonSettings;
+                separateTaskbarItems.Checked = _Account.SeparateTaskbarIcons;
+                if(_Account.SeparateJsonSettings)
+                {
+                    // Make sure there is a JSON file to use for Settings.
+                    FileHelper.CreateJSONSettings(_Account.DisplayName);
+                }
                 SelecteRegion(_Account.Region);
             } else
             {
@@ -130,7 +137,8 @@ namespace MultiInstanceManager
                     config.InstallationPath = (string)Registry.GetValue(Constants.gameInstallRegKey[0], Constants.gameInstallRegKey[1], "");
                 } catch (Exception ex)
                 {
-                    Log.Debug("Can not find installation in registry: " + e.ToString());
+                    Log.Debug("Can not find installation in registry: " + ex.ToString());
+                    Log.Debug(e.ToString());
                     config.InstallationPath = "";
                 }
                 config.GameExecutable = Constants.clientExecutableName;
@@ -155,7 +163,13 @@ namespace MultiInstanceManager
             config.SkipCinematics = skipIntroVideos.Checked;
             config.ModifyWindowtitles = modifyWindowTitles.Checked;
             config.WindowHotKey = _HotKey;
-
+            config.SeparateJsonSettings = separateJsonSettings.Checked;
+            config.SeparateTaskbarIcons = separateTaskbarItems.Checked;
+            if (_Account.SeparateJsonSettings)
+            {
+                // Make sure there is a JSON file to use for Settings.
+                FileHelper.CreateJSONSettings(_Account.DisplayName);
+            }
             FileHelper.SaveAccountConfiguration(config);
 
         }
@@ -306,16 +320,6 @@ namespace MultiInstanceManager
 
 
         }
-        private void checkBox4_CheckedChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void textBox6_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
         private void selectAccount_SelectedIndexChanged(object sender, EventArgs e)
         {
             LoadAccount();
@@ -326,7 +330,7 @@ namespace MultiInstanceManager
             if (useDefaultGame.Checked)
             {
                 installationPath.Text = (string)Registry.GetValue(Constants.gameInstallRegKey[0], Constants.gameInstallRegKey[1], "");
-                gameExecutableName.Text = Constants.clientExecutableName + Constants.executableFileExt;
+                gameExecutableName.Text = Constants.clientExecutableName;
             }
         }
 

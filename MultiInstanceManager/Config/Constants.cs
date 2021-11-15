@@ -18,6 +18,9 @@ namespace MultiInstanceManager
         /* Account related registry keys */
         public static List<String> accountRegKey = new List<String> { "HKEY_CURRENT_USER\\SOFTWARE\\Blizzard Entertainment\\Battle.net\\Launch Options\\OSI", "WEB_TOKEN" };
         public static List<String> gameInstallRegKey = new List<string> { "HKEY_LOCAL_MACHINE\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Diablo II Resurrected", "InstallLocation" };
+        /* Account Related Statics */
+        public static string clientSettingsAppendName = " - clientSettings.json";
+        public static string clientSettingsJsonLocation = @"%UserProfile%\Saved Games\Diablo II Resurrected\";
         /* Window classes */
         public static string gameClass = "OsWindow";
         public static string bnetLauncherClass = "Qt5QWindowIcon";

@@ -71,7 +71,7 @@ namespace MultiInstanceManager
             // 
             // launchButton
             // 
-            this.launchButton.Location = new System.Drawing.Point(255, 136);
+            this.launchButton.Location = new System.Drawing.Point(255, 165);
             this.launchButton.Name = "launchButton";
             this.launchButton.Size = new System.Drawing.Size(114, 23);
             this.launchButton.TabIndex = 2;
@@ -80,7 +80,7 @@ namespace MultiInstanceManager
             // 
             // refreshButton
             // 
-            this.refreshButton.Location = new System.Drawing.Point(255, 165);
+            this.refreshButton.Location = new System.Drawing.Point(255, 194);
             this.refreshButton.Name = "refreshButton";
             this.refreshButton.Size = new System.Drawing.Size(114, 23);
             this.refreshButton.TabIndex = 3;
@@ -208,7 +208,7 @@ namespace MultiInstanceManager
             // 
             // configureAccountsButton
             // 
-            this.configureAccountsButton.Location = new System.Drawing.Point(256, 195);
+            this.configureAccountsButton.Location = new System.Drawing.Point(256, 136);
             this.configureAccountsButton.Name = "configureAccountsButton";
             this.configureAccountsButton.Size = new System.Drawing.Size(113, 23);
             this.configureAccountsButton.TabIndex = 19;

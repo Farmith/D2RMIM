@@ -33,5 +33,7 @@ namespace MultiInstanceManager.Structs
         public bool UseDefaultGameInstallation { get; set; }
         [ProtoMember(11)]
         public bool SeparateTaskbarIcons { get; set; }
+        [ProtoMember(12)]
+        public bool SeparateJsonSettings { get; set; }
     }
 }

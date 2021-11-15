@@ -256,5 +256,6 @@ namespace MultiInstanceManager
             var path = System.IO.Path.GetDirectoryName(ePath);
             Process.Start(path + "\\README.txt");
         }
+
     }
 }

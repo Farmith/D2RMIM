@@ -1,4 +1,5 @@
-﻿using MultiInstanceManager.Structs;
+﻿#nullable enable
+using MultiInstanceManager.Structs;
 using ProtoBuf;
 using ProtoBuf.Meta;
 using System;
@@ -27,7 +28,45 @@ namespace MultiInstanceManager.Helpers
             }
             return Accounts;
         }
-
+        public static bool JSONSettingsExist(string name)
+        {
+            if(File.Exists(name))
+            {
+                return true;
+            }
+            return false;
+        }
+        public static void CreateJSONSettings(string name)
+        {
+            var filePath = Environment.ExpandEnvironmentVariables(Constants.clientSettingsJsonLocation);
+            var inJson = filePath +  "Settings.json";
+            var outJson = name + Constants.clientSettingsAppendName;
+            if (!JSONSettingsExist(outJson))
+            {
+                if(!File.Exists(inJson))
+                {
+                    // There is no settings file, cant do this.
+                    Log.Debug("No settings file in: " + inJson);
+                    return;
+                }
+                File.Copy(inJson, outJson);
+            }
+        }
+        public static void ReplaceJSONSettingsFile(string name)
+        {
+            var filePath = Environment.ExpandEnvironmentVariables(Constants.clientSettingsJsonLocation);
+            var inJson = filePath + "Settings.json";
+            var outJson = name + Constants.clientSettingsAppendName;
+            var storeJson = "original" + Constants.clientSettingsAppendName;
+            // For just being double sure, check that there IS a settings file:
+            CreateJSONSettings(name);
+            // Copy the "standard" or old file to temp:
+            if (File.Exists(inJson))
+            {
+                File.Copy(inJson, storeJson);
+                File.Copy(outJson, inJson);
+            }
+        }
         public static void SaveAccountConfiguration(Account account)
         {
             //            var model = RuntimeTypeModel.Create();

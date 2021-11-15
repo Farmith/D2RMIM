@@ -228,6 +228,12 @@ namespace MultiInstanceManager.Modules
             Log.Debug("Launching account ("+(instances.Count+1)+"): '" + accountName + "'");
             Account account = FileHelper.LoadAccountConfiguration(accountName);
             UseAccountToken(accountName);
+            cmdArgs = account.LaunchOptions.LaunchArguments.Length > 0 ? account.LaunchOptions.LaunchArguments : "";
+            // Check if we need to do some magic with the Settings.json
+            if (account.SeparateJsonSettings)
+            {
+                FileHelper.ReplaceJSONSettingsFile(account.DisplayName);
+            }
             var process = LaunchGame(accountName, cmdArgs);
             Log.Debug("Process should be: " + process.Id);
             if(account.ModifyWindowtitles)
@@ -286,11 +292,13 @@ namespace MultiInstanceManager.Modules
 
         }
        
-        private Process LaunchGame(string accountName, string cmdArgs = "")
+        private Process LaunchGame(string accountName, string cmdArgs = "", string? _installPath=null, string? _exeName=null)
         {
-            string installPath = (string)Registry.GetValue(Constants.gameInstallRegKey[0], Constants.gameInstallRegKey[1], "");
             var process = new Process();
-            process.StartInfo.FileName = installPath + "\\" + gameExecutableName;
+            _exeName = _exeName != null ? _exeName : gameExecutableName;
+            _installPath = _installPath != null ? _installPath : (string)Registry.GetValue(Constants.gameInstallRegKey[0], Constants.gameInstallRegKey[1], "");
+
+            process.StartInfo.FileName = _installPath + "\\" + _exeName;
             process.StartInfo.Arguments = cmdArgs;
             process.Start();
             var thisInstance = new GameInstance { account = accountName, process = process };
