@@ -42,6 +42,8 @@ namespace MultiInstanceManager
             forceExitToolTip.SetToolTip(forceExit, "ForceExit means, kill the game client once the tokens are set when 'refreshing'");
             MH = new MultiHandler(this, accountList);
             MH.SetCredentialMode(saveAccounInfo.Checked);
+            var version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+            appVersion.Text = String.Format("Version: {0}", version);
             // Prepare keybinds
             Debug.WriteLine("Adding keybinds");
             settings = new Settings();
