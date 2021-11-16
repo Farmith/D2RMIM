@@ -26,6 +26,7 @@ namespace MultiInstanceManager.Helpers
                 var fileName = Path.GetFileNameWithoutExtension(account);
                 Accounts.Add(new AccountBinary { FullPath = account, AccountName = fileName, LastWriteTime = lastWrite });
             }
+            Log.Debug("Found: " + Accounts.Count + " accounts by .bin");
             return Accounts;
         }
         public static bool JSONSettingsExist(string name)
