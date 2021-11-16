@@ -9,7 +9,7 @@ namespace MultiInstanceManager.Helpers
 {
     public static class Prompt
     {
-        public static string ShowDialog(string text, string caption)
+        public static string ShowDialog(string text, string caption, bool isPassword=false)
         {
             Form prompt = new Form()
             {
@@ -22,14 +22,23 @@ namespace MultiInstanceManager.Helpers
             Label textLabel = new Label() { Left = 50, Top = 20, Text = text };
             textLabel.Width = TextRenderer.MeasureText(textLabel.Text, textLabel.Font).Width;
 
-            TextBox textBox = new TextBox() { Left = 50, Top = 50, Width = 400 };
             Button confirmation = new Button() { Text = "Continue", Left = 350, Width = 100, Top = 70, DialogResult = DialogResult.OK };
             confirmation.Click += (sender, e) => { prompt.Close(); };
+
+            TextBox textBox = new TextBox();
+            if (isPassword)
+            {
+                textBox = new TextBox() { Left = 50, Top = 50, Width = 400, PasswordChar = '*' };
+            }
+            else
+            {
+                textBox = new TextBox() { Left = 50, Top = 50, Width = 400 };
+            }
             prompt.Controls.Add(textBox);
             prompt.Controls.Add(confirmation);
             prompt.Controls.Add(textLabel);
             prompt.AcceptButton = confirmation;
-
+            Log.Debug("Password: " + textBox.Text);
             return prompt.ShowDialog() == DialogResult.OK ? textBox.Text : "";
         }
     }

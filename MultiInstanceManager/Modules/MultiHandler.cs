@@ -27,7 +27,7 @@ namespace MultiInstanceManager.Modules
         private bool modifyWindowTitles;
         private string gameExecutableName;
         private bool saveCredentials;
-        private List<Account> accountStore;
+        private List<Account> profileStore;
         private List<ActiveWindow> activeWindows;
         public MultiHandler(Form _parent,CheckedListBox _accountList)
         {
@@ -38,7 +38,7 @@ namespace MultiInstanceManager.Modules
             modifyWindowTitles = false;
             gameExecutableName = Constants.clientExecutableName + Constants.executableFileExt;
             saveCredentials = false;
-            accountStore = new List<Account>();
+            profileStore = new List<Account>();
             activeWindows = new List<ActiveWindow>();
         }
         public void SetCredentialMode(bool _saveCredentials = false)
@@ -58,14 +58,14 @@ namespace MultiInstanceManager.Modules
 
         public ActiveWindow SwapFocus(Account account)
         {
-            var activeWindow = activeWindows.Find(x => x.Account.DisplayName == account.DisplayName);
+            var activeWindow = activeWindows.Find(x => x.Profile.DisplayName == account.DisplayName);
             if (activeWindow == null)
             {
                 Log.Debug("Active window is null for: " + account.DisplayName);
                 return new ActiveWindow();
             }
 
-            var clientProcesses = Process.GetProcessesByName(activeWindow.Account.GameExecutable);
+            var clientProcesses = Process.GetProcessesByName(activeWindow.Profile.GameExecutable);
             Debug.WriteLine("Game Process count: " + clientProcesses.Count());
 
             // Set focus to specified window
@@ -107,7 +107,7 @@ namespace MultiInstanceManager.Modules
             }
             return activeWindow;
         }
-        public bool Setup(string displayName = "", string cmdArgs = "", Boolean killProcessesWhenDone = true)
+        public bool Setup(string displayName = "", Boolean killProcessesWhenDone = true)
         {
             Log.Clear();
             // Zero out everything
@@ -124,7 +124,7 @@ namespace MultiInstanceManager.Modules
             if (ProcessManager.blizzardProcessesExists())
             {
                 WindowHelper.ShowMessage("Close all D2R/Battle.net related programs first.");
-                return Setup(displayName, cmdArgs, true);
+                return Setup(displayName, true);
             } 
             if(displayName.Length == 0)
             {
@@ -220,9 +220,9 @@ namespace MultiInstanceManager.Modules
             Log.Debug("All done, exiting setup thread");
             return true;
         }
-        public List<Account> GetAllAccounts()
+        public List<Account> GetAllProfiles()
         {
-            return accountStore;
+            return profileStore;
         }
         public void ResetSessions()
         {
@@ -233,14 +233,14 @@ namespace MultiInstanceManager.Modules
             bnetLauncherPID = 0;
             instances = new List<GameInstance>();
         }
-        public bool LaunchWithAccount(string accountName,string cmdArgs = "")
+        public bool LaunchWithAccount(string accountName, string cmdArgs = "")
         {
-            Log.Debug("Launching account ("+(instances.Count+1)+"): '" + accountName + "'");
-            Account? account = FileHelper.LoadAccountConfiguration(accountName);
+            Log.Debug("Launching account (" + (instances.Count + 1) + "): '" + accountName + "'");
+            Account? profile = FileHelper.LoadProfileConfiguration(accountName);
 
-            if(account != null && account.Region.Length > 0)
+            if (profile?.Region?.Length > 0)
             {
-                switch(account.Region)
+                switch (profile.Region)
                 {
                     case "Europe":
                         ChangeRealm("EU");
@@ -256,25 +256,36 @@ namespace MultiInstanceManager.Modules
                 }
             }
             UseAccountToken(accountName);
-            cmdArgs = account?.LaunchOptions.LaunchArguments.Length > 0 ? account.LaunchOptions.LaunchArguments : "";
+            cmdArgs = profile?.LaunchOptions.LaunchArguments.Length > 0 ? profile.LaunchOptions.LaunchArguments : "";
             // Check if we need to do some magic with the Settings.json
-            if (account != null && account.SeparateJsonSettings)
+            if (profile != null && profile.SeparateJsonSettings)
             {
-                FileHelper.ReplaceJSONSettingsFile(account.DisplayName);
+                FileHelper.ReplaceJSONSettingsFile(profile.DisplayName);
             }
-            var process = LaunchGame(accountName, cmdArgs);
+            string? installPath = null;
+            if (profile != null && profile.InstallationPath.Length > 0)
+            {
+                installPath = profile.InstallationPath;
+            }
+            string? gameExe = null;
+            if (profile != null && profile.GameExecutable.Length > 0)
+            { 
+                gameExe = profile.GameExecutable;
+            }
+            Log.Debug("Launching game with: " + installPath + gameExe + Constants.executableFileExt);
+            var process = LaunchGame(accountName, cmdArgs, installPath, gameExe);
             Log.Debug("Process should be: " + process.Id);
-            if(account != null && account.ModifyWindowtitles)
+            if(profile != null && profile.ModifyWindowtitles)
             {
                 WindowHelper.ModifyWindowTitleName(process, accountName);
             }
-            if(account != null && account.SeparateTaskbarIcons)
+            if(profile != null && profile.SeparateTaskbarIcons)
             {
                 Log.Debug("Handle: " + process.MainWindowHandle.ToString());
                 WindowHelper.SetWindowApplicationId(process.MainWindowHandle, "D2R" + accountName);
             }
-            if(account != null && (account.LaunchOptions.WindowX != 0 || account.LaunchOptions.WindowY != 0)) {
-                WindowHelper.SetWindowPosition(process.MainWindowHandle, account.LaunchOptions.WindowX, account.LaunchOptions.WindowY);
+            if(profile != null && (profile.LaunchOptions.WindowX != 0 || profile.LaunchOptions.WindowY != 0)) {
+                WindowHelper.SetWindowPosition(process.MainWindowHandle, profile.LaunchOptions.WindowX, profile.LaunchOptions.WindowY);
             }
             // Add a way to abort the frenetic clicking
             Log.Debug("Clicking away");
@@ -304,13 +315,13 @@ namespace MultiInstanceManager.Modules
             if (ProcessManager.MatchProcess(process))
             {
                 Log.Debug("Process seems to be alive: " + process.Id);
-                if (account != null && (account.LaunchOptions.WindowX != 0 || account.LaunchOptions.WindowY != 0))
+                if (profile != null && (profile.LaunchOptions.WindowX != 0 || profile.LaunchOptions.WindowY != 0))
                 {
-                    WindowHelper.SetWindowPosition(process.MainWindowHandle, account.LaunchOptions.WindowX, account.LaunchOptions.WindowY);
+                    WindowHelper.SetWindowPosition(process.MainWindowHandle, profile.LaunchOptions.WindowX, profile.LaunchOptions.WindowY);
                 }
                 ExportToken(accountName + ".bin");
                 Log.Debug("Closing mutex handles");
-                activeWindows.Add(new ActiveWindow { Process = process, Account = account });
+                activeWindows.Add(new ActiveWindow { Process = process, Profile = profile });
                 ProcessManager.CloseExternalHandles(process.ProcessName); // kill all D2R mutex handles
                 Thread.Sleep(500); // Small delay added
                 gameProcesses.Add(process);
@@ -323,18 +334,19 @@ namespace MultiInstanceManager.Modules
 
         }
        
-        private Process LaunchGame(string accountName, string cmdArgs = "", string? _installPath=null, string? _exeName=null)
+        private Process LaunchGame(string profile, string cmdArgs = "", string? _installPath=null, string? _exeName=null)
         {
             var process = new Process();
-            _exeName = _exeName != null ? _exeName : gameExecutableName;
+            _exeName = _exeName != null ? _exeName + Constants.executableFileExt : gameExecutableName;
             _installPath = _installPath != null ? _installPath : (string)Registry.GetValue(Constants.gameInstallRegKey[0], Constants.gameInstallRegKey[1], "");
 
             process.StartInfo.FileName = _installPath + "\\" + _exeName;
             process.StartInfo.Arguments = cmdArgs;
             process.Start();
-            var thisInstance = new GameInstance { account = accountName, process = process };
+            Log.Debug("Game should have started by this point.");
+            var thisInstance = new GameInstance { account = profile, process = process };
             instances.Add(thisInstance);
-            var name = gameExecutableName.Substring(0, gameExecutableName.Length - 4);
+            var name = _exeName.Substring(0, _exeName.Length - 4);
             var processes = Process.GetProcessesByName(name);
             var alive = false;
             // Sanity check to make sure the process is alive before we return it. trust me its required.
@@ -352,23 +364,19 @@ namespace MultiInstanceManager.Modules
             }
             return process;
         }
-        private void _loadAccounts()
+        public void LoadProfiles()
         {
-            var accounts = FileHelper.GetAccountsByFolder();
             accountList.Items.Clear();
-            accountStore.Clear();
-            foreach (var account in accounts)
+            var profiles = FileHelper.GetProfilesByFolder();
+            profileStore.Clear();
+            foreach (var profile in profiles)
             {
-                var fileName = account.AccountName + " | " + account.LastWriteTime.ToString();
-                Account? a = FileHelper.LoadAccountConfiguration(account.AccountName);
+                var fileName = profile.AccountName + " | " + profile.LastWriteTime.ToString();
+                Account? a = FileHelper.LoadProfileConfiguration(profile.AccountName);
                 if(a != null)
-                    accountStore.Add(a);
+                    profileStore.Add(a);
                 accountList.Items.Add(fileName);
             }
-        }
-        public void LoadAccounts()
-        {
-            _loadAccounts();
         }
         private void SetBnetLauncherPID(Process launcherProcess)
         {
@@ -441,7 +449,10 @@ namespace MultiInstanceManager.Modules
         private void WaitForNewToken(Process process,Boolean timeout = false)
         {
             if (!IsProcessRunning(process))
+            {
+                Log.Debug("Process has died or exited.");
                 return;
+            }
 
             byte[] CurrentKey = new byte[20];
 
