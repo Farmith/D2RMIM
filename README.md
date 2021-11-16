@@ -15,7 +15,7 @@
 ## Discord:
 
 If you want to chat about the app, have feature requests you wish to brainstorm or just feel like saying hi feel free to join the discord channel.
-https://discord.gg/NpZXgJMd
+https://discord.gg/fCRxGXQWcP
 
 ## Preparation:
 ~~If you have never used the accompanying handle64.exe you need to manually run that executable once, and accept the terms of use for it before beginning.~~
@@ -77,6 +77,18 @@ FAQ:
 
 
 ## Version log:
+
+
+
+* 1.6.1
+	-	**Bugfix release**
+			* Fix for wrong client executable being still referenced in the project.
+			* Fix for wrong client installation path still referenced.
+			* Fix for wrong command-line arguments still referenced.
+			* Stability-fix for profile deletion.
+			* Added removal of credentials upon removal of profile
+			* Start of renaming of "Account" things to "Profile" in the cases where it really is "Profile" things and not "Account" things.
+			* Added true-password mode for password-field in account-setup
 
 * 1.6
 	-	** Major Revamp **
