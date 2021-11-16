@@ -10,6 +10,6 @@ namespace MultiInstanceManager.Structs
     public class ActiveWindow
     {
         public Process Process;
-        public Account Account;
+        public Account Profile;
     }
 }

@@ -14,7 +14,7 @@ namespace MultiInstanceManager.Helpers
 {
     public static class FileHelper
     {
-        public static List<AccountBinary> GetAccountsByFolder(string extension="*.bin")
+        public static List<AccountBinary> GetProfilesByFolder(string extension="*.bin")
         {
             var ePath = Application.ExecutablePath;
             var path = Path.GetDirectoryName(ePath);
@@ -79,17 +79,17 @@ namespace MultiInstanceManager.Helpers
                 Serializer.Serialize(file, account);
             }
         }
-        public static Account? LoadAccountConfiguration(string DisplayName)
+        public static Account? LoadProfileConfiguration(string DisplayName)
         {
             var filename = DisplayName + ".bincnf";
-            var account = new Account();
+            var profile = new Account();
             if (File.Exists(filename))
             {
                 using (var file = File.OpenRead(filename))
                 {
-                    account = Serializer.Deserialize<Account>(file);
-                    return account;
+                    profile = Serializer.Deserialize<Account>(file);
                 }
+                return profile;
             }
             return null;
         }

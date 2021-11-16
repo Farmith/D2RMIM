@@ -27,18 +27,6 @@ namespace MultiInstanceManager
             readmeLink.Click += new EventHandler(readmeLink_Click);
             dumpRegKeyButton.Click += new EventHandler(dumpRegKeyButton_Click);
             forceExit.CheckedChanged += new EventHandler(forceExit_Changed);
-            
-            try
-            {
-                commandLineArguments.Text = ConfigurationManager.AppSettings["cmdArgs"];
-            } catch (Exception e)
-            {
-                Debug.WriteLine("Could not get cmdArgs from config: " + e.ToString());
-                commandLineArguments.Text = "";
-            }
-            commandLineArguments.TextChanged += new EventHandler(commandLineArguments_Changed);
-            modifyWindowTitles.Checked = ConfigurationManager.AppSettings.Get("modifyWindowTitles")?.ToString() == "true" ? true : false;
-            modifyWindowTitles.CheckedChanged += new EventHandler(modifyWindowTitles_Changed);
             forceExit.Checked = ConfigurationManager.AppSettings.Get("forceExitClients")?.ToString() == "true" ? true : false;
             saveAccounInfo.Checked = ConfigurationManager.AppSettings.Get("saveCredentials")?.ToString() == "true" ? true : false;
             saveAccounInfo.CheckedChanged += new EventHandler(saveAccounInfo_Changed);
@@ -59,8 +47,7 @@ namespace MultiInstanceManager
             settings = new Settings();
             settings.LoadWindowKeys();
             Debug.WriteLine("Done with keybinds");
-            MH.LoadAccounts();
-            MH.ToggleWindowTitleMode(modifyWindowTitles.Checked);
+            MH.LoadProfiles();
             try
             {
                 var gn = ConfigurationManager.AppSettings.Get("gameExecutableName").ToString();
@@ -80,7 +67,7 @@ namespace MultiInstanceManager
              */
 
             var hotkeyCollection = new HotkeyCollection(Scope.Global);
-            var store = MH.GetAllAccounts();
+            var store = MH.GetAllProfiles();
             foreach (var a in store)
             {
                 var bind = a.WindowHotKey;
@@ -139,27 +126,19 @@ namespace MultiInstanceManager
         {
             AddOrUpdateAppSettings("forceExitClients", forceExit.Checked.ToString());
         }
-        public void modifyWindowTitles_Changed(object sender, EventArgs e)
-        {
-            MH.ToggleWindowTitleMode(modifyWindowTitles.Checked);
-        }
-        private void commandLineArguments_Changed(object sender, EventArgs e)
-        {
-            AddOrUpdateAppSettings("cmdArgs",commandLineArguments.Text);
-        }
         private void dumpRegKeyButton_Click(object sender, EventArgs e)
         {
             MH.DumpCurrentRegKey();
         }
-        private async void addAccountButton_Click(object sender, System.EventArgs e)
+        private async void addAccountButton_Click(object sender, EventArgs e)
         {
             DisableButtons();
-            var task = Task.Factory.StartNew(() => MH.Setup("", commandLineArguments.Text));
+            var task = Task.Factory.StartNew(() => MH.Setup());
             var result = await task;
             EnableButtons();
-            MH.LoadAccounts();
+            MH.LoadProfiles();
         }
-        private async void launchButton_Click(object sender, System.EventArgs e)
+        private async void launchButton_Click(object sender, EventArgs e)
         {
             MH.ResetSessions();
             if(accountList.CheckedItems.Count != 0)
@@ -171,7 +150,7 @@ namespace MultiInstanceManager
                         var checkedItem = accountList.CheckedItems[x].ToString().Split('|')[0].Trim(' ');
                         // Doing this in a task makes sure the UI doesn't freeze
                         DisableButtons();
-                        var task = Task.Factory.StartNew(() => MH.LaunchWithAccount(checkedItem, commandLineArguments.Text));
+                        var task = Task.Factory.StartNew(() => MH.LaunchWithAccount(checkedItem));
                         var result = await task;
                         EnableButtons();
                     } catch(Exception ex)
@@ -180,20 +159,23 @@ namespace MultiInstanceManager
                         // Something went terribly wrong.. 
                     }
                 }
-                MH.LoadAccounts();
+                MH.LoadProfiles();
             }
         }
         private void removeButton_Click(object sender, System.EventArgs e)
         {
             // TODO: This feature should also try to clear the Windows Credential Store of credentials.
-            if (accountList.CheckedItems.Count != 0)
+            if (accountList.CheckedItems.Count > 0)
             {
                 for (var x = 0; x < accountList.CheckedItems.Count; x++)
                 {
                     try
                     {
-                        var checkedItem = accountList.CheckedItems[x].ToString().Split('|')[0];
+                        var checkedItem = accountList.CheckedItems[x].ToString().Split('|')[0].Trim(' ');
                         accountList.Items.Remove(accountList.CheckedItems[x]);
+                        Log.Debug("Removing Vault credentials for: " + checkedItem);
+                        CredentialHelper.RemoveVaultCredentials(checkedItem);
+                        Log.Debug("Deleting file: " + checkedItem + ".bin");
                         File.Delete(checkedItem + ".bin");
                     }
                     catch (Exception ex)
@@ -230,7 +212,7 @@ namespace MultiInstanceManager
                     {
                         var checkedItem = accountList.CheckedItems[x].ToString().Split('|');
                         DisableButtons();
-                        var task = Task.Factory.StartNew(() => MH.Setup(checkedItem[0].Trim(' '), commandLineArguments.Text, true));
+                        var task = Task.Factory.StartNew(() => MH.Setup(checkedItem[0].Trim(' '), true));
                         var result = await task;
                         EnableButtons();
                     }
@@ -239,7 +221,7 @@ namespace MultiInstanceManager
                         Debug.WriteLine(ex);
                     }
                 }
-                MH.LoadAccounts();
+                MH.LoadProfiles();
             }
         }
         private void readmeLink_Click(object sender, System.EventArgs e)

@@ -42,12 +42,9 @@ namespace MultiInstanceManager
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.addAccountButton = new System.Windows.Forms.Button();
-            this.label6 = new System.Windows.Forms.Label();
-            this.commandLineArguments = new System.Windows.Forms.TextBox();
             this.dumpRegKeyButton = new System.Windows.Forms.Button();
             this.forceExit = new System.Windows.Forms.CheckBox();
             this.forceExitToolTip = new System.Windows.Forms.ToolTip(this.components);
-            this.modifyWindowTitles = new System.Windows.Forms.CheckBox();
             this.saveAccounInfo = new System.Windows.Forms.CheckBox();
             this.configureAccountsButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
@@ -66,7 +63,7 @@ namespace MultiInstanceManager
             this.accountList.FormattingEnabled = true;
             this.accountList.Location = new System.Drawing.Point(16, 107);
             this.accountList.Name = "accountList";
-            this.accountList.Size = new System.Drawing.Size(233, 154);
+            this.accountList.Size = new System.Drawing.Size(233, 199);
             this.accountList.TabIndex = 1;
             // 
             // launchButton
@@ -151,22 +148,6 @@ namespace MultiInstanceManager
             this.addAccountButton.Text = "Add Account";
             this.addAccountButton.UseVisualStyleBackColor = true;
             // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(16, 264);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(169, 13);
-            this.label6.TabIndex = 11;
-            this.label6.Text = "Optional command-line arguments:";
-            // 
-            // commandLineArguments
-            // 
-            this.commandLineArguments.Location = new System.Drawing.Point(19, 281);
-            this.commandLineArguments.Name = "commandLineArguments";
-            this.commandLineArguments.Size = new System.Drawing.Size(230, 20);
-            this.commandLineArguments.TabIndex = 12;
-            // 
             // dumpRegKeyButton
             // 
             this.dumpRegKeyButton.Location = new System.Drawing.Point(256, 277);
@@ -179,31 +160,21 @@ namespace MultiInstanceManager
             // forceExit
             // 
             this.forceExit.AutoSize = true;
-            this.forceExit.Location = new System.Drawing.Point(19, 331);
+            this.forceExit.Location = new System.Drawing.Point(16, 312);
             this.forceExit.Name = "forceExit";
             this.forceExit.Size = new System.Drawing.Size(73, 17);
             this.forceExit.TabIndex = 16;
             this.forceExit.Text = "Force Exit";
             this.forceExit.UseVisualStyleBackColor = true;
             // 
-            // modifyWindowTitles
-            // 
-            this.modifyWindowTitles.AutoSize = true;
-            this.modifyWindowTitles.Location = new System.Drawing.Point(19, 308);
-            this.modifyWindowTitles.Name = "modifyWindowTitles";
-            this.modifyWindowTitles.Size = new System.Drawing.Size(127, 17);
-            this.modifyWindowTitles.TabIndex = 17;
-            this.modifyWindowTitles.Text = "Modify Window Titles";
-            this.modifyWindowTitles.UseVisualStyleBackColor = true;
-            // 
             // saveAccounInfo
             // 
             this.saveAccounInfo.AutoSize = true;
-            this.saveAccounInfo.Location = new System.Drawing.Point(178, 308);
+            this.saveAccounInfo.Location = new System.Drawing.Point(16, 335);
             this.saveAccounInfo.Name = "saveAccounInfo";
-            this.saveAccounInfo.Size = new System.Drawing.Size(180, 17);
+            this.saveAccounInfo.Size = new System.Drawing.Size(111, 17);
             this.saveAccounInfo.TabIndex = 18;
-            this.saveAccounInfo.Text = "Save Accountinfo (Experimental)";
+            this.saveAccounInfo.Text = "Save Accountinfo";
             this.saveAccounInfo.UseVisualStyleBackColor = true;
             // 
             // configureAccountsButton
@@ -222,11 +193,8 @@ namespace MultiInstanceManager
             this.ClientSize = new System.Drawing.Size(392, 392);
             this.Controls.Add(this.configureAccountsButton);
             this.Controls.Add(this.saveAccounInfo);
-            this.Controls.Add(this.modifyWindowTitles);
             this.Controls.Add(this.forceExit);
             this.Controls.Add(this.dumpRegKeyButton);
-            this.Controls.Add(this.commandLineArguments);
-            this.Controls.Add(this.label6);
             this.Controls.Add(this.addAccountButton);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.label4);
@@ -259,12 +227,9 @@ namespace MultiInstanceManager
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Button addAccountButton;
-        private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.TextBox commandLineArguments;
         private System.Windows.Forms.Button dumpRegKeyButton;
         private System.Windows.Forms.CheckBox forceExit;
         private System.Windows.Forms.ToolTip forceExitToolTip;
-        private System.Windows.Forms.CheckBox modifyWindowTitles;
         private System.Windows.Forms.CheckBox saveAccounInfo;
         private System.Windows.Forms.Button configureAccountsButton;
     }
