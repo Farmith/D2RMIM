@@ -25,12 +25,24 @@ namespace MultiInstanceManager.Helpers
                 Debug.WriteLine("Requesting username");
                 username = Prompt.ShowDialog("Enter your battle.net username: ", "Account Data Required");
                 Debug.WriteLine("Requesting password");
-                password = Prompt.ShowDialog("Enter your battle.net password: ", "Account Data Required");
+                password = Prompt.ShowDialog("Enter your battle.net password: ", "Account Data Required",true);
                 Debug.WriteLine("Saving credentials in store");
                 Vault.SetCredentials("D2RMIM-" + displayName, username, password); // Save credentials in windows credential store on local computer
                 bnetCredentials = Vault.GetCredential("D2RMIM-" + displayName);
             }
             return bnetCredentials;
+        }
+        public static bool RemoveVaultCredentials(string displayName)
+        {
+            var bnetCredentials = Vault.GetCredential("D2RMIM-" + displayName);
+            Debug.WriteLine("Disp: " + displayName + " User: " + bnetCredentials?.User + " Pass: <youwish>");
+            if (bnetCredentials != null)
+            {
+                Vault.RemoveCredentials("D2RMIM-" + displayName);
+                return true;
+            }
+            return false;
+        
         }
     }
 }

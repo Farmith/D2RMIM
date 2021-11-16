@@ -12,13 +12,13 @@ namespace MultiInstanceManager
 {
     public partial class AccountConfiguration : Form
     {
-        private List<AccountBinary> Accounts;
+        private List<AccountBinary> Profiles;
         private bool hotKeyPressRegistered = false;
         private string hotKeyPressString = "";
         private Keys? modifier = null;
         private Keys? hotkey = null;
         private HotKey _HotKey;
-        private Account _Account;
+        private Account _Profile;
 
         public AccountConfiguration()
         {
@@ -59,44 +59,44 @@ namespace MultiInstanceManager
             windowYposition.Text = "";
             resetRegion();
         }
-        private void LoadAccount()
+        private void LoadProfile()
         {
             DefaultSettings();
-            _Account = FileHelper.LoadAccountConfiguration(selectAccount.SelectedItem.ToString());
-            if (_Account != null)
+            _Profile = FileHelper.LoadProfileConfiguration(selectAccount.SelectedItem.ToString());
+            if (_Profile != null)
             {
-                modifyWindowTitles.Checked = _Account.ModifyWindowtitles;
-                skipIntroVideos.Checked = _Account.SkipCinematics;
-                if (_Account.WindowHotKey != null)
+                modifyWindowTitles.Checked = _Profile.ModifyWindowtitles;
+                skipIntroVideos.Checked = _Profile.SkipCinematics;
+                if (_Profile.WindowHotKey != null)
                 {
-                    _HotKey = _Account.WindowHotKey;
+                    _HotKey = _Profile.WindowHotKey;
                     modifier = _HotKey.ModifierKey;
                     hotkey = _HotKey.Key;
-                    enableHotkeys.Checked = _Account.WindowHotKey.Enabled;
+                    enableHotkeys.Checked = _Profile.WindowHotKey.Enabled;
                     var extraMod = "";
-                    if (_Account.WindowHotKey.ModifierKey.ToString().Length > 0)
+                    if (_Profile.WindowHotKey.ModifierKey.ToString().Length > 0)
                     {
-                        extraMod = _Account.WindowHotKey.ModifierKey.ToString() + "+";
+                        extraMod = _Profile.WindowHotKey.ModifierKey.ToString() + "+";
                     }
-                    currentHotKey.Text = extraMod + "[" + _Account.WindowHotKey.Key.ToString() + "]";
+                    currentHotKey.Text = extraMod + "[" + _Profile.WindowHotKey.Key.ToString() + "]";
                 }
-                gameExecutableName.Text = _Account.GameExecutable;
-                installationPath.Text = _Account.InstallationPath;
-                useDefaultGame.Checked = _Account.UseDefaultGameInstallation;
-                separateTaskbarItems.Checked = _Account.SeparateTaskbarIcons;
-                windowXposition.Text = _Account.LaunchOptions.WindowX.ToString();
-                windowYposition.Text = _Account.LaunchOptions.WindowY.ToString();
-                gameLaunchArgs.Text = _Account.LaunchOptions.LaunchArguments;
-                preLaunchCmd.Text = _Account.LaunchOptions.PreLaunchCommands;
-                postLaunchCmd.Text = _Account.LaunchOptions.PostLaunchCommands;
-                separateJsonSettings.Checked = _Account.SeparateJsonSettings;
-                separateTaskbarItems.Checked = _Account.SeparateTaskbarIcons;
-                if(_Account.SeparateJsonSettings)
+                gameExecutableName.Text = _Profile.GameExecutable;
+                installationPath.Text = _Profile.InstallationPath;
+                useDefaultGame.Checked = _Profile.UseDefaultGameInstallation;
+                separateTaskbarItems.Checked = _Profile.SeparateTaskbarIcons;
+                windowXposition.Text = _Profile.LaunchOptions.WindowX.ToString();
+                windowYposition.Text = _Profile.LaunchOptions.WindowY.ToString();
+                gameLaunchArgs.Text = _Profile.LaunchOptions.LaunchArguments;
+                preLaunchCmd.Text = _Profile.LaunchOptions.PreLaunchCommands;
+                postLaunchCmd.Text = _Profile.LaunchOptions.PostLaunchCommands;
+                separateJsonSettings.Checked = _Profile.SeparateJsonSettings;
+                separateTaskbarItems.Checked = _Profile.SeparateTaskbarIcons;
+                if(_Profile.SeparateJsonSettings)
                 {
                     // Make sure there is a JSON file to use for Settings.
-                    FileHelper.CreateJSONSettings(_Account.DisplayName);
+                    FileHelper.CreateJSONSettings(_Profile.DisplayName);
                 }
-                SelecteRegion(_Account.Region);
+                SelecteRegion(_Profile.Region);
             } else
             {
                 Log.Debug("Previous config is null");
@@ -117,10 +117,10 @@ namespace MultiInstanceManager
         private void FillAccounts()
         {
             selectAccount.Items.Clear();
-            Accounts = FileHelper.GetAccountsByFolder();
-            foreach(var account in Accounts)
+            Profiles = FileHelper.GetProfilesByFolder();
+            foreach(var profile in Profiles)
             {
-                selectAccount.Items.Add(account.AccountName);
+                selectAccount.Items.Add(profile.AccountName);
             }
         }
         private void SaveConfiguration(object sender, EventArgs e)
@@ -322,7 +322,7 @@ namespace MultiInstanceManager
         }
         private void selectAccount_SelectedIndexChanged(object sender, EventArgs e)
         {
-            LoadAccount();
+            LoadProfile();
         }
 
         private void useDefaultGame_CheckedChanged(object sender, EventArgs e)
