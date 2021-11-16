@@ -3,10 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.Win32;
 using MultiInstanceManager.Helpers;
@@ -27,9 +23,6 @@ namespace MultiInstanceManager
         public AccountConfiguration()
         {
             InitializeComponent();
-            resetRegion();
-            FillAccounts();
-            DefaultSettings();
             selectAccount.SelectedIndexChanged += new EventHandler(selectAccount_SelectedIndexChanged);
 
             // These below may not be neccessary because: Save Button
@@ -44,6 +37,7 @@ namespace MultiInstanceManager
         }
         public void OnShown(object sender, EventArgs e)
         {
+            Log.Debug("Resetting innards of config");
             resetRegion();
             FillAccounts();
             DefaultSettings();
@@ -105,7 +99,7 @@ namespace MultiInstanceManager
                 SelecteRegion(_Account.Region);
             } else
             {
-                Console.WriteLine("Previous config is null");
+                Log.Debug("Previous config is null");
             }
         }
         private void SelecteRegion(string region)
@@ -192,9 +186,6 @@ namespace MultiInstanceManager
         }
         private void hotKeyKey_KeyDown(object sender, KeyEventArgs e)
         {
-            Debug.WriteLine("Key: " + e.KeyCode.ToString());
-            
-
             switch(Control.ModifierKeys)
             {
                 case Keys.Alt:
@@ -295,7 +286,7 @@ namespace MultiInstanceManager
                     default:
                         break;
                 }
-                Debug.WriteLine("New hotkey: " + _hotkey + " Modifier: " + modifier.ToString());
+                // Debug.WriteLine("New hotkey: " + _hotkey + " Modifier: " + modifier.ToString());
                 hotKeyPressString = _hotkey;
                 if(hotKeyPressString.Length > 0)
                 {
@@ -324,7 +315,7 @@ namespace MultiInstanceManager
                 hotKeyPressRegistered = false;
             } else
             {
-                Debug.WriteLine("Still borked...");
+                // Debug.WriteLine("Still borked...");
             }
 
 
