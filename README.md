@@ -15,7 +15,7 @@
 ## Discord:
 
 If you want to chat about the app, have feature requests you wish to brainstorm or just feel like saying hi feel free to join the discord channel.
-https://discord.gg/jTYH5Wgz
+https://discord.gg/NpZXgJMd
 
 ## Preparation:
 ~~If you have never used the accompanying handle64.exe you need to manually run that executable once, and accept the terms of use for it before beginning.~~
