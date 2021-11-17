@@ -68,20 +68,20 @@ namespace MultiInstanceManager.Helpers
                 File.Copy(outJson, inJson,true);
             }
         }
-        public static void SaveAccountConfiguration(Account account)
+        public static void SaveAccountConfiguration(Account profile)
         {
             //            var model = RuntimeTypeModel.Create();
-            Console.WriteLine("Displ: " + account.DisplayName);
-            var filename = account.DisplayName + ".bincnf";
+            Log.Debug("Profile: " + profile.DisplayName);
+            var filename = profile.DisplayName + ".cnf";
 
             using (var file = File.Create(filename))
             {
-                Serializer.Serialize(file, account);
+                Serializer.Serialize(file, profile);
             }
         }
         public static Account? LoadProfileConfiguration(string DisplayName)
         {
-            var filename = DisplayName + ".bincnf";
+            var filename = DisplayName + ".cnf";
             var profile = new Account();
             if (File.Exists(filename))
             {
@@ -92,6 +92,18 @@ namespace MultiInstanceManager.Helpers
                 return profile;
             }
             return null;
+        }
+        public static void MoveOldProfileConfigurations()
+        {
+            var ePath = Application.ExecutablePath;
+            var path = Path.GetDirectoryName(ePath);
+            var profiles = Directory.GetFiles(path, "*.bincnf");
+            foreach (var profile in profiles)
+            {
+                var newname = profile.Substring(0, profile.Length - 7) + ".cnf";
+                File.Move(profile, newname);
+            }
+            Log.Debug("Found: " + profiles.Count() + " profiles that needed cleaning.");
         }
     }
 }

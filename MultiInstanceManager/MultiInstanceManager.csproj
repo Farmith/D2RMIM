@@ -12,7 +12,8 @@
     <LangVersion>9.0</LangVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <Deterministic>true</Deterministic>
+    <Deterministic>false</Deterministic>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -25,7 +26,6 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -119,6 +119,7 @@
     <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.4.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.5.3\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
     </Reference>
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -146,6 +147,7 @@
     <Compile Include="Helpers\CredentialHelper.cs" />
     <Compile Include="Helpers\FileHelper.cs" />
     <Compile Include="Helpers\Log.cs" />
+    <Compile Include="Helpers\ProcessHelper.cs" />
     <Compile Include="Helpers\Prompt.cs" />
     <Compile Include="Helpers\Sanity.cs" />
     <Compile Include="Helpers\WindowHelper.cs" />
@@ -216,9 +218,22 @@
     <Content Include="Resources\D2R_102-6-blue.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="PostBuildMacros">
+    <GetAssemblyIdentity AssemblyFiles="$(TargetPath)">
+      <Output TaskParameter="Assemblies" ItemName="Targets" />
+    </GetAssemblyIdentity>
+    <ItemGroup>
+	  <VersionNumber Include="$([System.Text.RegularExpressions.Regex]::Replace(&quot;%(Targets.Version)&quot;, &quot;^([^\.]+)\.([^\.]+).([^\.]+)(.*)$&quot;, &quot;$1.$2.$3&quot;))" />
+      <!-- <VersionNumber Include="@(Targets->'%(Version)')"/> -->
+    </ItemGroup>
+  </Target>
   <PropertyGroup>
+    <PostBuildEventDependsOn>
+      $(PostBuildEventDependsOn);
+      PostBuildMacros;
+    </PostBuildEventDependsOn>    
     <PostBuildEvent>copy /Y "$(SolutionDir)\\README.*" "$(TargetDir)"
-if exist D2RMIM-Release.zip ( Del D2RMIM-Release.zip )
-powershell.exe -command Compress-Archive -Path *.dll,README.*,MultiInstanceManager.exe,MultiInstanceManager.exe.config -DestinationPath D2RMIM-Release.zip</PostBuildEvent>
+if exist D2RMIM-Release-@(VersionNumber).zip ( Del D2RMIM-Release-@(VersionNumber).zip )
+powershell.exe -command Compress-Archive -Path *.dll,README.*,MultiInstanceManager.exe,MultiInstanceManager.exe.config -DestinationPath D2RMIM-Release-@(VersionNumber).zip</PostBuildEvent>
   </PropertyGroup>
 </Project>

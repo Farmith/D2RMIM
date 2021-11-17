@@ -9,13 +9,22 @@ namespace MultiInstanceManager.Helpers
 {
     public static class Log
     {
+        public static void Empty()
+        {
+            var now = DateTime.Now.ToString("[yyyy-dd-M] HH-mm-ss: ");
+            File.WriteAllText("debug.log", now + "New session started");
+        }
         public static void Clear()
         {
-            File.WriteAllText("debug.log", "\r\n");
+            var now = DateTime.Now.ToString("[yyyy-dd-M] HH-mm-ss: ");
+
+            File.AppendAllText("debug.log", "\r\n\r\n\r\n\r\n============ CLEAR ===============\r\n\r\n\r\n");
+            File.AppendAllText("debug.log", now);
         }
         public static void Debug(string text)
         {
-            File.AppendAllText("debug.log", text + "\r\n");
+            var now = DateTime.Now.ToString("[yyyy-dd-M] HH-mm-ss: ");
+            File.AppendAllText("debug.log", now + text + "\r\n");
         }
     }
 }

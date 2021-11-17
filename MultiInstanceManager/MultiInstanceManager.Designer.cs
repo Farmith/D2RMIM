@@ -47,6 +47,7 @@ namespace MultiInstanceManager
             this.forceExitToolTip = new System.Windows.Forms.ToolTip(this.components);
             this.saveAccounInfo = new System.Windows.Forms.CheckBox();
             this.configureAccountsButton = new System.Windows.Forms.Button();
+            this.appVersion = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // label1
@@ -186,11 +187,21 @@ namespace MultiInstanceManager
             this.configureAccountsButton.Text = "Configure";
             this.configureAccountsButton.UseVisualStyleBackColor = true;
             // 
+            // appVersion
+            // 
+            this.appVersion.AutoSize = true;
+            this.appVersion.Location = new System.Drawing.Point(13, 367);
+            this.appVersion.Name = "appVersion";
+            this.appVersion.Size = new System.Drawing.Size(48, 13);
+            this.appVersion.TabIndex = 20;
+            this.appVersion.Text = "Version: ";
+            // 
             // MultiInstanceManager
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(392, 392);
+            this.Controls.Add(this.appVersion);
             this.Controls.Add(this.configureAccountsButton);
             this.Controls.Add(this.saveAccounInfo);
             this.Controls.Add(this.forceExit);
@@ -232,6 +243,7 @@ namespace MultiInstanceManager
         private System.Windows.Forms.ToolTip forceExitToolTip;
         private System.Windows.Forms.CheckBox saveAccounInfo;
         private System.Windows.Forms.Button configureAccountsButton;
+        private System.Windows.Forms.Label appVersion;
     }
 }
 
