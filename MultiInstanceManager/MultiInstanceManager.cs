@@ -4,6 +4,7 @@ using MultiInstanceManager.Helpers;
 using MultiInstanceManager.Modules;
 using System;
 using System.Configuration;
+using System.Deployment.Application;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
@@ -37,6 +38,9 @@ namespace MultiInstanceManager
              */
             FileHelper.MoveOldProfileConfigurations();
 
+            // Show version
+            var version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+            appVersion.Text = (String.Format("Version: {0}.{1}.{2} Build: {3}", version.Major, version.Minor, version.Build, version.Revision));
             /*
              * Account configuration stuff
              * 
