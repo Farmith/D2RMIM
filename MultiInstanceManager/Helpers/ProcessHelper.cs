@@ -55,7 +55,7 @@ namespace MultiInstanceManager.Helpers
         public enum TOKEN_TYPE
         {
             TokenPrimary = 1,
-            TokenImpersonation
+            TokenImpersonation = 2
         }
 
         public const int GENERIC_ALL_ACCESS = 0x10000000;

@@ -421,8 +421,8 @@ namespace MultiInstanceManager.Modules
         }
         public static Process StartProcess(string cmd,bool wait = false)
         {
-            var process = new Process();
-
+            var process = Process.Start("explorer",cmd);
+            /*
             process.StartInfo.FileName = "Explorer.exe";
             process.StartInfo.Arguments = cmd;
             process.Start();
@@ -446,6 +446,7 @@ namespace MultiInstanceManager.Modules
                         processes = Process.GetProcessesByName(name);
                 }
             }
+            */
             return process;
         }
 
@@ -465,7 +466,7 @@ namespace MultiInstanceManager.Modules
                       hToken,
                       ProcessHelper.GENERIC_ALL_ACCESS,
                       ref sa,
-                      (int)ProcessHelper.SECURITY_IMPERSONATION_LEVEL.SecurityIdentification,
+                      (int)ProcessHelper.SECURITY_IMPERSONATION_LEVEL.SecurityImpersonation,
                       (int)ProcessHelper.TOKEN_TYPE.TokenPrimary,
                       ref hDupedToken
                    );

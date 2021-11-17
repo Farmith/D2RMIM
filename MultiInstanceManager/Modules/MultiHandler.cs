@@ -270,7 +270,8 @@ namespace MultiInstanceManager.Modules
 
             if (preLaunchCmds != null)
             {
-                ProcessManager.CreateProcessAsUser(preLaunchCmds,String.Empty);
+                // ProcessManager.CreateProcessAsUser(preLaunchCmds,String.Empty);
+                ProcessManager.StartProcess(preLaunchCmds);
             }
             string? installPath = null;
             if (profile != null && profile.InstallationPath.Length > 0)
@@ -350,7 +351,9 @@ namespace MultiInstanceManager.Modules
             }
             if (postLaunchCmds != null)
             {
-                ProcessManager.CreateProcessAsUser(postLaunchCmds, String.Empty);
+                // ProcessManager.CreateProcessAsUser(postLaunchCmds, String.Empty);
+                // Hacky way of starting unelevated process, but works atleast in initial tests.
+                ProcessManager.StartProcess(postLaunchCmds);
             }
             Log.Debug("All done, exiting this thread");
             return true;
