@@ -78,7 +78,20 @@ FAQ:
 
 ## Version log:
 
+* 1.6.2	**Minor release 1.6.2***
 
+	-	Bugfixes:
+			* Fixed pre-launch commands (now working in experimental mode)
+			* Fixed post-launch commands (now working in experimental mode)
+
+	-	New features:
+			* Attempt for spawned processes to become de-elevated (in use for pre and post launch commands)
+
+	-	General improvements:
+			* Moved .bincnf to .cnf (profile configuration files) in an attempt to solve a strange bug where some people perhaps see the .bincnf in the profile listing on the mainUI aswell
+			* Changed logclears to be just separations for debug.log
+			* Added a new logclear (empty) which is executed every time D2RMIM is started instead, for debug.log
+			* Added full date + time additions to debug.log
 
 * 1.6.1
 	-	**Bugfix release**
@@ -91,9 +104,9 @@ FAQ:
 			* Added true-password mode for password-field in account-setup
 
 * 1.6
-	-	** Major Revamp **
+	-	**Major Revamp**
 	
-	-	Buggfixes:
+	-	Bugfixes:
 	-	* Fixed problem where setup of new accounts would take longer than needed, by removing handle-kill from procedure.
 	-	* Fixed a hotkey problem that hotkeys were in numlock mode and were sending "drink potion" and other bad things to other clients.
 	-	* Fixed a problem where setting window-title would sometimes fail because the handle wasn't yet created properly.
@@ -123,8 +136,8 @@ FAQ:
 			this task is in a "long term"-watch	state as it needs many things to fall into place first.
 
 * 1.5.1
-	-	**Buffix & Refactoring release**
-	-	Buggfixes:
+	-	**Bugfix & Refactoring release**
+	-	Bugfixes:
 	-	* Fixed problem with "Add Account" button not listening to current settings
 	-	* Fixed problem with "Launch" button only being able to launch one client 
 	-	* Fixed problem with "Refresh" button only being able to launch once

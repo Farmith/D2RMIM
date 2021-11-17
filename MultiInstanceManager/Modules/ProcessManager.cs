@@ -9,12 +9,44 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Threading;
 using MultiInstanceManager.Helpers;
+using System.Security.Principal;
 
 namespace MultiInstanceManager.Modules
 {
     public static class ProcessManager
     {
         #region Native (Extern) Structs
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        public struct STARTUPINFO
+        {
+            public Int32 cb;
+            public string lpReserved;
+            public string lpDesktop;
+            public string lpTitle;
+            public Int32 dwX;
+            public Int32 dwY;
+            public Int32 dwXSize;
+            public Int32 dwYSize;
+            public Int32 dwXCountChars;
+            public Int32 dwYCountChars;
+            public Int32 dwFillAttribute;
+            public Int32 dwFlags;
+            public Int16 wShowWindow;
+            public Int16 cbReserved2;
+            public UIntPtr lpReserved2;
+            public UIntPtr hStdInput;
+            public UIntPtr hStdOutput;
+            public UIntPtr hStdError;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct PROCESS_INFORMATION
+        {
+            public UIntPtr hProcess;
+            public UIntPtr hThread;
+            public int dwProcessId;
+            public int dwThreadId;
+        }
         [Flags]
         private enum ProcessAccessFlags : uint
         {
@@ -386,6 +418,104 @@ namespace MultiInstanceManager.Modules
                 }
             }
             return null;
+        }
+        public static Process StartProcess(string cmd,bool wait = false)
+        {
+            var process = new Process();
+
+            process.StartInfo.FileName = "Explorer.exe";
+            process.StartInfo.Arguments = cmd;
+            process.Start();
+            Log.Debug("Command started: " + cmd);
+            if (wait)
+            {
+                var name = process.ProcessName;
+                var processes = Process.GetProcessesByName(name);
+                var alive = false;
+                // Sanity check to make sure the process is alive before we return it. trust me its required.
+                while (!alive)
+                {
+                    foreach (var p in processes)
+                    {
+                        if (p.Id == process.Id && p.MainWindowHandle != IntPtr.Zero)
+                        {
+                            alive = true;
+                        }
+                    }
+                    if (!alive)
+                        processes = Process.GetProcessesByName(name);
+                }
+            }
+            return process;
+        }
+
+        public static void CreateProcessAsUser(string command,string arguments,string startIn=@"C:\")
+        {
+            IntPtr hToken = WindowsIdentity.GetCurrent().Token;
+            IntPtr hDupedToken = IntPtr.Zero;
+
+            ProcessHelper.PROCESS_INFORMATION pi = new ProcessHelper.PROCESS_INFORMATION();
+
+            try
+            {
+                ProcessHelper.SECURITY_ATTRIBUTES sa = new ProcessHelper.SECURITY_ATTRIBUTES();
+                sa.Length = Marshal.SizeOf(sa);
+
+                bool result = ProcessHelper.DuplicateTokenEx(
+                      hToken,
+                      ProcessHelper.GENERIC_ALL_ACCESS,
+                      ref sa,
+                      (int)ProcessHelper.SECURITY_IMPERSONATION_LEVEL.SecurityIdentification,
+                      (int)ProcessHelper.TOKEN_TYPE.TokenPrimary,
+                      ref hDupedToken
+                   );
+
+                if (!result)
+                {
+                    Log.Debug("Can not execute command: " + command);
+                    Log.Debug("Command error: Can not duplicate token");
+                    return;
+                }
+
+
+                ProcessHelper.STARTUPINFO si = new ProcessHelper.STARTUPINFO();
+                si.cb = Marshal.SizeOf(si);
+                si.lpDesktop = String.Empty;
+
+                /*
+                 * hToken, ApplicationName, CommandLineArgs
+                 * 
+                 */
+                var application = @"" + command;
+                result = ProcessHelper.CreateProcessAsUser(
+                                     hDupedToken,
+                                     command,
+                                     arguments,
+                                     ref sa, ref sa,
+                                     false, 0, IntPtr.Zero,
+                                     startIn, 
+                                     ref si, 
+                                     ref pi
+                               );
+
+                if (!result)
+                {
+                    int error = Marshal.GetLastWin32Error();
+                    string message = String.Format("CreateProcessAsUser Error: {0}", error);
+                    Log.Debug("Can not execute command: " + command);
+                    Log.Debug("Command error: " + message);
+                    return;
+                }
+            }
+            finally
+            {
+                if (pi.hProcess != IntPtr.Zero)
+                    ProcessHelper.CloseHandle(pi.hProcess);
+                if (pi.hThread != IntPtr.Zero)
+                    ProcessHelper.CloseHandle(pi.hThread);
+                if (hDupedToken != IntPtr.Zero)
+                    ProcessHelper.CloseHandle(hDupedToken);
+            }
         }
     }
 }

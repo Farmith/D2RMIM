@@ -147,6 +147,7 @@
     <Compile Include="Helpers\CredentialHelper.cs" />
     <Compile Include="Helpers\FileHelper.cs" />
     <Compile Include="Helpers\Log.cs" />
+    <Compile Include="Helpers\ProcessHelper.cs" />
     <Compile Include="Helpers\Prompt.cs" />
     <Compile Include="Helpers\Sanity.cs" />
     <Compile Include="Helpers\WindowHelper.cs" />

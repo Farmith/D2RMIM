@@ -262,6 +262,16 @@ namespace MultiInstanceManager.Modules
             {
                 FileHelper.ReplaceJSONSettingsFile(profile.DisplayName);
             }
+            string? preLaunchCmds = null;
+            if (profile != null && profile.LaunchOptions.PreLaunchCommands.Length > 0)
+            {
+                preLaunchCmds = profile.LaunchOptions.PreLaunchCommands;
+            }
+
+            if (preLaunchCmds != null)
+            {
+                ProcessManager.CreateProcessAsUser(preLaunchCmds,String.Empty);
+            }
             string? installPath = null;
             if (profile != null && profile.InstallationPath.Length > 0)
             {
@@ -329,11 +339,24 @@ namespace MultiInstanceManager.Modules
             {
                 Log.Debug("Can't seem to find 'this' instance as a process?");
             }
+            /*
+             * Launch (any) post launch commands saved for this profile
+             * 
+             */
+            string? postLaunchCmds = null;
+            if (profile != null && profile.LaunchOptions.PostLaunchCommands.Length > 0)
+            {
+                postLaunchCmds = profile.LaunchOptions.PostLaunchCommands;
+            }
+            if (postLaunchCmds != null)
+            {
+                ProcessManager.CreateProcessAsUser(postLaunchCmds, String.Empty);
+            }
             Log.Debug("All done, exiting this thread");
             return true;
 
         }
-       
+        
         private Process LaunchGame(string profile, string cmdArgs = "", string? _installPath=null, string? _exeName=null)
         {
             var process = new Process();

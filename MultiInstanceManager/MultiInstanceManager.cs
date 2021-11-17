@@ -30,6 +30,12 @@ namespace MultiInstanceManager
             forceExit.Checked = ConfigurationManager.AppSettings.Get("forceExitClients")?.ToString() == "true" ? true : false;
             saveAccounInfo.Checked = ConfigurationManager.AppSettings.Get("saveCredentials")?.ToString() == "true" ? true : false;
             saveAccounInfo.CheckedChanged += new EventHandler(saveAccounInfo_Changed);
+            // Reset log once per start of application
+            Log.Empty();
+            /* 
+             * Clean any pre-1.6.2 version profiles to use a new name
+             */
+            FileHelper.MoveOldProfileConfigurations();
 
             /*
              * Account configuration stuff
@@ -42,8 +48,7 @@ namespace MultiInstanceManager
             forceExitToolTip.SetToolTip(forceExit, "ForceExit means, kill the game client once the tokens are set when 'refreshing'");
             MH = new MultiHandler(this, accountList);
             MH.SetCredentialMode(saveAccounInfo.Checked);
-            var version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
-            appVersion.Text = String.Format("Version: {0}", version);
+
             // Prepare keybinds
             Debug.WriteLine("Adding keybinds");
             settings = new Settings();
