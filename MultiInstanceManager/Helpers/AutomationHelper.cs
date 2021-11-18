@@ -128,6 +128,31 @@ namespace MultiInstanceManager.Helpers
             mouse_event(MOUSEEVENTF_LEFTDOWN, xpos, ypos, 0, 0);
             mouse_event(MOUSEEVENTF_LEFTUP, xpos, ypos, 0, 0);
         }
+        private static void SendString(string input)
+        {
+            // Special characters in SendKeys that we can't send as is:
+            char[] specialChars = { '{', '}', '(', ')', '+', '^' };
+
+            foreach (char c in input)
+            {
+                bool _specialCharFound = false;
+
+                for (int i = 0; i < specialChars.Length; i++)
+                {
+                    if (c == specialChars[i])
+                    {
+                        _specialCharFound = true;
+                        break;
+                    }
+                }
+                if (_specialCharFound)
+                    SendKeys.SendWait("{" + c.ToString() + "}");
+                else
+                    SendKeys.SendWait(c.ToString());
+
+                Thread.Sleep(2);
+            }
+        }
         public static void FillLauncherCredentials(Process launcher, string user, string pass)
         {
             var where = AutomationHelper.FindUsernameBox();
@@ -137,20 +162,12 @@ namespace MultiInstanceManager.Helpers
 
                 // We should be in the text-box now, we hope
                 SendKeys.SendWait("^(a)");
-                foreach (char c in user)
-                {
-                    SendKeys.SendWait(c.ToString());
-                    Thread.Sleep(2);
-                }
+                SendString(user);   // Wrapper for a sanitized SendKeys loop of a string.
                 Thread.Sleep(100);
                 SendKeys.SendWait("{TAB}");
                 Debug.WriteLine("Filling out password");
                 Thread.Sleep(5);
-                foreach (char c in pass)
-                {
-                    SendKeys.SendWait(c.ToString());
-                    Thread.Sleep(2);
-                }
+                SendString(pass);   // Wrapper for a sanitized SendKeys loop of a string.
                 Thread.Sleep(100);
                 Debug.WriteLine("Finding login button");
                 var button = AutomationHelper.FindLoginButton(where.X, where.Y);
