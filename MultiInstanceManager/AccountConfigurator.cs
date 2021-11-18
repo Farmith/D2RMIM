@@ -157,7 +157,7 @@ namespace MultiInstanceManager
             {
                 launchSettings.WindowX = x;
             }
-            if (int.TryParse(windowXposition.Text, out int y))
+            if (int.TryParse(windowYposition.Text, out int y))
             {
                 launchSettings.WindowY = y;
             }
