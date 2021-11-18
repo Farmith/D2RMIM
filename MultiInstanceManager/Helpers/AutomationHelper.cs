@@ -146,9 +146,25 @@ namespace MultiInstanceManager.Helpers
                 SendKeys.SendWait("{TAB}");
                 Debug.WriteLine("Filling out password");
                 Thread.Sleep(5);
+                // Here we have an issue with special characters like } for example.. lets try a fix:
+                char[] specialChars = { '{', '}', '(', ')', '+', '^' };
                 foreach (char c in pass)
                 {
-                    SendKeys.SendWait(c.ToString());
+                    bool _specialCharFound = false;
+
+                    for (int i = 0; i < specialChars.Length; i++)
+                    {
+                        if (c == specialChars[i])
+                        {
+                            _specialCharFound = true;
+                            break;
+                        }
+                    }
+                    if (_specialCharFound)
+                        SendKeys.Send("{" + c.ToString() + "}");
+                    else
+                        SendKeys.Send(c.ToString());
+
                     Thread.Sleep(2);
                 }
                 Thread.Sleep(100);
