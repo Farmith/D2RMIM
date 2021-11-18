@@ -146,9 +146,9 @@ namespace MultiInstanceManager.Helpers
                     }
                 }
                 if (_specialCharFound)
-                    SendKeys.Send("{" + c.ToString() + "}");
+                    SendKeys.SendWait("{" + c.ToString() + "}");
                 else
-                    SendKeys.Send(c.ToString());
+                    SendKeys.SendWait(c.ToString());
 
                 Thread.Sleep(2);
             }
