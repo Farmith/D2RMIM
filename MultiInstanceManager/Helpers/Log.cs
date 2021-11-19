@@ -30,6 +30,8 @@ namespace MultiInstanceManager.Helpers
             } catch (Exception ex)
             {
                 // Could not write to debug log its being used by another thread at this very time.
+                // Log.Debug(ex.ToString());
+
             }
         }
     }
