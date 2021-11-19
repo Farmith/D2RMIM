@@ -82,10 +82,10 @@ FAQ:
 	-	New features:
 	-	* Browse for game executable button now activated
 	-	* Command-line arguments now implemented, usage: 
-	-	*	Auto-refresh profile(s):	MultiInstanceManager.exe --autorefresh <profile> <profile2> <profileN>
-	-	*	Auto-restart after refresh:	MultiInstanceManager.exe --autorefresh <profile1> --relaunch
+	-	*	Auto-refresh profile(s):	MultiInstanceManager.exe --autorefresh \<profile\> \<profile2\> \<profileN\>
+	-	*	Auto-restart after refresh:	MultiInstanceManager.exe --autorefresh \<profile1\> --relaunch
 	-	*	Disable clearing of logs:	MultiInstanceManager.exe --keeplogs
-	-	*	Everything:					MultiInstanceManager.exe --autorefresh <profile1> --relaunch --keeplogs
+	-	*	Everything:					MultiInstanceManager.exe --autorefresh \<profile1\> --relaunch --keeplogs
 
 * 1.6.3 **Bugfix Release**
  	
