@@ -77,7 +77,22 @@ FAQ:
 
 
 ## Version log:
+* 1.6.5 **Minor Release**
+	-	New features:
+	-	* De-elevation of client exe and pre/post commands, they no longer run in elevated mode.
+	-	* Ability to save a client windows x/y coordinates to the profile
+	-	* Ability to select on a profile-basis if a client window should be muted when minimized
+	-	* Functionality to restart a client window that crashes with a 15s grace timer
 
+	-	Improvements:
+	-	* Cleanup of logging methods
+	-	* Cleanup of UI
+	-	* General refactoring on the code (Account => profile etc)
+
+	-	Bugfixes:
+	-	* Setting coordinate x/y for a client window to 0 no longer disables fixed positioning
+	-	* Miscelanious try-catch statements added to avoid crashes
+	 
 * 1.6.4 **Minor release**
 	-	New features:
 	-	* Browse for game executable button now activated
