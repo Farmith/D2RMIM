@@ -15,7 +15,7 @@ using System.Windows.Forms;
 
 namespace MultiInstanceManager.Modules
 {
-    class MultiHandler
+    public class MultiHandler
     {
         Form parent;
         private IntPtr lastWindowHandle;
@@ -44,6 +44,15 @@ namespace MultiInstanceManager.Modules
             saveCredentials = false;
             profileStore = new List<Profile>();
             activeWindows = new List<ActiveWindow>();
+        }
+        public ActiveWindow? GetActiveWindow(string displayname)
+        {
+            foreach(var window in activeWindows)
+            {
+                if (window.Profile.DisplayName == displayname)
+                    return window;
+            }
+            return null;
         }
         public void SetCredentialMode(bool _saveCredentials = false)
         {

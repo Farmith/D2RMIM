@@ -7,6 +7,7 @@ using System.IO;
 using System.Windows.Forms;
 using Microsoft.Win32;
 using MultiInstanceManager.Helpers;
+using MultiInstanceManager.Modules;
 using MultiInstanceManager.Structs;
 
 namespace MultiInstanceManager
@@ -20,6 +21,7 @@ namespace MultiInstanceManager
         private Keys? hotkey = null;
         private HotKey _HotKey;
         private Profile _Profile;
+        private MultiHandler MH;
 
         public AccountConfiguration()
         {
@@ -36,6 +38,12 @@ namespace MultiInstanceManager
 
             saveConfig.Click += SaveConfiguration;
             browseForInstallationButton.Click += browseForInstallationButton_Click;
+            grabWindowXYButton.Click += grabWindowXYButton_Click;
+            grabXYTooltip.SetToolTip(grabWindowXYButton, "Grabs the current x/y coordinates of this profiles game window\r\nrequires that the client is started.");
+        }
+        public void SetMultiHandler(MultiHandler handler)
+        {
+            MH = handler;
         }
         public void OnShown(object sender, EventArgs e)
         {
@@ -368,5 +376,22 @@ namespace MultiInstanceManager
             Console.WriteLine(size); // <-- Shows file size in debugging mode.
             Console.WriteLine(result); // <-- For debugging use.
         }
+        private void grabWindowXYButton_Click(object sender, EventArgs e)
+        {
+            var window = MH.GetActiveWindow(_Profile.DisplayName);
+            if(window != null)
+            {
+                try
+                {
+                    var rect = new Rect();
+                    WindowHelper.GetWindowRect(window.Process.MainWindowHandle, ref rect);
+                    windowXposition.Text = rect.Left.ToString();
+                    windowYposition.Text = rect.Top.ToString();
+                } catch (Exception re)
+                {
+                    Log.Debug("Can not find window rect for: " + _Profile.DisplayName);
+                }
+            }
+        } 
     }
 }

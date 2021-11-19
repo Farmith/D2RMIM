@@ -29,6 +29,7 @@ namespace MultiInstanceManager
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AccountConfiguration));
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.useDefaultGame = new System.Windows.Forms.CheckBox();
@@ -65,6 +66,8 @@ namespace MultiInstanceManager
             this.label9 = new System.Windows.Forms.Label();
             this.enableHotkeys = new System.Windows.Forms.CheckBox();
             this.saveConfig = new System.Windows.Forms.Button();
+            this.grabWindowXYButton = new System.Windows.Forms.Button();
+            this.grabXYTooltip = new System.Windows.Forms.ToolTip(this.components);
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -139,6 +142,7 @@ namespace MultiInstanceManager
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.grabWindowXYButton);
             this.groupBox2.Controls.Add(this.muteWhenMinimized);
             this.groupBox2.Controls.Add(this.separateJsonSettings);
             this.groupBox2.Controls.Add(this.separateTaskbarItems);
@@ -159,7 +163,7 @@ namespace MultiInstanceManager
             this.groupBox2.Controls.Add(this.label3);
             this.groupBox2.Location = new System.Drawing.Point(12, 168);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(381, 220);
+            this.groupBox2.Size = new System.Drawing.Size(450, 220);
             this.groupBox2.TabIndex = 1;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Launch Settings";
@@ -407,11 +411,20 @@ namespace MultiInstanceManager
             this.saveConfig.Text = "Save";
             this.saveConfig.UseVisualStyleBackColor = true;
             // 
+            // grabWindowXYButton
+            // 
+            this.grabWindowXYButton.Location = new System.Drawing.Point(360, 98);
+            this.grabWindowXYButton.Name = "grabWindowXYButton";
+            this.grabWindowXYButton.Size = new System.Drawing.Size(75, 23);
+            this.grabWindowXYButton.TabIndex = 18;
+            this.grabWindowXYButton.Text = "Grab X/Y";
+            this.grabWindowXYButton.UseVisualStyleBackColor = true;
+            // 
             // AccountConfiguration
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(409, 508);
+            this.ClientSize = new System.Drawing.Size(504, 508);
             this.Controls.Add(this.saveConfig);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.selectAccount);
@@ -469,5 +482,7 @@ namespace MultiInstanceManager
         private System.Windows.Forms.CheckBox separateTaskbarItems;
         private System.Windows.Forms.CheckBox separateJsonSettings;
         private System.Windows.Forms.CheckBox muteWhenMinimized;
+        private System.Windows.Forms.Button grabWindowXYButton;
+        private System.Windows.Forms.ToolTip grabXYTooltip;
     }
 }

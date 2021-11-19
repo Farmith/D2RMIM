@@ -201,6 +201,7 @@ namespace MultiInstanceManager
         {
             configureAccountsButton.Enabled = false;
             accountConfig.Shown += accountConfig.OnShown;
+            accountConfig.SetMultiHandler(MH);
             accountConfig.Show();
         }
         public void saveAccounInfo_Changed(object sender, EventArgs e)
