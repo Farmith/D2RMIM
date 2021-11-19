@@ -84,6 +84,22 @@ FAQ:
 	-	* Fixed bug with Y coordinate not saving properly (used X instead due to an oversight)
 	-	* Cleaned up reusable into function.
 
+* 1.6.4 **Minor release**
+	-	New features:
+	-	* Browse for game executable button now activated
+	-	* Command-line arguments now implemented, usage: 
+	-	*	Auto-refresh profile(s):	MultiInstanceManager.exe --autorefresh <profile> <profile2> <profileN>
+	-	*	Auto-restart after refresh:	MultiInstanceManager.exe --autorefresh <profile1> --relaunch
+	-	*	Disable clearing of logs:	MultiInstanceManager.exe --keeplogs
+	-	*	Everything:					MultiInstanceManager.exe --autorefresh <profile1> --relaunch --keeplogs
+
+* 1.6.3 **Bugfix Release**
+ 	
+	-	Bugfixes:
+	-	* Fixed bug with special characters in passwords
+	-	* Fixed bug with Y coordinate not saving properly (used X instead due to an oversight)
+	-	* Cleaned up reusable into function.
+
 * 1.6.2	**Minor release 1.6.2***
 
 	-	Bugfixes:
@@ -193,7 +209,3 @@ The closing of bnet + client is to allow multiple accounts to be setup easily wi
 
 Note: There is a "Dump RegKey" button still on the gui in this release, this is mostly for debug-purposes tho so don't worry about it, all it does is dump the web-keys for D2R into "dump.bin", nothing more nothing less.
 
-## TODO:
-
-*	Add more configuration options
-*	Find a faster way to "refresh" accounts

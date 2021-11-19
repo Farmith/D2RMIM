@@ -144,6 +144,7 @@
       <DependentUpon>AccountConfigurator.cs</DependentUpon>
     </Compile>
     <Compile Include="Helpers\AutomationHelper.cs" />
+    <Compile Include="Helpers\CMDLineHelper.cs" />
     <Compile Include="Helpers\CredentialHelper.cs" />
     <Compile Include="Helpers\FileHelper.cs" />
     <Compile Include="Helpers\Log.cs" />
@@ -223,7 +224,7 @@
       <Output TaskParameter="Assemblies" ItemName="Targets" />
     </GetAssemblyIdentity>
     <ItemGroup>
-	  <VersionNumber Include="$([System.Text.RegularExpressions.Regex]::Replace(&quot;%(Targets.Version)&quot;, &quot;^([^\.]+)\.([^\.]+).([^\.]+)(.*)$&quot;, &quot;$1.$2.$3&quot;))" />
+      <VersionNumber Include="$([System.Text.RegularExpressions.Regex]::Replace(&quot;%(Targets.Version)&quot;, &quot;^([^\.]+)\.([^\.]+).([^\.]+)(.*)$&quot;, &quot;$1.$2.$3&quot;))" />
       <!-- <VersionNumber Include="@(Targets->'%(Version)')"/> -->
     </ItemGroup>
   </Target>
@@ -231,7 +232,7 @@
     <PostBuildEventDependsOn>
       $(PostBuildEventDependsOn);
       PostBuildMacros;
-    </PostBuildEventDependsOn>    
+    </PostBuildEventDependsOn>
     <PostBuildEvent>copy /Y "$(SolutionDir)\\README.*" "$(TargetDir)"
 if exist D2RMIM-Release-@(VersionNumber).zip ( Del D2RMIM-Release-@(VersionNumber).zip )
 powershell.exe -command Compress-Archive -Path *.dll,README.*,MultiInstanceManager.exe,MultiInstanceManager.exe.config -DestinationPath D2RMIM-Release-@(VersionNumber).zip</PostBuildEvent>
