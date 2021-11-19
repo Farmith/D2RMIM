@@ -12,7 +12,7 @@ namespace MultiInstanceManager.Helpers
         public static void Empty()
         {
             var now = DateTime.Now.ToString("[yyyy-dd-M] HH-mm-ss: ");
-            File.WriteAllText("debug.log", now + "New session started");
+            // File.WriteAllText("debug.log", now + "New session started");
         }
         public static void Clear()
         {

@@ -281,12 +281,15 @@ namespace MultiInstanceManager.Modules
             if (profile != null && profile.LaunchOptions.PreLaunchCommands.Length > 0)
             {
                 preLaunchCmds = profile.LaunchOptions.PreLaunchCommands;
+                Log.Debug("Pre-launch command: " + preLaunchCmds);
             }
 
             if (preLaunchCmds != null)
             {
                 // ProcessManager.CreateProcessAsUser(preLaunchCmds,String.Empty);
-                ProcessManager.StartProcess(preLaunchCmds);
+                Log.Debug("Attempting to start: " + preLaunchCmds);
+                var preProcess = ProcessManager.DeElevatedProcess(preLaunchCmds);
+                // ProcessManager.StartProcess(preLaunchCmds);
             }
             string? installPath = null;
             if (profile != null && profile.InstallationPath.Length > 0)
@@ -368,16 +371,41 @@ namespace MultiInstanceManager.Modules
             }
             if (postLaunchCmds != null)
             {
-                // ProcessManager.CreateProcessAsUser(postLaunchCmds, String.Empty);
-                // Hacky way of starting unelevated process, but works atleast in initial tests.
-                ProcessManager.StartProcess(postLaunchCmds);
+                var postProcess = ProcessManager.DeElevatedProcess(postLaunchCmds);
             }
             Log.Debug("All done, exiting this thread");
             return true;
 
         }
+        private Process LaunchGame(string profile, string cmdArgs = "", string ? _installPath = null, string? _exeName = null)
+        {
+            _exeName = _exeName != null ? _exeName + Constants.executableFileExt : gameExecutableName;
+            _installPath = _installPath != null ? _installPath : (string)Registry.GetValue(Constants.gameInstallRegKey[0], Constants.gameInstallRegKey[1], "");
 
-        private Process LaunchGame(string profile, string cmdArgs = "", string? _installPath = null, string? _exeName = null)
+            var process = ProcessManager.DeElevatedProcess(_installPath + "\\" + _exeName + " " + cmdArgs);
+
+            Log.Debug("Game should have started by this point.");
+            var thisInstance = new GameInstance { account = profile, process = process };
+            instances.Add(thisInstance);
+            var name = _exeName.Substring(0, _exeName.Length - 4);
+            var processes = Process.GetProcessesByName(name);
+            var alive = false;
+            // Sanity check to make sure the process is alive before we return it. trust me its required.
+            while (!alive)
+            {
+                foreach (var p in processes)
+                {
+                    if (p.Id == process.Id && p.MainWindowHandle != IntPtr.Zero)
+                    {
+                        alive = true;
+                    }
+                }
+                if (!alive)
+                    processes = Process.GetProcessesByName(name);
+            }
+            return process;
+        }
+        private Process LaunchGameOld(string profile, string cmdArgs = "", string? _installPath = null, string? _exeName = null)
         {
             var process = new Process();
             _exeName = _exeName != null ? _exeName + Constants.executableFileExt : gameExecutableName;
@@ -650,7 +678,7 @@ namespace MultiInstanceManager.Modules
                     {
                         foreach (var activeWindow in activeWindows)
                         {
-                            if (activeWindow.Profile.MuteWhenMinimized == false)
+                            if (activeWindow == null || activeWindow.Profile.MuteWhenMinimized == false)
                                 continue;
 
                             if(activeWindow.VolumeControl == null)
