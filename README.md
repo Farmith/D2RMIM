@@ -77,12 +77,6 @@ FAQ:
 
 
 ## Version log:
-* 1.6.3 **Bugfix Release**
- 	
-	-	Bugfixes:
-	-	* Fixed bug with special characters in passwords
-	-	* Fixed bug with Y coordinate not saving properly (used X instead due to an oversight)
-	-	* Cleaned up reusable into function.
 
 * 1.6.4 **Minor release**
 	-	New features:
