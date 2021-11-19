@@ -390,6 +390,7 @@ namespace MultiInstanceManager
                 } catch (Exception re)
                 {
                     Log.Debug("Can not find window rect for: " + _Profile.DisplayName);
+                    Log.Debug(re.ToString());
                 }
             }
         } 

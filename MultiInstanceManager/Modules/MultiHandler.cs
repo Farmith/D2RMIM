@@ -29,10 +29,10 @@ namespace MultiInstanceManager.Modules
         private bool saveCredentials;
         private List<Profile> profileStore;
         private List<ActiveWindow> activeWindows;
-        private CancellationTokenSource processMonitorCTS;
-        private CancellationTokenSource audioMonitorCTS;
-        private Task processMonitorTask;
-        private Task audioMonitorTask;
+        private CancellationTokenSource? processMonitorCTS;
+        private CancellationTokenSource? audioMonitorCTS;
+        private Task? processMonitorTask;
+        private Task? audioMonitorTask;
         public MultiHandler(Form _parent, CheckedListBox _accountList)
         {
             parent = _parent;
@@ -590,7 +590,7 @@ namespace MultiInstanceManager.Modules
         {
             try
             {
-                processMonitorCTS.Cancel();
+                processMonitorCTS?.Cancel();
             }
             catch (OperationCanceledException e)
             {
@@ -598,14 +598,14 @@ namespace MultiInstanceManager.Modules
             }
             finally
             {
-                processMonitorCTS.Dispose();
+                processMonitorCTS?.Dispose();
             }
         }
         public void StopAudioMonitor()
         {
             try
             {
-                audioMonitorCTS.Cancel();
+                audioMonitorCTS?.Cancel();
             }
             catch (OperationCanceledException e)
             {
@@ -613,7 +613,7 @@ namespace MultiInstanceManager.Modules
             }
             finally
             {
-                audioMonitorCTS.Dispose();
+                audioMonitorCTS?.Dispose();
             }
         }
         public void ProcessMonitor(CancellationToken ct)
@@ -700,6 +700,7 @@ namespace MultiInstanceManager.Modules
                                 } catch (Exception me)
                                 {
                                     Log.Debug("Could not mute window for: " + activeWindow.Profile.DisplayName);
+                                    Log.Debug(me.ToString());
                                 }
                             }
                             else
@@ -718,6 +719,7 @@ namespace MultiInstanceManager.Modules
                                 catch (Exception me)
                                 {
                                     Log.Debug("Could not UnMute window for: " + activeWindow.Profile.DisplayName);
+                                    Log.Debug(me.ToString());
                                 }
                             }
                         }
