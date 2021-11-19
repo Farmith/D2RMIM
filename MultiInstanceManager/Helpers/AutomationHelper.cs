@@ -26,6 +26,7 @@ namespace MultiInstanceManager.Helpers
         public const int WM_KEYDOWN = 0x100; // 0x0100;
         public const int WM_KEYUP = 0x101; // 0x0101;
         public const int VK_SPACE = 0x20;
+        public const int WM_CLOSE = 0x0010;
 
         public static Bitmap GetScreenshot(Rect rect)
         {

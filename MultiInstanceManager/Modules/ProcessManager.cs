@@ -449,7 +449,6 @@ namespace MultiInstanceManager.Modules
             */
             return process;
         }
-
         public static void CreateProcessAsUser(string command,string arguments,string startIn=@"C:\")
         {
             IntPtr hToken = WindowsIdentity.GetCurrent().Token;
@@ -517,6 +516,19 @@ namespace MultiInstanceManager.Modules
                 if (hDupedToken != IntPtr.Zero)
                     ProcessHelper.CloseHandle(hDupedToken);
             }
+        }
+        public static Boolean IsProcessRunning(Process process)
+        {
+            try
+            {
+                var id = Process.GetProcessById(process.Id);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex);
+                return false;
+            }
+            return true;
         }
     }
 }

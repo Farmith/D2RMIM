@@ -29,6 +29,8 @@ namespace MultiInstanceManager.Modules
         private bool saveCredentials;
         private List<Account> profileStore;
         private List<ActiveWindow> activeWindows;
+        private CancellationTokenSource processMonitorCTS;
+        private Task processMonitorTask;
         public MultiHandler(Form _parent,CheckedListBox _accountList)
         {
             parent = _parent;
@@ -295,7 +297,7 @@ namespace MultiInstanceManager.Modules
                 Log.Debug("Handle: " + process.MainWindowHandle.ToString());
                 WindowHelper.SetWindowApplicationId(process.MainWindowHandle, "D2R" + accountName);
             }
-            if(profile != null && (profile.LaunchOptions.WindowX != 0 || profile.LaunchOptions.WindowY != 0)) {
+            if(profile != null && (profile.LaunchOptions.WindowX >= 0 || profile.LaunchOptions.WindowY >= 0)) {
                 WindowHelper.SetWindowPosition(process.MainWindowHandle, profile.LaunchOptions.WindowX, profile.LaunchOptions.WindowY);
             }
             // Add a way to abort the frenetic clicking
@@ -474,7 +476,7 @@ namespace MultiInstanceManager.Modules
         }
         private void WaitForNewToken(Process process,Boolean timeout = false)
         {
-            if (!IsProcessRunning(process))
+            if (!ProcessManager.IsProcessRunning(process))
             {
                 Log.Debug("Process has died or exited.");
                 return;
@@ -492,7 +494,7 @@ namespace MultiInstanceManager.Modules
             while (StructuralComparisons.StructuralEqualityComparer.Equals(CurrentKey, PrevKey) && (elapsedTime < maxWaitTime))
             {
                 Log.Debug("Waiting for Token to update ("+elapsedTime+"/"+maxWaitTime+")");
-                if (!IsProcessRunning(process))
+                if (!ProcessManager.IsProcessRunning(process))
                 {
                     Log.Debug("Client exited, aborting..");
                     return;
@@ -525,17 +527,71 @@ namespace MultiInstanceManager.Modules
             var data = File.ReadAllBytes(accountName + ".bin");
             Registry.SetValue(Constants.accountRegKey[0], Constants.accountRegKey[1], data, RegistryValueKind.Binary);
         }
-        private Boolean IsProcessRunning(Process process)
+
+        public void StartProcessMonitor()
+        {
+            processMonitorCTS = new CancellationTokenSource();
+            CancellationToken processMonitorCT = processMonitorCTS.Token;
+            processMonitorTask = Task.Factory.StartNew(() => ProcessMonitor(processMonitorCT), processMonitorCTS.Token);
+        }
+        public void StopProcessMonitor()
         {
             try
             {
-                var id = Process.GetProcessById(process.Id);
-            } catch (Exception ex)
-            {
-                Debug.WriteLine(ex);
-                return false;
+                processMonitorCTS.Cancel();
             }
-            return true;
+            catch (OperationCanceledException e)
+            {
+                Debug.WriteLine("Stopped ProcessMonitor: " + e);
+            }
+            finally
+            {
+                processMonitorCTS.Dispose();
+            }
+        }
+        public void ProcessMonitor(CancellationToken ct)
+        {
+            ct.ThrowIfCancellationRequested();
+            var keepGoing = true;
+            while (keepGoing)
+            {
+                if (ct.IsCancellationRequested)
+                {
+                    keepGoing = false;
+                }
+                else
+                {
+                    // Iterate all windows we SHOULD have:
+                    try
+                    {
+                        foreach (var activeWindow in activeWindows)
+                        {
+                            if (!ProcessManager.IsProcessRunning(activeWindow.Process))
+                            {
+                                Log.Debug("Window for profile: " + activeWindow.Profile.DisplayName + " has exited");
+                                // It has died, so we need to ask the user if we should restart it
+                                var confirmed = Prompt.ConfirmDialog("Restarting client in {timeout} seconds", "Client exited");
+                                if (confirmed)
+                                {
+                                    // Restart the client
+                                    Log.Debug("Restarting client: " + activeWindow.Profile.DisplayName);
+                                    var profileName = activeWindow.Profile.DisplayName;
+                                    activeWindows.Remove(activeWindow);
+                                    LaunchWithAccount(profileName);
+                                } else
+                                {
+                                    Log.Debug("Profile: " + activeWindow.Profile.DisplayName + " exited, not restarting due to user request.");
+                                    activeWindows.Remove(activeWindow);
+                                }
+                            }
+                        }
+                    } catch (Exception e)
+                    {
+                        Log.Debug("Iterating active windows failed: " + e.ToString());
+                    }
+                }
+                Thread.Sleep(1000);
+            }
         }
     }
 }

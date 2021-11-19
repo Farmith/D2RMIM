@@ -79,12 +79,9 @@ namespace MultiInstanceManager.Helpers
                                string lpCurrentDirectory, ref STARTUPINFO lpStartupInfo,
                                ref PROCESS_INFORMATION lpProcessInformation);
 
-        [
-           DllImport("advapi32.dll",
-              EntryPoint = "DuplicateTokenEx")
-        ]
-        public static extern bool
-           DuplicateTokenEx(IntPtr hExistingToken, Int32 dwDesiredAccess,
+        
+        [DllImport("advapi32.dll", EntryPoint = "DuplicateTokenEx")]
+        public static extern bool DuplicateTokenEx(IntPtr hExistingToken, Int32 dwDesiredAccess,
                             ref SECURITY_ATTRIBUTES lpThreadAttributes,
                             Int32 ImpersonationLevel, Int32 dwTokenType,
                             ref IntPtr phNewToken);

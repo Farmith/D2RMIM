@@ -23,8 +23,14 @@ namespace MultiInstanceManager.Helpers
         }
         public static void Debug(string text)
         {
-            var now = DateTime.Now.ToString("[yyyy-dd-M] HH-mm-ss: ");
-            File.AppendAllText("debug.log", now + text + "\r\n");
+            try
+            {
+                var now = DateTime.Now.ToString("[yyyy-dd-M] HH-mm-ss: ");
+                File.AppendAllText("debug.log", now + text + "\r\n");
+            } catch (Exception ex)
+            {
+                // Could not write to debug log its being used by another thread at this very time.
+            }
         }
     }
 }

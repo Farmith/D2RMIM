@@ -16,6 +16,8 @@ namespace MultiInstanceManager.Helpers
 {
     public static class WindowHelper
     {
+        [DllImport("user32.dll", EntryPoint = "FindWindow", SetLastError = true)]
+        public static extern IntPtr FindWindowByCaption(IntPtr ZeroOnly, string lpWindowName);
         [DllImport("user32.dll")]
         public static extern IntPtr GetWindowRect(IntPtr hWnd, ref Rect rect);
         [DllImport("user32.dll")]
