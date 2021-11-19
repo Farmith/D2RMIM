@@ -34,10 +34,11 @@ namespace MultiInstanceManager
             this.useDefaultGame = new System.Windows.Forms.CheckBox();
             this.gameExecutableName = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
-            this.button1 = new System.Windows.Forms.Button();
+            this.browseForInstallationButton = new System.Windows.Forms.Button();
             this.installationPath = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.separateJsonSettings = new System.Windows.Forms.CheckBox();
             this.separateTaskbarItems = new System.Windows.Forms.CheckBox();
             this.label12 = new System.Windows.Forms.Label();
             this.windowYposition = new System.Windows.Forms.TextBox();
@@ -63,7 +64,6 @@ namespace MultiInstanceManager
             this.label9 = new System.Windows.Forms.Label();
             this.enableHotkeys = new System.Windows.Forms.CheckBox();
             this.saveConfig = new System.Windows.Forms.Button();
-            this.separateJsonSettings = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -74,7 +74,7 @@ namespace MultiInstanceManager
             this.groupBox1.Controls.Add(this.useDefaultGame);
             this.groupBox1.Controls.Add(this.gameExecutableName);
             this.groupBox1.Controls.Add(this.label2);
-            this.groupBox1.Controls.Add(this.button1);
+            this.groupBox1.Controls.Add(this.browseForInstallationButton);
             this.groupBox1.Controls.Add(this.installationPath);
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Location = new System.Drawing.Point(13, 41);
@@ -111,14 +111,14 @@ namespace MultiInstanceManager
             this.label2.TabIndex = 3;
             this.label2.Text = "Game Executable Name (Without .exe)";
             // 
-            // button1
+            // browseForInstallationButton
             // 
-            this.button1.Location = new System.Drawing.Point(282, 44);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 2;
-            this.button1.Text = "browse";
-            this.button1.UseVisualStyleBackColor = true;
+            this.browseForInstallationButton.Location = new System.Drawing.Point(282, 44);
+            this.browseForInstallationButton.Name = "browseForInstallationButton";
+            this.browseForInstallationButton.Size = new System.Drawing.Size(75, 23);
+            this.browseForInstallationButton.TabIndex = 2;
+            this.browseForInstallationButton.Text = "browse";
+            this.browseForInstallationButton.UseVisualStyleBackColor = true;
             // 
             // installationPath
             // 
@@ -161,6 +161,16 @@ namespace MultiInstanceManager
             this.groupBox2.TabIndex = 1;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Launch Settings";
+            // 
+            // separateJsonSettings
+            // 
+            this.separateJsonSettings.AutoSize = true;
+            this.separateJsonSettings.Location = new System.Drawing.Point(13, 188);
+            this.separateJsonSettings.Name = "separateJsonSettings";
+            this.separateJsonSettings.Size = new System.Drawing.Size(152, 17);
+            this.separateJsonSettings.TabIndex = 16;
+            this.separateJsonSettings.Text = "Use Separate settings.json";
+            this.separateJsonSettings.UseVisualStyleBackColor = true;
             // 
             // separateTaskbarItems
             // 
@@ -385,16 +395,6 @@ namespace MultiInstanceManager
             this.saveConfig.Text = "Save";
             this.saveConfig.UseVisualStyleBackColor = true;
             // 
-            // separateJsonSettings
-            // 
-            this.separateJsonSettings.AutoSize = true;
-            this.separateJsonSettings.Location = new System.Drawing.Point(13, 188);
-            this.separateJsonSettings.Name = "separateJsonSettings";
-            this.separateJsonSettings.Size = new System.Drawing.Size(152, 17);
-            this.separateJsonSettings.TabIndex = 16;
-            this.separateJsonSettings.Text = "Use Separate settings.json";
-            this.separateJsonSettings.UseVisualStyleBackColor = true;
-            // 
             // AccountConfiguration
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -425,7 +425,7 @@ namespace MultiInstanceManager
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.TextBox gameExecutableName;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button browseForInstallationButton;
         private System.Windows.Forms.TextBox installationPath;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.GroupBox groupBox2;

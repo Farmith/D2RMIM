@@ -3,13 +3,16 @@ using MultiInstanceManager.Config;
 using MultiInstanceManager.Helpers;
 using MultiInstanceManager.Modules;
 using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Deployment.Application;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Linq;
 using static Dfust.Hotkeys.Enums;
+using System.Threading;
 
 namespace MultiInstanceManager
 {
@@ -21,6 +24,10 @@ namespace MultiInstanceManager
         public MultiInstanceManager()
         {
             InitializeComponent();
+
+            // Fetch the commandline arguments first and foremost:
+            var CommandLineArguments = CMDLineHelper.GetArguments();
+
             addAccountButton.Click += new EventHandler(addAccountButton_Click);
             launchButton.Click += new EventHandler(launchButton_Click);
             removeButton.Click += new EventHandler(removeButton_Click);
@@ -32,7 +39,13 @@ namespace MultiInstanceManager
             saveAccounInfo.Checked = ConfigurationManager.AppSettings.Get("saveCredentials")?.ToString() == "true" ? true : false;
             saveAccounInfo.CheckedChanged += new EventHandler(saveAccounInfo_Changed);
             // Reset log once per start of application
-            Log.Empty();
+            if(CommandLineArguments.TryGetValue("keeplogs",out List<String> parm))
+            {
+                if (parm.FirstOrDefault() != "false")
+                {
+                    Log.Empty();
+                }
+            }
             /* 
              * Clean any pre-1.6.2 version profiles to use a new name
              */
@@ -92,8 +105,74 @@ namespace MultiInstanceManager
                     MH.SwapFocus(a);
                 });
             }
-        }
+            // Auto-launch features:
+            bool launchWhenAllRefreshed = false;
+            if (CommandLineArguments.TryGetValue("relaunch", out List<String> laf))
+            {
+                if (laf.FirstOrDefault().CompareTo("true")==0)
+                {
+                    Log.Debug("Auto-starting all profiles we refresh, after last refresh");
+                    launchWhenAllRefreshed = true;
+                }
+            }
+            if (CommandLineArguments.TryGetValue("autorefresh", out List<String> profs))
+            {
+                Log.Debug("Refreshing: " + profs.Count + " profiles on start due to cmd-line request");
+                RefreshProfiles(profs,launchWhenAllRefreshed);
+            }
+            if (CommandLineArguments.TryGetValue("autostart", out List<String> autostarts) && !launchWhenAllRefreshed)
+            {
+                Log.Debug("Auto-starting: " + autostarts.Count + " profiles on start due to cmd-line request");
+                LaunchProfiles(autostarts);
+            }
 
+        }
+        public async Task LaunchProfiles(List<String> profiles)
+        {
+            foreach (var profile in profiles)
+            {
+                try
+                {
+                    DisableButtons();
+                    Log.Debug("Launching profile: " + profile);
+                    var task = Task.Factory.StartNew(() => MH.LaunchWithAccount(profile.Trim(' ')));
+                    var result = await task;
+                    EnableButtons();
+                }
+                catch (Exception e)
+                {
+                    Log.Debug("Could not start profile: " + profile + " error: ");
+                    Log.Debug(e.ToString());
+                }
+            }
+            Log.Debug("All profiles should be launched");
+        }
+        public async Task RefreshProfiles(List<String> profiles,bool launchWhenAllRefreshed)
+        {
+            foreach (var profile in profiles)
+            {
+                try
+                {
+                    DisableButtons();
+                    var task = Task.Factory.StartNew(() => MH.Setup(profile.Trim(' '), true));
+                    var result = await task;
+                    EnableButtons();
+                }
+                catch (Exception e)
+                {
+                    Log.Debug("Could not refresh: " + profile + " error: ");
+                    Log.Debug(e.ToString());
+                }
+            }
+            if(launchWhenAllRefreshed)
+            {
+                Log.Debug("Restarting all previous profiles due to commandline request");
+                Log.Debug("Waiting a moment for refreshed client to completely die");
+                Thread.Sleep(2000);
+                var task = Task.Factory.StartNew(() => LaunchProfiles(profiles));
+                var result = await task;
+            }
+        }
         public static void AddOrUpdateAppSettings(string key, string value)
         {
             try
@@ -175,7 +254,6 @@ namespace MultiInstanceManager
         }
         private void removeButton_Click(object sender, System.EventArgs e)
         {
-            // TODO: This feature should also try to clear the Windows Credential Store of credentials.
             if (accountList.CheckedItems.Count > 0)
             {
                 for (var x = 0; x < accountList.CheckedItems.Count; x++)
@@ -191,6 +269,8 @@ namespace MultiInstanceManager
                     }
                     catch (Exception ex)
                     {
+                        Log.Debug("Something went wrong while removing profiles:");
+                        Log.Debug(ex.ToString());
                         Debug.WriteLine(ex);
                         // Something went terribly wrong.. 
                     }

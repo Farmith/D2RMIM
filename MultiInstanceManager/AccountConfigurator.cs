@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
+using System.IO;
 using System.Windows.Forms;
 using Microsoft.Win32;
 using MultiInstanceManager.Helpers;
@@ -34,6 +35,7 @@ namespace MultiInstanceManager
             hotKeyKey.KeyUp += hotKeyKey_KeyUp;
 
             saveConfig.Click += SaveConfiguration;
+            browseForInstallationButton.Click += browseForInstallationButton_Click;
         }
         public void OnShown(object sender, EventArgs e)
         {
@@ -342,6 +344,27 @@ namespace MultiInstanceManager
         private void selectedRegion_SelectedIndexChanged(object sender, EventArgs e)
         {
 
+        }
+        private void browseForInstallationButton_Click(object sender, EventArgs e)
+        {
+            int size = -1;
+            System.Windows.Forms.OpenFileDialog openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
+            openFileDialog1.InitialDirectory = (string)Registry.GetValue(Constants.gameInstallRegKey[0], Constants.gameInstallRegKey[1], "");
+            openFileDialog1.Filter = "Executables (*.exe)|*.exe";
+            openFileDialog1.FilterIndex = 1;
+            openFileDialog1.RestoreDirectory = true;
+            DialogResult result = openFileDialog1.ShowDialog(); // Show the dialog.
+            if (result == DialogResult.OK) // Test result.
+            {
+                string filepath = openFileDialog1.FileName;
+                string path = Path.GetDirectoryName(filepath);
+                string file = Path.GetFileNameWithoutExtension(filepath);
+                
+                installationPath.Text = path;
+                gameExecutableName.Text = file;
+            }
+            Console.WriteLine(size); // <-- Shows file size in debugging mode.
+            Console.WriteLine(result); // <-- For debugging use.
         }
     }
 }
