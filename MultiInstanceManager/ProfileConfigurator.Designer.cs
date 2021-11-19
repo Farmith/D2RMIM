@@ -38,6 +38,7 @@ namespace MultiInstanceManager
             this.installationPath = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.muteWhenMinimized = new System.Windows.Forms.CheckBox();
             this.separateJsonSettings = new System.Windows.Forms.CheckBox();
             this.separateTaskbarItems = new System.Windows.Forms.CheckBox();
             this.label12 = new System.Windows.Forms.Label();
@@ -138,6 +139,7 @@ namespace MultiInstanceManager
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.muteWhenMinimized);
             this.groupBox2.Controls.Add(this.separateJsonSettings);
             this.groupBox2.Controls.Add(this.separateTaskbarItems);
             this.groupBox2.Controls.Add(this.label12);
@@ -161,6 +163,16 @@ namespace MultiInstanceManager
             this.groupBox2.TabIndex = 1;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Launch Settings";
+            // 
+            // muteWhenMinimized
+            // 
+            this.muteWhenMinimized.AutoSize = true;
+            this.muteWhenMinimized.Location = new System.Drawing.Point(172, 188);
+            this.muteWhenMinimized.Name = "muteWhenMinimized";
+            this.muteWhenMinimized.Size = new System.Drawing.Size(155, 17);
+            this.muteWhenMinimized.TabIndex = 17;
+            this.muteWhenMinimized.Text = "Mute client when minimized";
+            this.muteWhenMinimized.UseVisualStyleBackColor = true;
             // 
             // separateJsonSettings
             // 
@@ -315,9 +327,9 @@ namespace MultiInstanceManager
             this.label8.AutoSize = true;
             this.label8.Location = new System.Drawing.Point(22, 17);
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(83, 13);
+            this.label8.Size = new System.Drawing.Size(72, 13);
             this.label8.TabIndex = 2;
-            this.label8.Text = "Select Account:";
+            this.label8.Text = "Select Profile:";
             // 
             // selectAccount
             // 
@@ -408,7 +420,7 @@ namespace MultiInstanceManager
             this.Controls.Add(this.groupBox1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "AccountConfiguration";
-            this.Text = "Account Configuration";
+            this.Text = "Profile Configuration";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
@@ -456,5 +468,6 @@ namespace MultiInstanceManager
         private System.Windows.Forms.TextBox currentHotKey;
         private System.Windows.Forms.CheckBox separateTaskbarItems;
         private System.Windows.Forms.CheckBox separateJsonSettings;
+        private System.Windows.Forms.CheckBox muteWhenMinimized;
     }
 }

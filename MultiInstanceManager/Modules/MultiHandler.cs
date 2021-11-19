@@ -27,11 +27,13 @@ namespace MultiInstanceManager.Modules
         private bool modifyWindowTitles;
         private string gameExecutableName;
         private bool saveCredentials;
-        private List<Account> profileStore;
+        private List<Profile> profileStore;
         private List<ActiveWindow> activeWindows;
         private CancellationTokenSource processMonitorCTS;
+        private CancellationTokenSource audioMonitorCTS;
         private Task processMonitorTask;
-        public MultiHandler(Form _parent,CheckedListBox _accountList)
+        private Task audioMonitorTask;
+        public MultiHandler(Form _parent, CheckedListBox _accountList)
         {
             parent = _parent;
             accountList = _accountList;
@@ -40,7 +42,7 @@ namespace MultiInstanceManager.Modules
             modifyWindowTitles = false;
             gameExecutableName = Constants.clientExecutableName + Constants.executableFileExt;
             saveCredentials = false;
-            profileStore = new List<Account>();
+            profileStore = new List<Profile>();
             activeWindows = new List<ActiveWindow>();
         }
         public void SetCredentialMode(bool _saveCredentials = false)
@@ -58,7 +60,7 @@ namespace MultiInstanceManager.Modules
             modifyWindowTitles = mode;
         }
 
-        public ActiveWindow SwapFocus(Account account)
+        public ActiveWindow SwapFocus(Profile account)
         {
             var activeWindow = activeWindows.Find(x => x.Profile.DisplayName == account.DisplayName);
             if (activeWindow == null)
@@ -100,7 +102,8 @@ namespace MultiInstanceManager.Modules
                 try
                 {
                     WindowHelper.forceForegroundWindow(activeWindow.Process.MainWindowHandle);
-                } catch (Exception e)
+                }
+                catch (Exception e)
                 {
                     // The window has died or been removed or something
                     Debug.WriteLine("Could not force foreground window: " + e.ToString());
@@ -127,17 +130,17 @@ namespace MultiInstanceManager.Modules
             {
                 WindowHelper.ShowMessage("Close all D2R/Battle.net related programs first.");
                 return Setup(displayName, true);
-            } 
-            if(displayName.Length == 0)
+            }
+            if (displayName.Length == 0)
             {
                 displayName = Prompt.ShowDialog("Enter desired displayname for this account:", "Add Account");
             }
-            Credentials? bNetCredentials = new Credentials(null,null);
+            Credentials? bNetCredentials = new Credentials(null, null);
             if (saveCredentials)
             {
                 Debug.WriteLine("Fixing credentials");
                 bNetCredentials = CredentialHelper.GetVaultCredentials(displayName);
-                if(bNetCredentials != null)
+                if (bNetCredentials != null)
                     Debug.WriteLine("User: " + bNetCredentials.User);
             }
             var launcherProcess = LaunchLauncher();
@@ -155,11 +158,11 @@ namespace MultiInstanceManager.Modules
             }
             else
             {
-                WindowHelper.WinWaitClose(Constants.bnetLauncherClass,launcherProcess.MainWindowHandle);
+                WindowHelper.WinWaitClose(Constants.bnetLauncherClass, launcherProcess.MainWindowHandle);
             }
             processCounter++;
             Log.Debug("Waiting for Game Client to start");
-            var clientExecutable = ProcessManager.ProcessWait(Constants.clientExecutableName,processCounter);
+            var clientExecutable = ProcessManager.ProcessWait(Constants.clientExecutableName, processCounter);
             if (clientExecutable == null)
                 return false;
             Log.Debug("Client ready, glhf");
@@ -201,7 +204,7 @@ namespace MultiInstanceManager.Modules
             Log.Debug("Successfully saved new token for " + displayName);
 
             Log.Debug("Closing launcher and client mutex handles");
-            if(launcherProcess != null)
+            if (launcherProcess != null)
                 CloseBnetLauncher(launcherProcess);
             Log.Debug("Launcher closed, killing mutex");
             // ProcessManager.CloseExternalHandles(clientExecutable.ProcessName); // Don't need to close mutexes when setting up anymore
@@ -214,7 +217,8 @@ namespace MultiInstanceManager.Modules
                 {
                     CloseGameClient(clientExecutable.Id);
                 }
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 // Not able to kill the game client, for whatever reason
                 Log.Debug(ex.ToString());
@@ -222,7 +226,7 @@ namespace MultiInstanceManager.Modules
             Log.Debug("All done, exiting setup thread");
             return true;
         }
-        public List<Account> GetAllProfiles()
+        public List<Profile> GetAllProfiles()
         {
             return profileStore;
         }
@@ -238,7 +242,7 @@ namespace MultiInstanceManager.Modules
         public bool LaunchWithAccount(string accountName, string cmdArgs = "")
         {
             Log.Debug("Launching account (" + (instances.Count + 1) + "): '" + accountName + "'");
-            Account? profile = FileHelper.LoadProfileConfiguration(accountName);
+            Profile? profile = FileHelper.LoadProfileConfiguration(accountName);
 
             if (profile?.Region?.Length > 0)
             {
@@ -282,22 +286,23 @@ namespace MultiInstanceManager.Modules
             }
             string? gameExe = null;
             if (profile != null && profile.GameExecutable.Length > 0)
-            { 
+            {
                 gameExe = profile.GameExecutable;
             }
             Log.Debug("Launching game with: " + installPath + gameExe + Constants.executableFileExt);
             var process = LaunchGame(accountName, cmdArgs, installPath, gameExe);
             Log.Debug("Process should be: " + process.Id);
-            if(profile != null && profile.ModifyWindowtitles)
+            if (profile != null && profile.ModifyWindowtitles)
             {
                 WindowHelper.ModifyWindowTitleName(process, accountName);
             }
-            if(profile != null && profile.SeparateTaskbarIcons)
+            if (profile != null && profile.SeparateTaskbarIcons)
             {
                 Log.Debug("Handle: " + process.MainWindowHandle.ToString());
                 WindowHelper.SetWindowApplicationId(process.MainWindowHandle, "D2R" + accountName);
             }
-            if(profile != null && (profile.LaunchOptions.WindowX >= 0 || profile.LaunchOptions.WindowY >= 0)) {
+            if (profile != null && (profile.LaunchOptions.WindowX >= 0 || profile.LaunchOptions.WindowY >= 0))
+            {
                 WindowHelper.SetWindowPosition(process.MainWindowHandle, profile.LaunchOptions.WindowX, profile.LaunchOptions.WindowY);
             }
             // Add a way to abort the frenetic clicking
@@ -311,7 +316,7 @@ namespace MultiInstanceManager.Modules
             // Wait for a new token
             WaitForNewToken(process);
             // Then wait again incase it changes in any forseeable future
-            WaitForNewToken(process,true); // Specify that we do want the 30s timeout, just incase
+            WaitForNewToken(process, true); // Specify that we do want the 30s timeout, just incase
             try
             {
                 freneticClickingCTS.Cancel();
@@ -338,7 +343,8 @@ namespace MultiInstanceManager.Modules
                 ProcessManager.CloseExternalHandles(process.ProcessName); // kill all D2R mutex handles
                 Thread.Sleep(500); // Small delay added
                 gameProcesses.Add(process);
-            } else
+            }
+            else
             {
                 Log.Debug("Can't seem to find 'this' instance as a process?");
             }
@@ -361,8 +367,8 @@ namespace MultiInstanceManager.Modules
             return true;
 
         }
-        
-        private Process LaunchGame(string profile, string cmdArgs = "", string? _installPath=null, string? _exeName=null)
+
+        private Process LaunchGame(string profile, string cmdArgs = "", string? _installPath = null, string? _exeName = null)
         {
             var process = new Process();
             _exeName = _exeName != null ? _exeName + Constants.executableFileExt : gameExecutableName;
@@ -380,14 +386,14 @@ namespace MultiInstanceManager.Modules
             // Sanity check to make sure the process is alive before we return it. trust me its required.
             while (!alive)
             {
-                foreach(var p in processes)
+                foreach (var p in processes)
                 {
-                    if(p.Id == process.Id && p.MainWindowHandle != IntPtr.Zero)
+                    if (p.Id == process.Id && p.MainWindowHandle != IntPtr.Zero)
                     {
                         alive = true;
                     }
                 }
-                if(!alive)
+                if (!alive)
                     processes = Process.GetProcessesByName(name);
             }
             return process;
@@ -400,8 +406,8 @@ namespace MultiInstanceManager.Modules
             foreach (var profile in profiles)
             {
                 var fileName = profile.AccountName + " | " + profile.LastWriteTime.ToString();
-                Account? a = FileHelper.LoadProfileConfiguration(profile.AccountName);
-                if(a != null)
+                Profile? a = FileHelper.LoadProfileConfiguration(profile.AccountName);
+                if (a != null)
                     profileStore.Add(a);
                 accountList.Items.Add(fileName);
             }
@@ -434,12 +440,14 @@ namespace MultiInstanceManager.Modules
                 {
                     Debug.WriteLine("Killing launcher");
                     target.Kill();
-                } else
+                }
+                else
                 {
                     Debug.WriteLine("Couldn't kill launcher?");
                 }
                 return;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 Debug.WriteLine("Can't kill bnet launcher: " + ex.ToString());
                 return;
@@ -474,7 +482,7 @@ namespace MultiInstanceManager.Modules
         {
             Registry.SetValue(Constants.clientRegionKey[0], Constants.clientRegionKey[1], realm, RegistryValueKind.String);
         }
-        private void WaitForNewToken(Process process,Boolean timeout = false)
+        private void WaitForNewToken(Process process, Boolean timeout = false)
         {
             if (!ProcessManager.IsProcessRunning(process))
             {
@@ -493,21 +501,22 @@ namespace MultiInstanceManager.Modules
 
             while (StructuralComparisons.StructuralEqualityComparer.Equals(CurrentKey, PrevKey) && (elapsedTime < maxWaitTime))
             {
-                Log.Debug("Waiting for Token to update ("+elapsedTime+"/"+maxWaitTime+")");
+                Log.Debug("Waiting for Token to update (" + elapsedTime + "/" + maxWaitTime + ")");
                 if (!ProcessManager.IsProcessRunning(process))
                 {
                     Log.Debug("Client exited, aborting..");
                     return;
                 }
                 CurrentKey = (byte[])Registry.GetValue(Constants.accountRegKey[0], Constants.accountRegKey[1], "");
-                if(timeout == true)
+                if (timeout == true)
                     elapsedTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) - startTime;
             }
             if (!StructuralComparisons.StructuralEqualityComparer.Equals(CurrentKey, PrevKey))
             {
                 Log.Debug("Token updated");
                 // token = CurrentKey;
-            } else
+            }
+            else
             {
                 Log.Debug("Token remains the same");
             }
@@ -534,6 +543,12 @@ namespace MultiInstanceManager.Modules
             CancellationToken processMonitorCT = processMonitorCTS.Token;
             processMonitorTask = Task.Factory.StartNew(() => ProcessMonitor(processMonitorCT), processMonitorCTS.Token);
         }
+        public void StartAudioMonitor()
+        {
+            audioMonitorCTS = new CancellationTokenSource();
+            CancellationToken audioMonitorCT = audioMonitorCTS.Token;
+            audioMonitorTask = Task.Factory.StartNew(() => AudioMonitor(audioMonitorCT), audioMonitorCTS.Token);
+        }
         public void StopProcessMonitor()
         {
             try
@@ -547,6 +562,21 @@ namespace MultiInstanceManager.Modules
             finally
             {
                 processMonitorCTS.Dispose();
+            }
+        }
+        public void StopAudioMonitor()
+        {
+            try
+            {
+                audioMonitorCTS.Cancel();
+            }
+            catch (OperationCanceledException e)
+            {
+                Debug.WriteLine("Stopped AudioMonitor: " + e);
+            }
+            finally
+            {
+                audioMonitorCTS.Dispose();
             }
         }
         public void ProcessMonitor(CancellationToken ct)
@@ -578,19 +608,87 @@ namespace MultiInstanceManager.Modules
                                     var profileName = activeWindow.Profile.DisplayName;
                                     activeWindows.Remove(activeWindow);
                                     LaunchWithAccount(profileName);
-                                } else
+                                }
+                                else
                                 {
                                     Log.Debug("Profile: " + activeWindow.Profile.DisplayName + " exited, not restarting due to user request.");
                                     activeWindows.Remove(activeWindow);
                                 }
                             }
                         }
-                    } catch (Exception e)
+                    }
+                    catch (Exception e)
                     {
                         Log.Debug("Iterating active windows failed: " + e.ToString());
                     }
                 }
                 Thread.Sleep(1000);
+            }
+        }
+        public void AudioMonitor(CancellationToken ct)
+        {
+            ct.ThrowIfCancellationRequested();
+            var keepGoing = true;
+            while (keepGoing)
+            {
+                if (ct.IsCancellationRequested)
+                {
+                    keepGoing = false;
+                }
+                else
+                {
+                    try
+                    {
+                        foreach (var activeWindow in activeWindows)
+                        {
+                            if (activeWindow.Profile.MuteWhenMinimized == false)
+                                continue;
+
+                            if(activeWindow.VolumeControl == null)
+                            {
+                                Log.Debug("Fetching volume control for: " + activeWindow.Profile.DisplayName);
+                                activeWindow.VolumeControl = AudioHelper.GetWindowAudioControl(activeWindow.Process);
+                            }
+                            if (WindowHelper.IsMinimized(activeWindow.Process))
+                            {
+                                try
+                                {
+                                    bool isMuted;
+                                    Guid bs = Guid.Empty;
+                                    activeWindow.VolumeControl.GetMute(out isMuted);
+                                    if (!isMuted) {
+                                        Log.Debug("Muting window for: " + activeWindow.Profile.DisplayName);
+                                        activeWindow.VolumeControl.SetMute(true, bs);
+                                    }
+                                } catch (Exception me)
+                                {
+                                    Log.Debug("Could not mute window for: " + activeWindow.Profile.DisplayName);
+                                }
+                            }
+                            else
+                            {
+                                try
+                                {
+                                    bool isMuted;
+                                    Guid bs = Guid.Empty;
+                                    activeWindow.VolumeControl.GetMute(out isMuted);
+                                    if (isMuted)
+                                    {
+                                        Log.Debug("UnMuting window for: " + activeWindow.Profile.DisplayName);
+                                        activeWindow.VolumeControl.SetMute(false, bs);
+                                    }
+                                }
+                                catch (Exception me)
+                                {
+                                    Log.Debug("Could not UnMute window for: " + activeWindow.Profile.DisplayName);
+                                }
+                            }
+                        }
+                    } catch (Exception e)
+                    {
+                        Log.Debug("Ammount of windows changed: " + e.ToString());
+                    }
+                }
             }
         }
     }

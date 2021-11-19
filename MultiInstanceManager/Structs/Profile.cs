@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace MultiInstanceManager.Structs
 {
     [ProtoContract]
-    public class Account
+    public class Profile
     {
         [ProtoMember(1)]
         public string DisplayName { get; set; }
@@ -35,5 +35,7 @@ namespace MultiInstanceManager.Structs
         public bool SeparateTaskbarIcons { get; set; }
         [ProtoMember(12)]
         public bool SeparateJsonSettings { get; set; }
+        [ProtoMember(13)]
+        public bool MuteWhenMinimized { get; set; }
     }
 }

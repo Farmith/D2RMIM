@@ -61,8 +61,9 @@ namespace MultiInstanceManager
             forceExitToolTip.SetToolTip(forceExit, "ForceExit means, kill the game client once the tokens are set when 'refreshing'");
             MH = new MultiHandler(this, accountList);
             MH.SetCredentialMode(saveAccounInfo.Checked);
-            // Start the process monitor early:
+            // Start the Monitors early:
             MH.StartProcessMonitor();
+            MH.StartAudioMonitor();
 
             // Prepare keybinds
             Debug.WriteLine("Adding keybinds");

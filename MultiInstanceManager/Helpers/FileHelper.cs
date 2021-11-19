@@ -68,7 +68,7 @@ namespace MultiInstanceManager.Helpers
                 File.Copy(outJson, inJson,true);
             }
         }
-        public static void SaveAccountConfiguration(Account profile)
+        public static void SaveAccountConfiguration(Profile profile)
         {
             //            var model = RuntimeTypeModel.Create();
             Log.Debug("Profile: " + profile.DisplayName);
@@ -79,15 +79,15 @@ namespace MultiInstanceManager.Helpers
                 Serializer.Serialize(file, profile);
             }
         }
-        public static Account? LoadProfileConfiguration(string DisplayName)
+        public static Profile? LoadProfileConfiguration(string DisplayName)
         {
             var filename = DisplayName + ".cnf";
-            var profile = new Account();
+            var profile = new Profile();
             if (File.Exists(filename))
             {
                 using (var file = File.OpenRead(filename))
                 {
-                    profile = Serializer.Deserialize<Account>(file);
+                    profile = Serializer.Deserialize<Profile>(file);
                 }
                 return profile;
             }

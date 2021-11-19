@@ -19,7 +19,7 @@ namespace MultiInstanceManager
         private Keys? modifier = null;
         private Keys? hotkey = null;
         private HotKey _HotKey;
-        private Account _Profile;
+        private Profile _Profile;
 
         public AccountConfiguration()
         {
@@ -93,6 +93,7 @@ namespace MultiInstanceManager
                 postLaunchCmd.Text = _Profile.LaunchOptions.PostLaunchCommands;
                 separateJsonSettings.Checked = _Profile.SeparateJsonSettings;
                 separateTaskbarItems.Checked = _Profile.SeparateTaskbarIcons;
+                muteWhenMinimized.Checked = _Profile.MuteWhenMinimized;
                 if(_Profile.SeparateJsonSettings)
                 {
                     // Make sure there is a JSON file to use for Settings.
@@ -127,7 +128,7 @@ namespace MultiInstanceManager
         }
         private void SaveConfiguration(object sender, EventArgs e)
         {
-            Account config = new Account();
+            Profile config = new Profile();
 
             config.DisplayName = selectAccount.SelectedItem.ToString();
             if (!useDefaultGame.Checked) {
@@ -170,6 +171,7 @@ namespace MultiInstanceManager
             config.WindowHotKey = _HotKey;
             config.SeparateJsonSettings = separateJsonSettings.Checked;
             config.SeparateTaskbarIcons = separateTaskbarItems.Checked;
+            config.MuteWhenMinimized = muteWhenMinimized.Checked;
             if (config.SeparateJsonSettings)
             {
                 // Make sure there is a JSON file to use for Settings.
