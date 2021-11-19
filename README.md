@@ -78,30 +78,46 @@ FAQ:
 
 ## Version log:
 
+* 1.6.4 **Minor release**
+	-	New features:
+	-	* Browse for game executable button now activated
+	-	* Command-line arguments now implemented, usage: 
+	-	*	Auto-refresh profile(s):	MultiInstanceManager.exe --autorefresh <profile> <profile2> <profileN>
+	-	*	Auto-restart after refresh:	MultiInstanceManager.exe --autorefresh <profile1> --relaunch
+	-	*	Disable clearing of logs:	MultiInstanceManager.exe --keeplogs
+	-	*	Everything:					MultiInstanceManager.exe --autorefresh <profile1> --relaunch --keeplogs
+
+* 1.6.3 **Bugfix Release**
+ 	
+	-	Bugfixes:
+	-	* Fixed bug with special characters in passwords
+	-	* Fixed bug with Y coordinate not saving properly (used X instead due to an oversight)
+	-	* Cleaned up reusable into function.
+
 * 1.6.2	**Minor release 1.6.2***
 
 	-	Bugfixes:
-			* Fixed pre-launch commands (now working in experimental mode)
-			* Fixed post-launch commands (now working in experimental mode)
+	-	* Fixed pre-launch commands (now working in experimental mode)
+	-	* Fixed post-launch commands (now working in experimental mode)
 
 	-	New features:
-			* Attempt for spawned processes to become de-elevated (in use for pre and post launch commands)
+	-	* Attempt for spawned processes to become de-elevated (in use for pre and post launch commands)
 
 	-	General improvements:
-			* Moved .bincnf to .cnf (profile configuration files) in an attempt to solve a strange bug where some people perhaps see the .bincnf in the profile listing on the mainUI aswell
+	-	* Moved .bincnf to .cnf (profile configuration files) in an attempt to solve a strange bug where some people perhaps see the .bincnf in the profile listing on the mainUI aswell
 			* Changed logclears to be just separations for debug.log
 			* Added a new logclear (empty) which is executed every time D2RMIM is started instead, for debug.log
 			* Added full date + time additions to debug.log
 
 * 1.6.1
 	-	**Bugfix release**
-			* Fix for wrong client executable being still referenced in the project.
-			* Fix for wrong client installation path still referenced.
-			* Fix for wrong command-line arguments still referenced.
-			* Stability-fix for profile deletion.
-			* Added removal of credentials upon removal of profile
-			* Start of renaming of "Account" things to "Profile" in the cases where it really is "Profile" things and not "Account" things.
-			* Added true-password mode for password-field in account-setup
+	-	* Fix for wrong client executable being still referenced in the project.
+	-	* Fix for wrong client installation path still referenced.
+	-	* Fix for wrong command-line arguments still referenced.
+	-	* Stability-fix for profile deletion.
+	-	* Added removal of credentials upon removal of profile
+	-	* Start of renaming of "Account" things to "Profile" in the cases where it really is "Profile" things and not "Account" things.
+	-	* Added true-password mode for password-field in account-setup
 
 * 1.6
 	-	**Major Revamp**
@@ -187,7 +203,3 @@ The closing of bnet + client is to allow multiple accounts to be setup easily wi
 
 Note: There is a "Dump RegKey" button still on the gui in this release, this is mostly for debug-purposes tho so don't worry about it, all it does is dump the web-keys for D2R into "dump.bin", nothing more nothing less.
 
-## TODO:
-
-*	Add more configuration options
-*	Find a faster way to "refresh" accounts

@@ -39,12 +39,9 @@ namespace MultiInstanceManager
             saveAccounInfo.Checked = ConfigurationManager.AppSettings.Get("saveCredentials")?.ToString() == "true" ? true : false;
             saveAccounInfo.CheckedChanged += new EventHandler(saveAccounInfo_Changed);
             // Reset log once per start of application
-            if(CommandLineArguments.TryGetValue("keeplogs",out List<String> parm))
+            if(!CommandLineArguments.TryGetValue("keeplogs",out List<String> parm))
             {
-                if (parm.FirstOrDefault() != "false")
-                {
-                    Log.Empty();
-                }
+                Log.Empty();
             }
             /* 
              * Clean any pre-1.6.2 version profiles to use a new name
@@ -109,11 +106,8 @@ namespace MultiInstanceManager
             bool launchWhenAllRefreshed = false;
             if (CommandLineArguments.TryGetValue("relaunch", out List<String> laf))
             {
-                if (laf.FirstOrDefault().CompareTo("true")==0)
-                {
-                    Log.Debug("Auto-starting all profiles we refresh, after last refresh");
-                    launchWhenAllRefreshed = true;
-                }
+                Log.Debug("Auto-starting all profiles we refresh, after last refresh");
+                launchWhenAllRefreshed = true;
             }
             if (CommandLineArguments.TryGetValue("autorefresh", out List<String> profs))
             {
