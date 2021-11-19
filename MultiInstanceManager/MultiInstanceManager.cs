@@ -27,7 +27,6 @@ namespace MultiInstanceManager
 
             // Fetch the commandline arguments first and foremost:
             var CommandLineArguments = CMDLineHelper.GetArguments();
-
             addAccountButton.Click += new EventHandler(addAccountButton_Click);
             launchButton.Click += new EventHandler(launchButton_Click);
             removeButton.Click += new EventHandler(removeButton_Click);
@@ -62,6 +61,9 @@ namespace MultiInstanceManager
             forceExitToolTip.SetToolTip(forceExit, "ForceExit means, kill the game client once the tokens are set when 'refreshing'");
             MH = new MultiHandler(this, accountList);
             MH.SetCredentialMode(saveAccounInfo.Checked);
+            // Start the Monitors early:
+            MH.StartProcessMonitor();
+            MH.StartAudioMonitor();
 
             // Prepare keybinds
             Debug.WriteLine("Adding keybinds");
@@ -199,6 +201,7 @@ namespace MultiInstanceManager
         {
             configureAccountsButton.Enabled = false;
             accountConfig.Shown += accountConfig.OnShown;
+            accountConfig.SetMultiHandler(MH);
             accountConfig.Show();
         }
         public void saveAccounInfo_Changed(object sender, EventArgs e)

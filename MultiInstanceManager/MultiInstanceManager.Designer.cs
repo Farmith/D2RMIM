@@ -55,9 +55,9 @@ namespace MultiInstanceManager
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(13, 90);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(55, 13);
+            this.label1.Size = new System.Drawing.Size(44, 13);
             this.label1.TabIndex = 0;
-            this.label1.Text = "Accounts:";
+            this.label1.Text = "Profiles:";
             // 
             // accountList
             // 
@@ -146,7 +146,7 @@ namespace MultiInstanceManager
             this.addAccountButton.Name = "addAccountButton";
             this.addAccountButton.Size = new System.Drawing.Size(114, 23);
             this.addAccountButton.TabIndex = 10;
-            this.addAccountButton.Text = "Add Account";
+            this.addAccountButton.Text = "Add Profile";
             this.addAccountButton.UseVisualStyleBackColor = true;
             // 
             // dumpRegKeyButton

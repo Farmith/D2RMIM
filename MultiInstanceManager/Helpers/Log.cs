@@ -12,7 +12,7 @@ namespace MultiInstanceManager.Helpers
         public static void Empty()
         {
             var now = DateTime.Now.ToString("[yyyy-dd-M] HH-mm-ss: ");
-            File.WriteAllText("debug.log", now + "New session started");
+            // File.WriteAllText("debug.log", now + "New session started");
         }
         public static void Clear()
         {
@@ -23,8 +23,16 @@ namespace MultiInstanceManager.Helpers
         }
         public static void Debug(string text)
         {
-            var now = DateTime.Now.ToString("[yyyy-dd-M] HH-mm-ss: ");
-            File.AppendAllText("debug.log", now + text + "\r\n");
+            try
+            {
+                var now = DateTime.Now.ToString("[yyyy-dd-M] HH-mm-ss: ");
+                File.AppendAllText("debug.log", now + text + "\r\n");
+            } catch (Exception ex)
+            {
+                // Could not write to debug log its being used by another thread at this very time.
+                // Log.Debug(ex.ToString());
+
+            }
         }
     }
 }

@@ -17,6 +17,12 @@ namespace MultiInstanceManager.Helpers
     public static class WindowHelper
     {
         [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool GetWindowPlacement(IntPtr hWnd, ref WINDOWPLACEMENT lpwndpl);
+
+        [DllImport("user32.dll", EntryPoint = "FindWindow", SetLastError = true)]
+        public static extern IntPtr FindWindowByCaption(IntPtr ZeroOnly, string lpWindowName);
+        [DllImport("user32.dll")]
         public static extern IntPtr GetWindowRect(IntPtr hWnd, ref Rect rect);
         [DllImport("user32.dll")]
         private static extern int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
@@ -65,6 +71,28 @@ namespace MultiInstanceManager.Helpers
             ShowWindow = 0x0040,
         }
         #endregion
+        public static bool IsMinimized(Process process)
+        {
+            if (process.MainWindowHandle != IntPtr.Zero)
+            {
+                WINDOWPLACEMENT placement = new WINDOWPLACEMENT();
+                GetWindowPlacement(process.MainWindowHandle, ref placement);
+                switch (placement.showCmd)
+                {
+                    case 1:
+                        // Console.WriteLine("Normal");
+                        break;
+                    case 2:
+                        // Console.WriteLine("Minimized");
+                        return true;
+                        break;
+                    case 3:
+                        // Console.WriteLine("Maximized");
+                        break;
+                }
+            }
+            return false;
+        }
         public static void ShowMessage(string message)
         {
             _ = MessageBox.Show(message);

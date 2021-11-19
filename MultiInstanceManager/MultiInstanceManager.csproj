@@ -137,12 +137,13 @@
     <Compile Include="Config\Settings.cs" />
     <Compile Include="Config\WindowKeyBindElement.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
-    <Compile Include="AccountConfigurator.cs">
+    <Compile Include="ProfileConfigurator.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="AccountConfigurator.Designer.cs">
-      <DependentUpon>AccountConfigurator.cs</DependentUpon>
+    <Compile Include="ProfileConfigurator.Designer.cs">
+      <DependentUpon>ProfileConfigurator.cs</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\AudioHelper.cs" />
     <Compile Include="Helpers\AutomationHelper.cs" />
     <Compile Include="Helpers\CMDLineHelper.cs" />
     <Compile Include="Helpers\CredentialHelper.cs" />
@@ -155,7 +156,7 @@
     <Compile Include="Interfaces\IKeyBind.cs" />
     <Compile Include="Modules\MultiHandler.cs" />
     <Compile Include="Modules\ProcessManager.cs" />
-    <Compile Include="Modules\Rect.cs" />
+    <Compile Include="Structs\Rect.cs" />
     <Compile Include="Modules\Vault.cs" />
     <Compile Include="MultiInstanceManager.cs">
       <SubType>Form</SubType>
@@ -165,7 +166,7 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Structs\Account.cs" />
+    <Compile Include="Structs\Profile.cs" />
     <Compile Include="Structs\AccountBinary.cs" />
     <Compile Include="Structs\ActiveWindow.cs" />
     <Compile Include="Structs\Credentials.cs" />
@@ -173,8 +174,9 @@
     <Compile Include="Structs\HotKey.cs" />
     <Compile Include="Structs\LaunchSettings.cs" />
     <Compile Include="Structs\KeyToggle.cs" />
-    <EmbeddedResource Include="AccountConfigurator.resx">
-      <DependentUpon>AccountConfigurator.cs</DependentUpon>
+    <Compile Include="Structs\WINDOWPLACEMENT.cs" />
+    <EmbeddedResource Include="ProfileConfigurator.resx">
+      <DependentUpon>ProfileConfigurator.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MultiInstanceManager.resx">
       <DependentUpon>MultiInstanceManager.cs</DependentUpon>

@@ -449,74 +449,68 @@ namespace MultiInstanceManager.Modules
             */
             return process;
         }
-
-        public static void CreateProcessAsUser(string command,string arguments,string startIn=@"C:\")
+        public static Process DeElevatedProcess(string args)
         {
-            IntPtr hToken = WindowsIdentity.GetCurrent().Token;
-            IntPtr hDupedToken = IntPtr.Zero;
+            var shellWnd = ProcessHelper.GetShellWindow();
+            if (shellWnd == IntPtr.Zero)
+            {
+                Log.Debug("Could not get a shell window");
+                return new Process();
+            }
 
-            ProcessHelper.PROCESS_INFORMATION pi = new ProcessHelper.PROCESS_INFORMATION();
+            uint shellProcessId;
+            WindowHelper.GetWindowThreadProcessId(shellWnd, out shellProcessId);
 
+            var hShellProcess = OpenProcess(ProcessAccessFlags.QueryInformation, false, shellProcessId);
+
+            var hShellToken = UIntPtr.Zero;
+            if (!ProcessHelper.OpenProcessToken(hShellProcess, 2 /* TOKEN_DUPLICATE */, out hShellToken))
+            {
+                Log.Debug("Can not open process token");
+                return new Process();
+            }
+
+            int tokenAccess = 8 /*TOKEN_QUERY*/ | 1 /*TOKEN_ASSIGN_PRIMARY*/ | 2 /*TOKEN_DUPLICATE*/ | 0x80 /*TOKEN_ADJUST_DEFAULT*/ | 0x100 /*TOKEN_ADJUST_SESSIONID*/;
+            var hToken = IntPtr.Zero;
+            var dupTokenHandle = UIntPtr.Zero;
+
+            ProcessHelper.SECURITY_ATTRIBUTES sa = new ProcessHelper.SECURITY_ATTRIBUTES();
+            sa.bInheritHandle = true;
+            sa.Length = Marshal.SizeOf(sa);
+            sa.lpSecurityDescriptor = (IntPtr)0;
+
+            ProcessHelper.DuplicateTokenEx(hShellToken, tokenAccess, ref sa, 2 /* SecurityImpersonation */, 1 /* TokenPrimary */, ref dupTokenHandle);
+
+            var pi = new ProcessHelper.PROCESS_INFORMATION();
+            var si = new ProcessHelper.STARTUPINFO();
+            si.cb = Marshal.SizeOf(si);
+            if (!ProcessHelper.CreateProcessWithTokenW(dupTokenHandle, 0, null, args, 0, IntPtr.Zero, null, ref si, out pi))
+            {
+                Log.Debug("Unable to create process with token");
+                Log.Debug(Marshal.GetLastWin32Error().ToString());
+                return new Process();
+            }
+            var proc = Process.GetProcessById(pi.dwProcessID);
+            if (proc.Id == pi.dwProcessID)
+            {
+                Log.Debug("We probably started the process as a de-elevated one now: " + pi.dwProcessID);
+                return proc;
+            }
+            return new Process();
+        }
+        
+        public static Boolean IsProcessRunning(Process process)
+        {
             try
             {
-                ProcessHelper.SECURITY_ATTRIBUTES sa = new ProcessHelper.SECURITY_ATTRIBUTES();
-                sa.Length = Marshal.SizeOf(sa);
-
-                bool result = ProcessHelper.DuplicateTokenEx(
-                      hToken,
-                      ProcessHelper.GENERIC_ALL_ACCESS,
-                      ref sa,
-                      (int)ProcessHelper.SECURITY_IMPERSONATION_LEVEL.SecurityImpersonation,
-                      (int)ProcessHelper.TOKEN_TYPE.TokenPrimary,
-                      ref hDupedToken
-                   );
-
-                if (!result)
-                {
-                    Log.Debug("Can not execute command: " + command);
-                    Log.Debug("Command error: Can not duplicate token");
-                    return;
-                }
-
-
-                ProcessHelper.STARTUPINFO si = new ProcessHelper.STARTUPINFO();
-                si.cb = Marshal.SizeOf(si);
-                si.lpDesktop = String.Empty;
-
-                /*
-                 * hToken, ApplicationName, CommandLineArgs
-                 * 
-                 */
-                var application = @"" + command;
-                result = ProcessHelper.CreateProcessAsUser(
-                                     hDupedToken,
-                                     command,
-                                     arguments,
-                                     ref sa, ref sa,
-                                     false, 0, IntPtr.Zero,
-                                     startIn, 
-                                     ref si, 
-                                     ref pi
-                               );
-
-                if (!result)
-                {
-                    int error = Marshal.GetLastWin32Error();
-                    string message = String.Format("CreateProcessAsUser Error: {0}", error);
-                    Log.Debug("Can not execute command: " + command);
-                    Log.Debug("Command error: " + message);
-                    return;
-                }
+                var id = Process.GetProcessById(process.Id);
             }
-            finally
+            catch (Exception ex)
             {
-                if (pi.hProcess != IntPtr.Zero)
-                    ProcessHelper.CloseHandle(pi.hProcess);
-                if (pi.hThread != IntPtr.Zero)
-                    ProcessHelper.CloseHandle(pi.hThread);
-                if (hDupedToken != IntPtr.Zero)
-                    ProcessHelper.CloseHandle(hDupedToken);
+                Debug.WriteLine(ex);
+                return false;
             }
+            return true;
         }
     }
 }
