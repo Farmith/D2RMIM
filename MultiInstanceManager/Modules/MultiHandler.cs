@@ -28,7 +28,7 @@ namespace MultiInstanceManager.Modules
         private string gameExecutableName;
         private bool saveCredentials;
         private List<Profile> profileStore;
-        private List<ActiveWindow> activeWindows;
+        public static List<ActiveWindow>? activeWindows;
         private CancellationTokenSource? processMonitorCTS;
         private CancellationTokenSource? audioMonitorCTS;
         private Task? processMonitorTask;
@@ -47,10 +47,13 @@ namespace MultiInstanceManager.Modules
         }
         public ActiveWindow? GetActiveWindow(string displayname)
         {
-            foreach(var window in activeWindows)
+            if (activeWindows != null)
             {
-                if (window.Profile.DisplayName == displayname)
-                    return window;
+                foreach (var window in activeWindows)
+                {
+                    if (window.Profile.DisplayName == displayname)
+                        return window;
+                }
             }
             return null;
         }
@@ -71,7 +74,7 @@ namespace MultiInstanceManager.Modules
 
         public ActiveWindow SwapFocus(Profile account)
         {
-            var activeWindow = activeWindows.Find(x => x.Profile.DisplayName == account.DisplayName);
+            var activeWindow = activeWindows?.Find(x => x.Profile.DisplayName == account.DisplayName);
             if (activeWindow == null)
             {
                 Log.Debug("Active window is null for: " + account.DisplayName);
@@ -116,7 +119,7 @@ namespace MultiInstanceManager.Modules
                 {
                     // The window has died or been removed or something
                     Debug.WriteLine("Could not force foreground window: " + e.ToString());
-                    activeWindows.Remove(activeWindow);
+                    activeWindows?.Remove(activeWindow);
                 }
             }
             return activeWindow;
@@ -372,7 +375,7 @@ namespace MultiInstanceManager.Modules
                 }
                 ExportToken(accountName + ".bin");
                 Log.Debug("Closing mutex handles");
-                activeWindows.Add(new ActiveWindow { Process = process, Profile = profile });
+                activeWindows?.Add(new ActiveWindow { Process = process, Profile = profile });
                 ProcessManager.CloseExternalHandles(process.ProcessName); // kill all D2R mutex handles
                 Thread.Sleep(500); // Small delay added
                 gameProcesses.Add(process);
@@ -652,25 +655,28 @@ namespace MultiInstanceManager.Modules
                     // Iterate all windows we SHOULD have:
                     try
                     {
-                        foreach (var activeWindow in activeWindows)
+                        if (activeWindows != null)
                         {
-                            if (!ProcessManager.IsProcessRunning(activeWindow.Process))
+                            foreach (var activeWindow in activeWindows)
                             {
-                                Log.Debug("Window for profile: " + activeWindow.Profile.DisplayName + " has exited");
-                                // It has died, so we need to ask the user if we should restart it
-                                var confirmed = Prompt.ConfirmDialog("Restarting client in {timeout} seconds", "Client exited");
-                                if (confirmed)
+                                if (!ProcessManager.IsProcessRunning(activeWindow.Process))
                                 {
-                                    // Restart the client
-                                    Log.Debug("Restarting client: " + activeWindow.Profile.DisplayName);
-                                    var profileName = activeWindow.Profile.DisplayName;
-                                    activeWindows.Remove(activeWindow);
-                                    LaunchWithAccount(profileName);
-                                }
-                                else
-                                {
-                                    Log.Debug("Profile: " + activeWindow.Profile.DisplayName + " exited, not restarting due to user request.");
-                                    activeWindows.Remove(activeWindow);
+                                    Log.Debug("Window for profile: " + activeWindow.Profile.DisplayName + " has exited");
+                                    // It has died, so we need to ask the user if we should restart it
+                                    var confirmed = Prompt.ConfirmDialog("Restarting client in {timeout} seconds", "Client exited");
+                                    if (confirmed)
+                                    {
+                                        // Restart the client
+                                        Log.Debug("Restarting client: " + activeWindow.Profile.DisplayName);
+                                        var profileName = activeWindow.Profile.DisplayName;
+                                        activeWindows.Remove(activeWindow);
+                                        LaunchWithAccount(profileName);
+                                    }
+                                    else
+                                    {
+                                        Log.Debug("Profile: " + activeWindow.Profile.DisplayName + " exited, not restarting due to user request.");
+                                        activeWindows.Remove(activeWindow);
+                                    }
                                 }
                             }
                         }
@@ -697,53 +703,58 @@ namespace MultiInstanceManager.Modules
                 {
                     try
                     {
-                        foreach (var activeWindow in activeWindows)
+                        if (activeWindows != null)
                         {
-                            if (activeWindow == null || activeWindow.Profile.MuteWhenMinimized == false)
-                                continue;
+                            foreach (var activeWindow in activeWindows)
+                            {
+                                if (activeWindow == null || activeWindow.Profile.MuteWhenMinimized == false)
+                                    continue;
 
-                            if(activeWindow.VolumeControl == null)
-                            {
-                                Log.Debug("Fetching volume control for: " + activeWindow.Profile.DisplayName);
-                                activeWindow.VolumeControl = AudioHelper.GetWindowAudioControl(activeWindow.Process);
-                            }
-                            if (WindowHelper.IsMinimized(activeWindow.Process))
-                            {
-                                try
+                                if (activeWindow.VolumeControl == null)
                                 {
-                                    bool isMuted;
-                                    Guid bs = Guid.Empty;
-                                    activeWindow.VolumeControl.GetMute(out isMuted);
-                                    if (!isMuted) {
-                                        Log.Debug("Muting window for: " + activeWindow.Profile.DisplayName);
-                                        activeWindow.VolumeControl.SetMute(true, bs);
-                                    }
-                                } catch (Exception me)
-                                {
-                                    Log.Debug("Could not mute window for: " + activeWindow.Profile.DisplayName);
-                                    Log.Debug(me.ToString());
+                                    Log.Debug("Fetching volume control for: " + activeWindow.Profile.DisplayName);
+                                    activeWindow.VolumeControl = AudioHelper.GetWindowAudioControl(activeWindow.Process);
                                 }
-                            }
-                            else
-                            {
-                                try
+                                if (WindowHelper.IsMinimized(activeWindow.Process))
                                 {
-                                    bool isMuted;
-                                    Guid bs = Guid.Empty;
-                                    activeWindow.VolumeControl.GetMute(out isMuted);
-                                    if (isMuted)
+                                    try
                                     {
-                                        Log.Debug("UnMuting window for: " + activeWindow.Profile.DisplayName);
-                                        activeWindow.VolumeControl.SetMute(false, bs);
+                                        bool isMuted;
+                                        Guid bs = Guid.Empty;
+                                        activeWindow.VolumeControl.GetMute(out isMuted);
+                                        if (!isMuted)
+                                        {
+                                            Log.Debug("Muting window for: " + activeWindow.Profile.DisplayName);
+                                            activeWindow.VolumeControl.SetMute(true, bs);
+                                        }
+                                    }
+                                    catch (Exception me)
+                                    {
+                                        Log.Debug("Could not mute window for: " + activeWindow.Profile.DisplayName);
+                                        Log.Debug(me.ToString());
                                     }
                                 }
-                                catch (Exception me)
+                                else
                                 {
-                                    Log.Debug("Could not UnMute window for: " + activeWindow.Profile.DisplayName);
-                                    Log.Debug(me.ToString());
+                                    try
+                                    {
+                                        bool isMuted;
+                                        Guid bs = Guid.Empty;
+                                        activeWindow.VolumeControl.GetMute(out isMuted);
+                                        if (isMuted)
+                                        {
+                                            Log.Debug("UnMuting window for: " + activeWindow.Profile.DisplayName);
+                                            activeWindow.VolumeControl.SetMute(false, bs);
+                                        }
+                                    }
+                                    catch (Exception me)
+                                    {
+                                        Log.Debug("Could not UnMute window for: " + activeWindow.Profile.DisplayName);
+                                        Log.Debug(me.ToString());
+                                    }
                                 }
+                                Thread.Sleep(50); // Small delay here too
                             }
-                            Thread.Sleep(50); // Small delay here too
                         }
                     } catch (Exception e)
                     {
