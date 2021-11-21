@@ -152,6 +152,26 @@ namespace MultiInstanceManager.Modules
                 if (bNetCredentials != null)
                     Debug.WriteLine("User: " + bNetCredentials.User);
             }
+            // Set the region
+            Profile? profile = FileHelper.LoadProfileConfiguration(displayName);
+
+            if (profile?.Region?.Length > 0)
+            {
+                switch (profile.Region)
+                {
+                    case "Europe":
+                        ChangeRealm("EU");
+                        break;
+                    case "Americas":
+                        ChangeRealm("US");
+                        break;
+                    case "Asia":
+                        ChangeRealm("KR");
+                        break;
+                    default:
+                        break;
+                }
+            }
             var launcherProcess = LaunchLauncher();
             WindowHelper.WinWait(Constants.bnetLauncherClass);
             SetBnetLauncherPID(launcherProcess);
@@ -163,6 +183,7 @@ namespace MultiInstanceManager.Modules
                 AutomationHelper.FillLauncherCredentials(launcherProcess, bNetCredentials.User, bNetCredentials.Pass);
                 bnetClientHandle = WindowHelper.WinWait(Constants.bnetClientClass);
                 launcherProcess = ProcessManager.GetProcessByHandle(bnetClientHandle);
+
                 AutomationHelper.StartGameWithLauncherButton();
             }
             else
@@ -381,8 +402,8 @@ namespace MultiInstanceManager.Modules
         {
             _exeName = _exeName != null ? _exeName + Constants.executableFileExt : gameExecutableName;
             _installPath = _installPath != null ? _installPath : (string)Registry.GetValue(Constants.gameInstallRegKey[0], Constants.gameInstallRegKey[1], "");
-
-            var process = ProcessManager.DeElevatedProcess(_installPath + "\\" + _exeName + " " + cmdArgs);
+            var forcedArgs = " -uid osi -launcher";
+            var process = ProcessManager.DeElevatedProcess(_installPath + "\\" + _exeName + " " + cmdArgs + forcedArgs);
 
             Log.Debug("Game should have started by this point.");
             var thisInstance = new GameInstance { account = profile, process = process };
@@ -728,6 +749,7 @@ namespace MultiInstanceManager.Modules
                         Log.Debug("Ammount of windows changed: " + e.ToString());
                     }
                 }
+                Thread.Sleep(1000);
             }
         }
     }
