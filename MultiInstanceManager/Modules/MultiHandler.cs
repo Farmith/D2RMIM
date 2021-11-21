@@ -743,6 +743,7 @@ namespace MultiInstanceManager.Modules
                                     Log.Debug(me.ToString());
                                 }
                             }
+                            Thread.Sleep(50); // Small delay here too
                         }
                     } catch (Exception e)
                     {
