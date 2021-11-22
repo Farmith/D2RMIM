@@ -199,6 +199,7 @@ namespace MultiInstanceManager.Modules
             if (clientExecutable == null)
                 return false;
             Log.Debug("Client ready, glhf");
+
             // Wait for the initial token update
             if (modifyWindowTitles)
             {
@@ -213,8 +214,6 @@ namespace MultiInstanceManager.Modules
             Debug.WriteLine("Clicking away");
             var freneticClickingCTS = new CancellationTokenSource();
             CancellationToken freneticClickingCT = freneticClickingCTS.Token;
-
-            // var task = Task.Factory.StartNew(() => AutomationHelper.ClickFreneticallyInsideWindow(freneticClickingCT, clientExecutable, 2), freneticClickingCTS.Token);
             var task = Task.Factory.StartNew(() => AutomationHelper.SpaceMan(freneticClickingCT, clientExecutable, 2), freneticClickingCTS.Token);
             WaitForNewToken(clientExecutable);
             // Then we do it once more, because it may update twice
@@ -272,7 +271,7 @@ namespace MultiInstanceManager.Modules
             bnetLauncherPID = 0;
             instances = new List<GameInstance>();
         }
-        public bool LaunchWithAccount(string accountName, string cmdArgs = "")
+        public async Task LaunchWithAccount(string accountName, string cmdArgs = "")
         {
             Log.Debug("Launching account (" + (instances.Count + 1) + "): '" + accountName + "'");
             Profile? profile = FileHelper.LoadProfileConfiguration(accountName);
@@ -328,6 +327,11 @@ namespace MultiInstanceManager.Modules
             Log.Debug("Launching game with: " + installPath + gameExe + Constants.executableFileExt);
             var process = LaunchGame(accountName, cmdArgs, installPath, gameExe);
             Log.Debug("Process should be: " + process.Id);
+
+            // Start the handle killer early
+            // ProcessManager.CloseExternalHandles(process.ProcessName); // kill all D2R mutex handles
+            var handleKillerTask = Task.Factory.StartNew(() => ProcessManager.CloseExternalHandles(process.ProcessName));
+
             if (profile != null && profile.ModifyWindowtitles)
             {
                 WindowHelper.ModifyWindowTitleName(process, accountName);
@@ -374,10 +378,11 @@ namespace MultiInstanceManager.Modules
                     WindowHelper.SetWindowPosition(process.MainWindowHandle, profile.LaunchOptions.WindowX, profile.LaunchOptions.WindowY);
                 }
                 ExportToken(accountName + ".bin");
-                Log.Debug("Closing mutex handles");
+                // Log.Debug("Closing mutex handles");
                 activeWindows?.Add(new ActiveWindow { Process = process, Profile = profile });
-                ProcessManager.CloseExternalHandles(process.ProcessName); // kill all D2R mutex handles
-                Thread.Sleep(500); // Small delay added
+                // ProcessManager.CloseExternalHandles(process.ProcessName); // kill all D2R mutex handles
+                // Thread.Sleep(500); // Small delay added
+                var handleKillerResult = await handleKillerTask; // Wait for the handlekiller to finish at this point, it should already be done.
                 gameProcesses.Add(process);
             }
             else
@@ -398,8 +403,6 @@ namespace MultiInstanceManager.Modules
                 var postProcess = ProcessManager.DeElevatedProcess(postLaunchCmds);
             }
             Log.Debug("All done, exiting this thread");
-            return true;
-
         }
         private Process LaunchGame(string profile, string cmdArgs = "", string ? _installPath = null, string? _exeName = null)
         {
