@@ -137,6 +137,8 @@
     <Compile Include="Config\Settings.cs" />
     <Compile Include="Config\WindowKeyBindElement.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
+    <Compile Include="Interfaces\IPlugin.cs" />
+    <Compile Include="Modules\PluginManager.cs" />
     <Compile Include="ProfileConfigurator.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -219,6 +221,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\D2R_102-6-blue.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="plugins\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="PostBuildMacros">
