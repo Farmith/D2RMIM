@@ -77,6 +77,16 @@ FAQ:
 
 
 ## Version log:
+
+* 1.6.6 **Feature release**
+	-	New features:
+	-	* Plugin System base now active, ExamplePlugin project added which will over time display available functionality
+	-	Improvements:
+	-	* New structure for killing handles, now the wait time between client starts is about 0
+	-	* Added breathingroom to audiomanager to lessen cpu intensity
+	-	Bugfixes:
+	-	* Couple minor buggfixes slipped in
+
 * 1.6.5 **Minor Release**
 	-	New features:
 	-	* De-elevation of client exe and pre/post commands, they no longer run in elevated mode.
@@ -92,7 +102,7 @@ FAQ:
 	-	Bugfixes:
 	-	* Setting coordinate x/y for a client window to 0 no longer disables fixed positioning
 	-	* Miscelanious try-catch statements added to avoid crashes
-	 
+
 * 1.6.4 **Minor release**
 	-	New features:
 	-	* Browse for game executable button now activated

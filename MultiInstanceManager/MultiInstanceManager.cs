@@ -21,12 +21,31 @@ namespace MultiInstanceManager
         MultiHandler MH;
         Settings settings;
         AccountConfiguration accountConfig;
+        PluginManager pluginManager;
+
         public MultiInstanceManager()
         {
             InitializeComponent();
 
             // Fetch the commandline arguments first and foremost:
             var CommandLineArguments = CMDLineHelper.GetArguments();
+
+            // Load all plugins
+            pluginManager = new PluginManager();
+            try
+            {
+                pluginManager.LoadPlugins();
+            }
+            catch (Exception e)
+            {
+                Log.Debug(string.Format("Plugins couldn't be loaded: {0}", e.Message));
+            }
+
+            Log.Debug("Setting up plugin communication in a separate thread");
+            var pluginHandlerCTS = new CancellationTokenSource();
+            CancellationToken pluginHandlerCT = pluginHandlerCTS.Token;
+            var pluginHandlerTask = Task.Factory.StartNew(() => pluginManager.MessageHandler(pluginHandlerCT), pluginHandlerCTS.Token);
+
             addAccountButton.Click += new EventHandler(addAccountButton_Click);
             launchButton.Click += new EventHandler(launchButton_Click);
             removeButton.Click += new EventHandler(removeButton_Click);

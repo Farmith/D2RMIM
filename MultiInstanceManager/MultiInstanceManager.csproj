@@ -137,6 +137,8 @@
     <Compile Include="Config\Settings.cs" />
     <Compile Include="Config\WindowKeyBindElement.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
+    <Compile Include="Interfaces\IPlugin.cs" />
+    <Compile Include="Modules\PluginManager.cs" />
     <Compile Include="ProfileConfigurator.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -220,6 +222,9 @@
   <ItemGroup>
     <Content Include="Resources\D2R_102-6-blue.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="plugins\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="PostBuildMacros">
     <GetAssemblyIdentity AssemblyFiles="$(TargetPath)">
@@ -237,6 +242,6 @@
     </PostBuildEventDependsOn>
     <PostBuildEvent>copy /Y "$(SolutionDir)\\README.*" "$(TargetDir)"
 if exist D2RMIM-Release-@(VersionNumber).zip ( Del D2RMIM-Release-@(VersionNumber).zip )
-powershell.exe -command Compress-Archive -Path *.dll,README.*,MultiInstanceManager.exe,MultiInstanceManager.exe.config -DestinationPath D2RMIM-Release-@(VersionNumber).zip</PostBuildEvent>
+powershell.exe -command Compress-Archive -Path plugins,*.dll,README.*,MultiInstanceManager.exe,MultiInstanceManager.exe.config -DestinationPath D2RMIM-Release-@(VersionNumber).zip</PostBuildEvent>
   </PropertyGroup>
 </Project>
