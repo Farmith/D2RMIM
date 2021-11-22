@@ -78,6 +78,15 @@ FAQ:
 
 ## Version log:
 
+* 1.6.6 **Feature release**
+	-	New features:
+	-	* Plugin System base now active, ExamplePlugin project added which will over time display available functionality
+	-	Improvements:
+	-	* New structure for killing handles, now the wait time between client starts is about 0
+	-	* Added breathingroom to audiomanager to lessen cpu intensity
+	-	Bugfixes:
+	-	* Couple minor buggfixes slipped in
+
 * 1.6.4 **Minor release**
 	-	New features:
 	-	* Browse for game executable button now activated
