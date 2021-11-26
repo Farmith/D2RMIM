@@ -13,9 +13,9 @@ namespace MultiInstanceManager.Helpers
 {
     public static class AudioHelper
     {
-        private static IAudioSessionManager2 GetAudioSessionManager()
+        private static IAudioSessionManager2? GetAudioSessionManager()
         {
-            IMMDevice speakers = GetSpeakers();
+            IMMDevice? speakers = GetSpeakers();
             if (speakers == null)
                 return null;
 
@@ -27,12 +27,15 @@ namespace MultiInstanceManager.Helpers
             return o as IAudioSessionManager2;
         }
 
-        public static AudioDevice GetSpeakersDevice()
+        public static AudioDevice? GetSpeakersDevice()
         {
-            return CreateDevice(GetSpeakers());
+            var speaker = GetSpeakers();
+            if(speaker != null)
+                return CreateDevice(speaker);
+            return null;
         }
 
-        private static AudioDevice CreateDevice(IMMDevice dev)
+        private static AudioDevice? CreateDevice(IMMDevice dev)
         {
             if (dev == null)
                 return null;
@@ -55,7 +58,7 @@ namespace MultiInstanceManager.Helpers
                     {
                         PROPVARIANT value = new PROPVARIANT();
                         int hr = store.GetValue(ref pk, ref value);
-                        object v = value.GetValue();
+                        object? v = value.GetValue();
                         try
                         {
                             if (value.vt != VARTYPE.VT_BLOB) // for some reason, this fails?
@@ -67,7 +70,8 @@ namespace MultiInstanceManager.Helpers
                         {
                         }
                         string name = pk.ToString();
-                        properties[name] = v;
+                        if(v != null)
+                            properties[name] = v;
                     }
                 }
             }
@@ -77,7 +81,7 @@ namespace MultiInstanceManager.Helpers
         public static IList<AudioDevice> GetAllDevices()
         {
             List<AudioDevice> list = new List<AudioDevice>();
-            IMMDeviceEnumerator deviceEnumerator = null;
+            IMMDeviceEnumerator? deviceEnumerator = null;
             try
             {
                 deviceEnumerator = (IMMDeviceEnumerator)(new MMDeviceEnumerator());
@@ -97,17 +101,19 @@ namespace MultiInstanceManager.Helpers
             collection.GetCount(out count);
             for (int i = 0; i < count; i++)
             {
-                IMMDevice dev;
+                IMMDevice? dev;
                 collection.Item(i, out dev);
                 if (dev != null)
                 {
-                    list.Add(CreateDevice(dev));
+                    var d = CreateDevice(dev);
+                    if(d != null)
+                        list.Add(d);
                 }
             }
             return list;
         }
 
-        private static IMMDevice GetSpeakers()
+        private static IMMDevice? GetSpeakers()
         {
             // get the speakers (1st render + multimedia) device
             try
@@ -126,7 +132,7 @@ namespace MultiInstanceManager.Helpers
         public static IList<AudioSession> GetAllSessions()
         {
             List<AudioSession> list = new List<AudioSession>();
-            IAudioSessionManager2 mgr = GetAudioSessionManager();
+            IAudioSessionManager2? mgr = GetAudioSessionManager();
             if (mgr == null)
                 return list;
 
@@ -142,7 +148,7 @@ namespace MultiInstanceManager.Helpers
                 if (ctl == null)
                     continue;
 
-                IAudioSessionControl2 ctl2 = ctl as IAudioSessionControl2;
+                IAudioSessionControl2? ctl2 = ctl as IAudioSessionControl2;
                 if (ctl2 != null)
                 {
                     list.Add(new AudioSession(ctl2));
@@ -155,7 +161,7 @@ namespace MultiInstanceManager.Helpers
         public static IList<ISimpleAudioVolume> GetProcessVolumeControls(Process process)
         {
             List<ISimpleAudioVolume> list = new List<ISimpleAudioVolume>();
-            IAudioSessionManager2 mgr = GetAudioSessionManager();
+            IAudioSessionManager2? mgr = GetAudioSessionManager();
             if (mgr == null)
                 return list;
 
@@ -170,7 +176,7 @@ namespace MultiInstanceManager.Helpers
                 sessionEnumerator.GetSession(i, out ctl);
                 if (ctl == null)
                     continue;
-                IAudioSessionControl2 ctl2 = ctl as IAudioSessionControl2;
+                IAudioSessionControl2? ctl2 = ctl as IAudioSessionControl2;
                 if (ctl2 != null)
                 {
                     var volume = ctl as ISimpleAudioVolume;
@@ -201,7 +207,7 @@ namespace MultiInstanceManager.Helpers
                 ctrl.GetMute(out mute);
             }
         }
-        public static ISimpleAudioVolume GetWindowAudioControl(Process process)
+        public static ISimpleAudioVolume? GetWindowAudioControl(Process process)
         {
             return GetProcessVolumeControls(process).FirstOrDefault();
         }
@@ -220,10 +226,10 @@ namespace MultiInstanceManager.Helpers
             foreach (ISimpleAudioVolume ctrl in GetProcessVolumeControls(process))
             {
                 Guid guid = Guid.Empty;
-                ctrl.SetMute(true,guid);
+                ctrl.SetMute(true, guid);
             }
         }
-        public static AudioSession GetProcessSession()
+        public static AudioSession? GetProcessSession()
         {
             int id = Process.GetCurrentProcess().Id;
             foreach (AudioSession session in GetAllSessions())
@@ -316,7 +322,7 @@ namespace MultiInstanceManager.Helpers
             public ushort wReserved3;
             public PROPVARIANTunion union;
 
-            public object GetValue()
+            public object? GetValue()
             {
                 switch (vt)
                 {
@@ -498,7 +504,7 @@ namespace MultiInstanceManager.Helpers
         {
             // IAudioSessionControl
             [PreserveSig]
-            int GetState(out AudioSessionState pRetVal);
+            int GetState(out AudioSessionState? pRetVal);
 
             [PreserveSig]
             int GetDisplayName([MarshalAs(UnmanagedType.LPWStr)] out string pRetVal);
@@ -513,7 +519,7 @@ namespace MultiInstanceManager.Helpers
             int SetIconPath([MarshalAs(UnmanagedType.LPWStr)] string Value, [MarshalAs(UnmanagedType.LPStruct)] Guid EventContext);
 
             [PreserveSig]
-            int GetGroupingParam(out Guid pRetVal);
+            int GetGroupingParam(out Guid? pRetVal);
 
             [PreserveSig]
             int SetGroupingParam([MarshalAs(UnmanagedType.LPStruct)] Guid Override, [MarshalAs(UnmanagedType.LPStruct)] Guid EventContext);
@@ -532,7 +538,7 @@ namespace MultiInstanceManager.Helpers
             int GetSessionInstanceIdentifier([MarshalAs(UnmanagedType.LPWStr)] out string pRetVal);
 
             [PreserveSig]
-            int GetProcessId(out int pRetVal);
+            int? GetProcessId(out int? pRetVal);
 
             [PreserveSig]
             int IsSystemSoundsSession();
@@ -603,23 +609,23 @@ namespace MultiInstanceManager.Helpers
 
     public sealed class AudioSession : IDisposable
     {
-        private AudioHelper.IAudioSessionControl2 _ctl;
-        private Process _process;
+        private AudioHelper.IAudioSessionControl2? _ctl;
+        private Process? _process;
 
-        internal AudioSession(AudioHelper.IAudioSessionControl2 ctl)
+        internal AudioSession(AudioHelper.IAudioSessionControl2? ctl)
         {
             _ctl = ctl;
         }
 
-        public Process Process
+        public Process? Process
         {
             get
             {
-                if (_process == null && ProcessId != 0)
+                if (_process == null && ProcessId != null)
                 {
                     try
                     {
-                        _process = Process.GetProcessById(ProcessId);
+                        _process = Process.GetProcessById((int)ProcessId);
                     }
                     catch
                     {
@@ -630,104 +636,105 @@ namespace MultiInstanceManager.Helpers
             }
         }
 
-        public int ProcessId
+        public int? ProcessId
         {
             get
             {
                 CheckDisposed();
-                int i;
-                _ctl.GetProcessId(out i);
+                int? i = null;
+                _ctl?.GetProcessId(out i);
                 return i;
             }
         }
 
-        public string Identifier
+        public string? Identifier
         {
             get
             {
                 CheckDisposed();
-                string s;
-                _ctl.GetSessionIdentifier(out s);
+                string? s = null;
+                _ctl?.GetSessionIdentifier(out s);
                 return s;
             }
         }
 
-        public string InstanceIdentifier
+        public string? InstanceIdentifier
         {
             get
             {
                 CheckDisposed();
-                string s;
-                _ctl.GetSessionInstanceIdentifier(out s);
+                string? s = null;
+                _ctl?.GetSessionInstanceIdentifier(out s);
                 return s;
             }
         }
 
-        public AudioSessionState State
+        public AudioSessionState? State
         {
             get
             {
                 CheckDisposed();
-                AudioSessionState s;
-                _ctl.GetState(out s);
+                AudioSessionState? s = null;
+                _ctl?.GetState(out s);
                 return s;
             }
         }
 
-        public Guid GroupingParam
+        public Guid? GroupingParam
         {
             get
             {
                 CheckDisposed();
-                Guid g;
-                _ctl.GetGroupingParam(out g);
+                Guid? g = null;
+                _ctl?.GetGroupingParam(out g);
                 return g;
             }
             set
             {
                 CheckDisposed();
-                _ctl.SetGroupingParam(value, Guid.Empty);
+                if(value != null)
+                    _ctl?.SetGroupingParam((Guid)value, Guid.Empty);
             }
         }
 
-        public string DisplayName
+        public string? DisplayName
         {
             get
             {
                 CheckDisposed();
-                string s;
-                _ctl.GetDisplayName(out s);
+                string? s = null;
+                _ctl?.GetDisplayName(out s);
                 return s;
             }
             set
             {
                 CheckDisposed();
-                string s;
-                _ctl.GetDisplayName(out s);
-                if (s != value)
+                string? s = null;
+                _ctl?.GetDisplayName(out s);
+                if ((s == null && value != null) || (value != null && s != value))
                 {
-                    _ctl.SetDisplayName(value, Guid.Empty);
+                    _ctl?.SetDisplayName((string)value, Guid.Empty);
                 }
             }
         }
 
-        public string IconPath
+        public string? IconPath
         {
             get
             {
                 CheckDisposed();
-                string s;
-                _ctl.GetIconPath(out s);
+                string? s = null;
+                _ctl?.GetIconPath(out s);
                 return s;
             }
             set
             {
                 CheckDisposed();
-                string s;
-                _ctl.GetIconPath(out s);
-                if (s != value)
+                string? s = null;
+                _ctl?.GetIconPath(out s);
+                if (s != null && s != value && value != null)
                 {
-                    _ctl.SetIconPath(value, Guid.Empty);
+                    _ctl?.SetIconPath((string)value, Guid.Empty);
                 }
             }
         }
@@ -740,7 +747,7 @@ namespace MultiInstanceManager.Helpers
 
         public override string ToString()
         {
-            string s = DisplayName;
+            string? s = DisplayName;
             if (!string.IsNullOrEmpty(s))
                 return "DisplayName: " + s;
 
@@ -778,7 +785,7 @@ namespace MultiInstanceManager.Helpers
             get
             {
                 const string PKEY_Device_DeviceDesc = "{a45c254e-df1c-4efd-8020-67d146a850e0} 2";
-                object value;
+                object? value;
                 Properties.TryGetValue(PKEY_Device_DeviceDesc, out value);
                 return string.Format("{0}", value);
             }
@@ -789,7 +796,7 @@ namespace MultiInstanceManager.Helpers
             get
             {
                 const string PKEY_Devices_ContainerId = "{8c7ed206-3f8a-4827-b3ab-ae9e1faefc6c} 2";
-                object value;
+                object? value;
                 Properties.TryGetValue(PKEY_Devices_ContainerId, out value);
                 return string.Format("{0}", value);
             }
@@ -800,7 +807,7 @@ namespace MultiInstanceManager.Helpers
             get
             {
                 const string PKEY_Device_EnumeratorName = "{a45c254e-df1c-4efd-8020-67d146a850e0} 24";
-                object value;
+                object? value;
                 Properties.TryGetValue(PKEY_Device_EnumeratorName, out value);
                 return string.Format("{0}", value);
             }
@@ -811,7 +818,7 @@ namespace MultiInstanceManager.Helpers
             get
             {
                 const string DEVPKEY_DeviceInterface_FriendlyName = "{026e516e-b814-414b-83cd-856d6fef4822} 2";
-                object value;
+                object? value;
                 Properties.TryGetValue(DEVPKEY_DeviceInterface_FriendlyName, out value);
                 return string.Format("{0}", value);
             }
@@ -822,7 +829,7 @@ namespace MultiInstanceManager.Helpers
             get
             {
                 const string DEVPKEY_Device_FriendlyName = "{a45c254e-df1c-4efd-8020-67d146a850e0} 14";
-                object value;
+                object? value;
                 Properties.TryGetValue(DEVPKEY_Device_FriendlyName, out value);
                 return string.Format("{0}", value);
             }
@@ -833,7 +840,7 @@ namespace MultiInstanceManager.Helpers
             get
             {
                 const string DEVPKEY_DeviceClass_IconPath = "{259abffc-50a7-47ce-af08-68c9a7d73366} 12";
-                object value;
+                object? value;
                 Properties.TryGetValue(DEVPKEY_DeviceClass_IconPath, out value);
                 return string.Format("{0}", value);
             }

@@ -48,7 +48,7 @@ namespace MultiInstanceManager.Helpers
         private static extern uint GetCurrentThreadId();
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
-        static extern bool SetWindowPos(IntPtr hWnd,IntPtr hWndInsertAfter, int X, int Y, int cx, int cy,SetWindowPosFlags uFlags);
+        static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, SetWindowPosFlags uFlags);
 
         #region flags
         [Flags()]
@@ -85,7 +85,7 @@ namespace MultiInstanceManager.Helpers
                         break;
                     case 2:
                         // Console.WriteLine("Minimized");
-                        retVal =  true;
+                        retVal = true;
                         break;
                     case 3:
                         // Console.WriteLine("Maximized");
@@ -98,7 +98,7 @@ namespace MultiInstanceManager.Helpers
         {
             _ = MessageBox.Show(message);
         }
-        public static void SetWindowPosition(IntPtr handle, int x, int y,int w=-1, int h=-1)
+        public static void SetWindowPosition(IntPtr handle, int x, int y, int w = -1, int h = -1)
         {
             // Set the window's position.
             var rect = new Modules.Rect();
@@ -114,12 +114,13 @@ namespace MultiInstanceManager.Helpers
             SetWindowPos(handle, IntPtr.Zero,
                 x, y, w, h, 0);
         }
-        public static void SetWindowApplicationId(IntPtr handle,string applicationId,bool noretry = false)
+        public static void SetWindowApplicationId(IntPtr handle, string applicationId, bool noretry = false)
         {
             try
             {
                 TaskbarManager.Instance.SetApplicationIdForSpecificWindow(handle, applicationId);
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 Log.Debug("Can not modify AppID: " + e.ToString());
                 if (!noretry)

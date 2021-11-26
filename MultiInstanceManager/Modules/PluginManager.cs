@@ -13,8 +13,8 @@ namespace MultiInstanceManager.Modules
 {
     public class PluginManager
     {
-        public static List<IPlugin> Plugins { get; set; }
-        private Dictionary<String,CancellationTokenSource> PluginTokenSources { get; set; }
+        public static List<IPlugin>? Plugins { get; set; }
+        private Dictionary<String,CancellationTokenSource>? PluginTokenSources { get; set; }
 
         public void MessageHandler(CancellationToken ct)
         {
@@ -27,7 +27,7 @@ namespace MultiInstanceManager.Modules
                 {
                     keepGoing = false;
                 }
-                Log.Debug("So far we have: " + Plugins.Count + " plugins");
+                Log.Debug("So far we have: " + Plugins?.Count + " plugins");
                 Thread.Sleep(10000); // Just since we aren't actually doing anything here, yet
             }
         }
@@ -73,7 +73,9 @@ namespace MultiInstanceManager.Modules
                 {
                     // Initiate new instance of all plugins (types)
                     Log.Debug("Adding plugin of type: " + type.ToString());
-                    Plugins.Add((IPlugin)Activator.CreateInstance(type));
+                    var ip = (IPlugin?)Activator.CreateInstance(type);
+                    if(ip != null)
+                        Plugins.Add((IPlugin)ip);
                 }
                 Thread.Sleep(5000);
                 // Start all plugins main-loop
@@ -85,10 +87,12 @@ namespace MultiInstanceManager.Modules
             } catch (ReflectionTypeLoadException ex)
             {
                 StringBuilder sb = new StringBuilder();
-                foreach (Exception exSub in ex.LoaderExceptions)
+                foreach (Exception? exSub in ex.LoaderExceptions)
                 {
+                    if (exSub == null)
+                        continue;
                     sb.AppendLine(exSub.Message);
-                    FileNotFoundException exFileNotFound = exSub as FileNotFoundException;
+                    FileNotFoundException? exFileNotFound = exSub as FileNotFoundException;
                     if(exFileNotFound != null)
                     {
                         if(!string.IsNullOrEmpty(exFileNotFound.FusionLog))

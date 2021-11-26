@@ -8,9 +8,9 @@ namespace MultiInstanceManager.Structs
 {
     public class Credentials
     {
-        public string User;
-        public string Pass;
-        public Credentials(string user, string pass)
+        public string? User;
+        public string? Pass;
+        public Credentials(string? user, string? pass)
         {
             User = user;
             Pass = pass;

@@ -142,7 +142,7 @@ namespace MultiInstanceManager.Helpers
         public static extern bool CloseHandle(IntPtr handle);
 
         [DllImport("advapi32", SetLastError = true, CharSet = CharSet.Unicode)]
-        public static extern bool CreateProcessWithTokenW(UIntPtr hToken, LogonFlags dwLogonFlags, string lpApplicationName, string lpCommandLine, CreationFlags dwCreationFlags, IntPtr lpEnvironment, string lpCurrentDirectory, [In] ref STARTUPINFO lpStartupInfo, out PROCESS_INFORMATION lpProcessInformation);
+        public static extern bool CreateProcessWithTokenW(UIntPtr hToken, LogonFlags dwLogonFlags, string? lpApplicationName, string? lpCommandLine, CreationFlags dwCreationFlags, IntPtr lpEnvironment, string? lpCurrentDirectory, [In] ref STARTUPINFO lpStartupInfo, out PROCESS_INFORMATION lpProcessInformation);
 
         [DllImport("advapi32.dll",EntryPoint = "CreateProcessAsUser", SetLastError = true,CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)]
         public static extern bool

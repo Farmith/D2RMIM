@@ -18,7 +18,7 @@ namespace MultiInstanceManager.Collections
         {
             Debug.WriteLine("Instantiating a new collection");
         }
-        public WindowKeyBindElement this[int index]
+        public WindowKeyBindElement? this[int index]
         {
             get
             {

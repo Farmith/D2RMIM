@@ -17,7 +17,7 @@ namespace MultiInstanceManager.Helpers
 
         [DllImport("user32.dll")]
         public static extern void mouse_event(int dwFlags, int dx, int dy, int cButtons, int dwExtraInfo);
-        
+
         [DllImport("User32.dll")]
         public static extern int SendMessage(IntPtr hWnd, int uMsg, int wParam, int lParam);
         [DllImport("User32.dll")]
@@ -193,23 +193,24 @@ namespace MultiInstanceManager.Helpers
         }
         public static Point GetRandomPointWithinRect(Rect rect)
         {
-            var y = new System.Random().Next(rect.Top+5, rect.Bottom-5);
-            var x = new System.Random().Next(rect.Left+5, rect.Right-5);
+            var y = new System.Random().Next(rect.Top + 5, rect.Bottom - 5);
+            var x = new System.Random().Next(rect.Left + 5, rect.Right - 5);
             return new Point(x, y);
         }
         /*
          * I always wanted you to spam, into Space Man...
          */
-        public static void SpaceMan(CancellationToken ct, Process process, int intervalSeconds=5)
+        public static void SpaceMan(CancellationToken ct, Process process, int intervalSeconds = 5)
         {
             ct.ThrowIfCancellationRequested();
             var keepGoing = true;
-            while(keepGoing)
+            while (keepGoing)
             {
-                if(ct.IsCancellationRequested)
+                if (ct.IsCancellationRequested)
                 {
                     keepGoing = false;
-                } else
+                }
+                else
                 {
                     Debug.WriteLine("Space, man..");
                     PostMessage(process.MainWindowHandle, WM_KEYDOWN, (IntPtr)VK_SPACE, (IntPtr)(0));
@@ -219,12 +220,12 @@ namespace MultiInstanceManager.Helpers
                 }
             }
         }
-        public static void ClickFreneticallyInsideWindow(CancellationToken ct, Process process,int intervalSeconds=5)
+        public static void ClickFreneticallyInsideWindow(CancellationToken ct, Process process, int intervalSeconds = 5)
         {
             ct.ThrowIfCancellationRequested();
             // Thread.Sleep(10000);    // Sleep for an arbitrary, 10s to let window boot
             var keepGoing = true;
-            while(keepGoing)
+            while (keepGoing)
             {
                 if (ct.IsCancellationRequested)
                 {

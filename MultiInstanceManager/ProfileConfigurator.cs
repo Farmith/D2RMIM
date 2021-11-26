@@ -16,14 +16,14 @@ namespace MultiInstanceManager
 {
     public partial class AccountConfiguration : Form
     {
-        private List<AccountBinary> Profiles;
+        private List<AccountBinary>? Profiles;
         private bool hotKeyPressRegistered = false;
         private string hotKeyPressString = "";
         private Keys? modifier = null;
         private Keys? hotkey = null;
-        private HotKey _HotKey;
-        private Profile _Profile;
-        private MultiHandler MH;
+        private HotKey? _HotKey;
+        private Profile? _Profile;
+        private MultiHandler? MH;
 
         public AccountConfiguration()
         {
@@ -47,7 +47,7 @@ namespace MultiInstanceManager
         {
             MH = handler;
         }
-        public void OnShown(object sender, EventArgs e)
+        public void OnShown(object? sender, EventArgs e)
         {
             Log.Debug("Resetting innards of config");
             resetRegion();
@@ -74,7 +74,12 @@ namespace MultiInstanceManager
         private void LoadProfile()
         {
             DefaultSettings();
-            _Profile = FileHelper.LoadProfileConfiguration(selectAccount.SelectedItem.ToString());
+            if (selectAccount.SelectedItem == null)
+                return;
+            var selection = selectAccount.SelectedItem.ToString();
+            if (selection == null)
+                return;
+            _Profile = FileHelper.LoadProfileConfiguration(selection);
             if (_Profile != null)
             {
                 modifyWindowTitles.Checked = _Profile.ModifyWindowtitles;
@@ -86,7 +91,7 @@ namespace MultiInstanceManager
                     hotkey = _HotKey.Key;
                     enableHotkeys.Checked = _Profile.WindowHotKey.Enabled;
                     var extraMod = "";
-                    if (_Profile.WindowHotKey.ModifierKey.ToString().Length > 0)
+                    if (_Profile.WindowHotKey.ModifierKey?.ToString().Length > 0)
                     {
                         extraMod = _Profile.WindowHotKey.ModifierKey.ToString() + "+";
                     }
@@ -96,30 +101,32 @@ namespace MultiInstanceManager
                 installationPath.Text = _Profile.InstallationPath;
                 useDefaultGame.Checked = _Profile.UseDefaultGameInstallation;
                 separateTaskbarItems.Checked = _Profile.SeparateTaskbarIcons;
-                windowXposition.Text = _Profile.LaunchOptions.WindowX.ToString();
-                windowYposition.Text = _Profile.LaunchOptions.WindowY.ToString();
-                gameLaunchArgs.Text = _Profile.LaunchOptions.LaunchArguments;
-                preLaunchCmd.Text = _Profile.LaunchOptions.PreLaunchCommands;
-                postLaunchCmd.Text = _Profile.LaunchOptions.PostLaunchCommands;
+                windowXposition.Text = _Profile.LaunchOptions?.WindowX.ToString();
+                windowYposition.Text = _Profile.LaunchOptions?.WindowY.ToString();
+                gameLaunchArgs.Text = _Profile.LaunchOptions?.LaunchArguments;
+                preLaunchCmd.Text = _Profile.LaunchOptions?.PreLaunchCommands;
+                postLaunchCmd.Text = _Profile.LaunchOptions?.PostLaunchCommands;
                 separateJsonSettings.Checked = _Profile.SeparateJsonSettings;
                 separateTaskbarItems.Checked = _Profile.SeparateTaskbarIcons;
                 muteWhenMinimized.Checked = _Profile.MuteWhenMinimized;
                 if(_Profile.SeparateJsonSettings)
                 {
                     // Make sure there is a JSON file to use for Settings.
-                    FileHelper.CreateJSONSettings(_Profile.DisplayName);
+                    FileHelper.CreateJSONSettings(_Profile?.DisplayName);
                 }
-                SelecteRegion(_Profile.Region);
+                SelecteRegion(_Profile?.Region);
             } else
             {
                 Log.Debug("Previous config is null");
             }
         }
-        private void SelecteRegion(string region)
+        private void SelecteRegion(string? region)
         {
+            if (region == null || selectedRegion == null || selectedRegion.Items.Count < 1)
+                return;
             for(int i = 0; i < selectedRegion.Items.Count; i++)
             {
-                if(selectedRegion.Items[i].ToString().CompareTo(region) == 0)
+                if(selectedRegion.Items[i].ToString()?.CompareTo(region) == 0)
                 {
                     selectedRegion.SelectedIndex = i;
                     return;
@@ -136,7 +143,7 @@ namespace MultiInstanceManager
                 selectAccount.Items.Add(profile.AccountName);
             }
         }
-        private void SaveConfiguration(object sender, EventArgs e)
+        private void SaveConfiguration(object? sender, EventArgs e)
         {
             Profile config = new Profile();
 
@@ -149,11 +156,10 @@ namespace MultiInstanceManager
             {
                 try
                 {
-                    config.InstallationPath = (string)Registry.GetValue(Constants.gameInstallRegKey[0], Constants.gameInstallRegKey[1], "");
+                    config.InstallationPath = (string?)Registry.GetValue(Constants.gameInstallRegKey[0], Constants.gameInstallRegKey[1], "");
                 } catch (Exception ex)
                 {
                     Log.Debug("Can not find installation in registry: " + ex.ToString());
-                    Log.Debug(e.ToString());
                     config.InstallationPath = "";
                 }
                 config.GameExecutable = Constants.clientExecutableName;
@@ -198,7 +204,7 @@ namespace MultiInstanceManager
             selectedRegion.Items.Add("Americas");
             selectedRegion.Items.Add("Asia");
         }
-        private void hotKeyKey_KeyDown(object sender, KeyEventArgs e)
+        private void hotKeyKey_KeyDown(object? sender, KeyEventArgs e)
         {
             switch(Control.ModifierKeys)
             {
@@ -310,11 +316,11 @@ namespace MultiInstanceManager
                 }
             }
         }
-        private void hotKeyKey_KeyPress(object sender, KeyPressEventArgs e)
+        private void hotKeyKey_KeyPress(object? sender, KeyPressEventArgs e)
         {
             e.Handled = true;
         }
-        private void hotKeyKey_KeyUp(object sender, System.Windows.Forms.KeyEventArgs e)
+        private void hotKeyKey_KeyUp(object? sender, System.Windows.Forms.KeyEventArgs e)
         {
             // Check for the flag being set in the KeyDown event.
 
@@ -322,7 +328,7 @@ namespace MultiInstanceManager
             {
                 var newText = "";
                 // Stop the character from being entered into the control since it is non-numerical.
-                if (modifier.ToString().Length > 0)
+                if (modifier.ToString()?.Length > 0)
                     newText = modifier.ToString() + "+";
                 currentHotKey.Text = newText + "["+hotKeyPressString+"]";
                 hotKeyKey.Text = "";
@@ -334,34 +340,34 @@ namespace MultiInstanceManager
 
 
         }
-        private void selectAccount_SelectedIndexChanged(object sender, EventArgs e)
+        private void selectAccount_SelectedIndexChanged(object? sender, EventArgs e)
         {
             LoadProfile();
         }
 
-        private void useDefaultGame_CheckedChanged(object sender, EventArgs e)
+        private void useDefaultGame_CheckedChanged(object? sender, EventArgs e)
         {
             if (useDefaultGame.Checked)
             {
-                installationPath.Text = (string)Registry.GetValue(Constants.gameInstallRegKey[0], Constants.gameInstallRegKey[1], "");
+                installationPath.Text = (string?)Registry.GetValue(Constants.gameInstallRegKey[0], Constants.gameInstallRegKey[1], "");
                 gameExecutableName.Text = Constants.clientExecutableName;
             }
         }
 
-        private void skipIntroVideos_CheckedChanged(object sender, EventArgs e)
+        private void skipIntroVideos_CheckedChanged(object? sender, EventArgs e)
         {
 
         }
 
-        private void selectedRegion_SelectedIndexChanged(object sender, EventArgs e)
+        private void selectedRegion_SelectedIndexChanged(object? sender, EventArgs e)
         {
 
         }
-        private void browseForInstallationButton_Click(object sender, EventArgs e)
+        private void browseForInstallationButton_Click(object? sender, EventArgs e)
         {
             int size = -1;
             System.Windows.Forms.OpenFileDialog openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
-            openFileDialog1.InitialDirectory = (string)Registry.GetValue(Constants.gameInstallRegKey[0], Constants.gameInstallRegKey[1], "");
+            openFileDialog1.InitialDirectory = (string?)Registry.GetValue(Constants.gameInstallRegKey[0], Constants.gameInstallRegKey[1], "");
             openFileDialog1.Filter = "Executables (*.exe)|*.exe";
             openFileDialog1.FilterIndex = 1;
             openFileDialog1.RestoreDirectory = true;
@@ -369,7 +375,7 @@ namespace MultiInstanceManager
             if (result == DialogResult.OK) // Test result.
             {
                 string filepath = openFileDialog1.FileName;
-                string path = Path.GetDirectoryName(filepath);
+                string? path = Path.GetDirectoryName(filepath);
                 string file = Path.GetFileNameWithoutExtension(filepath);
                 
                 installationPath.Text = path;
@@ -378,14 +384,18 @@ namespace MultiInstanceManager
             Console.WriteLine(size); // <-- Shows file size in debugging mode.
             Console.WriteLine(result); // <-- For debugging use.
         }
-        private void grabWindowXYButton_Click(object sender, EventArgs e)
+        private void grabWindowXYButton_Click(object? sender, EventArgs e)
         {
-            var window = MH.GetActiveWindow(_Profile.DisplayName);
+            if (_Profile == null || _Profile.DisplayName == null)
+                return;
+            var window = MH?.GetActiveWindow(_Profile.DisplayName);
             if(window != null)
             {
                 try
                 {
                     var rect = new Rect();
+                    if (window.Process == null)
+                        return;
                     WindowHelper.GetWindowRect(window.Process.MainWindowHandle, ref rect);
                     windowXposition.Text = rect.Left.ToString();
                     windowYposition.Text = rect.Top.ToString();

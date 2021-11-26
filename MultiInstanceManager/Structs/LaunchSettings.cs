@@ -11,11 +11,11 @@ namespace MultiInstanceManager.Structs
     public class LaunchSettings
     {
         [ProtoMember(1)]
-        public string PreLaunchCommands { get; set; }
+        public string? PreLaunchCommands { get; set; }
         [ProtoMember(2)]
-        public string PostLaunchCommands { get; set; }
+        public string? PostLaunchCommands { get; set; }
         [ProtoMember(3)]
-        public string LaunchArguments { get; set; }
+        public string? LaunchArguments { get; set; }
         [ProtoMember(4)]
         public int WindowX { get; set; }
         [ProtoMember(5)]

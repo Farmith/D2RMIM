@@ -9,7 +9,7 @@ namespace MultiInstanceManager.Structs
 {
     public class GameInstance
     {
-        public string account;
-        public Process process;
+        public string? account;
+        public Process? process;
     }
 }

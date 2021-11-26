@@ -11,7 +11,7 @@ namespace MultiInstanceManager.Structs
     public class Profile
     {
         [ProtoMember(1)]
-        public string DisplayName { get; set; }
+        public string? DisplayName { get; set; }
         [ProtoMember(2)]
         public bool SkipCinematics { get; set; }
         [ProtoMember(3)]
@@ -19,16 +19,16 @@ namespace MultiInstanceManager.Structs
         [ProtoMember(4)]
         public bool ModifyWindowtitles { get; set; }
         [ProtoMember(5)]
-        public string InstallationPath { get; set; }
+        public string? InstallationPath { get; set; }
         [ProtoMember(6)]
-        public string GameExecutable { get; set; }
+        public string? GameExecutable { get; set; }
         [ProtoMember(7)]
-        public LaunchSettings LaunchOptions { get; set; }
+        public LaunchSettings? LaunchOptions { get; set; }
 
         [ProtoMember(8)]
-        public string Region { get; set; }
+        public string? Region { get; set; }
         [ProtoMember(9)]
-        public HotKey WindowHotKey { get; set; }
+        public HotKey? WindowHotKey { get; set; }
         [ProtoMember(10)]
         public bool UseDefaultGameInstallation { get; set; }
         [ProtoMember(11)]

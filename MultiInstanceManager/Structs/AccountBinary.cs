@@ -8,8 +8,8 @@ namespace MultiInstanceManager.Structs
 {
     public class AccountBinary
     {
-        public string FullPath { get; set; }
-        public string AccountName { get; set; }
+        public string? FullPath { get; set; }
+        public string? AccountName { get; set; }
 
         public DateTime LastWriteTime { get; set; }
     }

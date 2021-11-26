@@ -31,10 +31,12 @@ namespace MultiInstanceManager.Config
             }
             else
             {
-                KeyBindsSection winKeyBinds = ConfigurationManager.GetSection("keyBinds") as KeyBindsSection;
-                List<IKeyBind> collection = winKeyBinds.WindowKeyBinds.All;
+                KeyBindsSection? winKeyBinds = ConfigurationManager.GetSection("keyBinds") as KeyBindsSection;
+                List<IKeyBind>? collection = winKeyBinds?.WindowKeyBinds?.All;
 
                 int i = 0;
+                if (collection == null)
+                    return;
                 foreach (WindowKeyBindElement keyToggle in collection)
                 {
                     if (keyToggle.enabled)

@@ -14,12 +14,12 @@ namespace MultiInstanceManager.Helpers
 {
     public static class FileHelper
     {
-        public static List<AccountBinary> GetProfilesByFolder(string extension="*.bin")
+        public static List<AccountBinary> GetProfilesByFolder(string extension = "*.bin")
         {
             var ePath = Application.ExecutablePath;
             var path = Path.GetDirectoryName(ePath);
             var Accounts = new List<AccountBinary>();
-            if(path == null)
+            if (path == null)
             {
                 return Accounts;
             }
@@ -35,20 +35,22 @@ namespace MultiInstanceManager.Helpers
         }
         public static bool JSONSettingsExist(string name)
         {
-            if(File.Exists(name))
+            if (File.Exists(name))
             {
                 return true;
             }
             return false;
         }
-        public static void CreateJSONSettings(string name)
+        public static void CreateJSONSettings(string? name)
         {
+            if (name == null)
+                return;
             var filePath = Environment.ExpandEnvironmentVariables(Constants.clientSettingsJsonLocation);
-            var inJson = filePath +  "Settings.json";
+            var inJson = filePath + "Settings.json";
             var outJson = name + Constants.clientSettingsAppendName;
             if (!JSONSettingsExist(outJson))
             {
-                if(!File.Exists(inJson))
+                if (!File.Exists(inJson))
                 {
                     // There is no settings file, cant do this.
                     Log.Debug("No settings file in: " + inJson);
@@ -57,8 +59,10 @@ namespace MultiInstanceManager.Helpers
                 File.Copy(inJson, outJson);
             }
         }
-        public static void ReplaceJSONSettingsFile(string name)
+        public static void ReplaceJSONSettingsFile(string? name)
         {
+            if (name == null)
+                return;
             var filePath = Environment.ExpandEnvironmentVariables(Constants.clientSettingsJsonLocation);
             var inJson = filePath + "Settings.json";
             var outJson = name + Constants.clientSettingsAppendName;
@@ -68,8 +72,8 @@ namespace MultiInstanceManager.Helpers
             // Copy the "standard" or old file to temp:
             if (File.Exists(inJson))
             {
-                File.Copy(inJson, storeJson,true);
-                File.Copy(outJson, inJson,true);
+                File.Copy(inJson, storeJson, true);
+                File.Copy(outJson, inJson, true);
             }
         }
         public static void SaveAccountConfiguration(Profile profile)

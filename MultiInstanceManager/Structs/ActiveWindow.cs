@@ -11,8 +11,8 @@ namespace MultiInstanceManager.Structs
 {
     public class ActiveWindow
     {
-        public Process Process;
-        public Profile Profile;
-        public ISimpleAudioVolume VolumeControl;
+        public Process? Process;
+        public Profile? Profile;
+        public ISimpleAudioVolume? VolumeControl;
     }
 }

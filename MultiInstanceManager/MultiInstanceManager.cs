@@ -18,7 +18,7 @@ namespace MultiInstanceManager
     {
         MultiHandler MH;
         Settings settings;
-        AccountConfiguration accountConfig;
+        AccountConfiguration? accountConfig;
         PluginManager pluginManager;
 
         public MultiInstanceManager()
@@ -55,7 +55,7 @@ namespace MultiInstanceManager
             saveAccounInfo.Checked = ConfigurationManager.AppSettings.Get("saveCredentials")?.ToString() == "true" ? true : false;
             saveAccounInfo.CheckedChanged += new EventHandler(saveAccounInfo_Changed);
             // Reset log once per start of application
-            if(!CommandLineArguments.TryGetValue("keeplogs",out List<String> parm))
+            if(!CommandLineArguments.TryGetValue("keeplogs",out List<String>? parm))
             {
                 Log.Empty();
             }
@@ -66,7 +66,8 @@ namespace MultiInstanceManager
 
             // Show version
             var version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
-            appVersion.Text = (String.Format("Version: {0}.{1}.{2} Build: {3}", version.Major, version.Minor, version.Build, version.Revision));
+            if(version != null)
+                appVersion.Text = (String.Format("Version: {0}.{1}.{2} Build: {3}", version.Major, version.Minor, version.Build, version.Revision));
             /*
              * Account configuration stuff
              * 
@@ -98,10 +99,12 @@ namespace MultiInstanceManager
             foreach (var a in store)
             {
                 var bind = a.WindowHotKey;
-                if (bind == null)
+                if (bind == null || bind.Key == null)
                     continue;
-                var hotkey = (Keys)bind.Key | (Keys)bind.ModifierKey;
-                hotkeyCollection.RegisterHotkey(hotkey, (e) =>
+                var hotkey = (Keys)bind.Key | (bind.ModifierKey != null ? (Keys)bind.ModifierKey : null);
+                if (hotkey == null)
+                    continue;
+                hotkeyCollection.RegisterHotkey((Keys)hotkey, (e) =>
                 {
                     Debug.WriteLine("Found recipient for hotkey: " + bind.Key.ToString() + " mod: " + bind.ModifierKey.ToString());
                     Debug.WriteLine("Account: " + a.DisplayName);
@@ -110,19 +113,19 @@ namespace MultiInstanceManager
             }
             // Auto-launch features:
             bool launchWhenAllRefreshed = false;
-            if (CommandLineArguments.TryGetValue("relaunch", out List<String> laf))
+            if (CommandLineArguments.TryGetValue("relaunch", out List<String>? laf))
             {
                 Log.Debug("Auto-starting all profiles we refresh, after last refresh");
                 launchWhenAllRefreshed = true;
             }
-            if (CommandLineArguments.TryGetValue("autorefresh", out List<String> profs))
+            if (CommandLineArguments.TryGetValue("autorefresh", out List<String>? profs))
             {
                 Log.Debug("Refreshing: " + profs.Count + " profiles on start due to cmd-line request");
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
                 RefreshProfiles(profs, launchWhenAllRefreshed);
 #pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
             }
-            if (CommandLineArguments.TryGetValue("autostart", out List<String> autostarts) && !launchWhenAllRefreshed)
+            if (CommandLineArguments.TryGetValue("autostart", out List<String>? autostarts) && !launchWhenAllRefreshed)
             {
                 Log.Debug("Auto-starting: " + autostarts.Count + " profiles on start due to cmd-line request");
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
@@ -199,33 +202,36 @@ namespace MultiInstanceManager
                 Console.WriteLine("Error writing app settings");
             }
         }
-        public void accountConfig_Disposed(object sender, EventArgs e)
+        public void accountConfig_Disposed(object? sender, EventArgs e)
         {
             accountConfig = new AccountConfiguration();
             accountConfig.Disposed += new EventHandler(accountConfig_Disposed);
             configureAccountsButton.Enabled = true;
         }
-        public void configureAccountsButton_Click(object sender, EventArgs e)
+        public void configureAccountsButton_Click(object? sender, EventArgs e)
         {
             configureAccountsButton.Enabled = false;
-            accountConfig.Shown += accountConfig.OnShown;
-            accountConfig.SetMultiHandler(MH);
-            accountConfig.Show();
+            if (accountConfig != null)
+            {
+                accountConfig.Shown += accountConfig.OnShown;
+                accountConfig.SetMultiHandler(MH);
+                accountConfig.Show();
+            }
         }
-        public void saveAccounInfo_Changed(object sender, EventArgs e)
+        public void saveAccounInfo_Changed(object? sender, EventArgs e)
         {
             AddOrUpdateAppSettings("saveCredentials", saveAccounInfo.Checked.ToString());
             MH.SetCredentialMode(saveAccounInfo.Checked);
         }
-        public void forceExit_Changed(object sender, EventArgs e)
+        public void forceExit_Changed(object? sender, EventArgs e)
         {
             AddOrUpdateAppSettings("forceExitClients", forceExit.Checked.ToString());
         }
-        private void dumpRegKeyButton_Click(object sender, EventArgs e)
+        private void dumpRegKeyButton_Click(object? sender, EventArgs e)
         {
             MH.DumpCurrentRegKey();
         }
-        private async void addAccountButton_Click(object sender, EventArgs e)
+        private async void addAccountButton_Click(object? sender, EventArgs e)
         {
             DisableButtons();
             var task = Task.Factory.StartNew(() => MH.Setup());
@@ -233,7 +239,7 @@ namespace MultiInstanceManager
             EnableButtons();
             MH.LoadProfiles();
         }
-        private async void launchButton_Click(object sender, EventArgs e)
+        private async void launchButton_Click(object? sender, EventArgs e)
         {
             MH.ResetSessions();
             if(accountList.CheckedItems.Count != 0)
@@ -242,7 +248,9 @@ namespace MultiInstanceManager
                 {
                     try
                     {
-                        var checkedItem = accountList.CheckedItems[x].ToString().Split('|')[0].Trim(' ');
+                        var checkedItem = accountList.CheckedItems[x].ToString()?.Split('|')[0].Trim(' ');
+                        if (checkedItem == null)
+                            continue;
                         // Doing this in a task makes sure the UI doesn't freeze
                         DisableButtons();
                         var task = Task.Factory.StartNew(() => MH.LaunchWithAccount(checkedItem));
@@ -257,7 +265,7 @@ namespace MultiInstanceManager
                 MH.LoadProfiles();
             }
         }
-        private void removeButton_Click(object sender, System.EventArgs e)
+        private void removeButton_Click(object? sender, System.EventArgs e)
         {
             if (accountList.CheckedItems.Count > 0)
             {
@@ -265,7 +273,9 @@ namespace MultiInstanceManager
                 {
                     try
                     {
-                        var checkedItem = accountList.CheckedItems[x].ToString().Split('|')[0].Trim(' ');
+                        var checkedItem = accountList.CheckedItems[x].ToString()?.Split('|')[0].Trim(' ');
+                        if (checkedItem == null)
+                            continue;
                         accountList.Items.Remove(accountList.CheckedItems[x]);
                         Log.Debug("Removing Vault credentials for: " + checkedItem);
                         CredentialHelper.RemoveVaultCredentials(checkedItem);
@@ -297,7 +307,7 @@ namespace MultiInstanceManager
             refreshButton.Enabled = false;
 
         }
-        private async void refreshButton_Click(object sender, System.EventArgs e)
+        private async void refreshButton_Click(object? sender, System.EventArgs e)
         {
             Log.Clear();
             if (accountList.CheckedItems.Count != 0)
@@ -306,7 +316,9 @@ namespace MultiInstanceManager
                 {
                     try
                     {
-                        var checkedItem = accountList.CheckedItems[x].ToString().Split('|');
+                        var checkedItem = accountList.CheckedItems[x].ToString()?.Split('|');
+                        if (checkedItem == null)
+                            continue;
                         DisableButtons();
                         var task = Task.Factory.StartNew(() => MH.Setup(checkedItem[0].Trim(' '), true));
                         var result = await task;
@@ -320,11 +332,11 @@ namespace MultiInstanceManager
                 MH.LoadProfiles();
             }
         }
-        private void readmeLink_Click(object sender, System.EventArgs e)
+        private void readmeLink_Click(object? sender, System.EventArgs e)
         {
             var ePath = Application.ExecutablePath;
             var path = System.IO.Path.GetDirectoryName(ePath);
-            Process.Start(path + "\\README.txt");
+            Process.Start(path + "\\README.md");
         }
 
     }

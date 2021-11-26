@@ -53,7 +53,7 @@ namespace MultiInstanceManager.Modules
             {
                 foreach (var window in activeWindows)
                 {
-                    if (window.Profile.DisplayName == displayname)
+                    if (window.Profile?.DisplayName == displayname)
                         return window;
                 }
             }
@@ -76,14 +76,14 @@ namespace MultiInstanceManager.Modules
 
         public ActiveWindow SwapFocus(Profile account)
         {
-            var activeWindow = activeWindows?.Find(x => x.Profile.DisplayName == account.DisplayName);
+            var activeWindow = activeWindows?.Find(x => x.Profile?.DisplayName == account.DisplayName);
             if (activeWindow == null)
             {
                 Log.Debug("Active window is null for: " + account.DisplayName);
                 return new ActiveWindow();
             }
 
-            var clientProcesses = Process.GetProcessesByName(activeWindow.Profile.GameExecutable);
+            var clientProcesses = Process.GetProcessesByName(activeWindow.Profile?.GameExecutable);
             Debug.WriteLine("Game Process count: " + clientProcesses.Count());
 
             // Set focus to specified window
@@ -110,12 +110,13 @@ namespace MultiInstanceManager.Modules
             }
             */
 
-            if (activeWindow.Process.MainWindowHandle != IntPtr.Zero)
+            if (activeWindow.Process?.MainWindowHandle != IntPtr.Zero)
             {
                 Log.Debug("We found a handle to this game client..");
                 try
                 {
-                    WindowHelper.forceForegroundWindow(activeWindow.Process.MainWindowHandle);
+                    if(activeWindow.Process != null)
+                        WindowHelper.forceForegroundWindow(activeWindow.Process.MainWindowHandle);
                 }
                 catch (Exception e)
                 {
@@ -181,7 +182,7 @@ namespace MultiInstanceManager.Modules
             WindowHelper.WinWait(Constants.bnetLauncherClass);
             SetBnetLauncherPID(launcherProcess);
             // Do some magic to enter the credentials
-            if (bNetCredentials?.User?.Length > 0)
+            if (bNetCredentials?.User?.Length > 0 && bNetCredentials?.Pass?.Length > 0)
             {
                 Thread.Sleep(5000); // Wait 5s to start filling in.
                 Debug.WriteLine("Finding the login boxes");
@@ -296,14 +297,14 @@ namespace MultiInstanceManager.Modules
                 }
             }
             UseAccountToken(accountName);
-            cmdArgs = profile?.LaunchOptions.LaunchArguments.Length > 0 ? profile.LaunchOptions.LaunchArguments : "";
+            cmdArgs = profile?.LaunchOptions?.LaunchArguments?.Length > 0 ? profile.LaunchOptions.LaunchArguments : "";
             // Check if we need to do some magic with the Settings.json
             if (profile != null && profile.SeparateJsonSettings)
             {
-                FileHelper.ReplaceJSONSettingsFile(profile.DisplayName);
+                FileHelper.ReplaceJSONSettingsFile(profile?.DisplayName);
             }
             string? preLaunchCmds = null;
-            if (profile != null && profile.LaunchOptions.PreLaunchCommands.Length > 0)
+            if (profile != null && profile.LaunchOptions?.PreLaunchCommands?.Length > 0)
             {
                 preLaunchCmds = profile.LaunchOptions.PreLaunchCommands;
                 Log.Debug("Pre-launch command: " + preLaunchCmds);
@@ -317,12 +318,12 @@ namespace MultiInstanceManager.Modules
                 // ProcessManager.StartProcess(preLaunchCmds);
             }
             string? installPath = null;
-            if (profile != null && profile.InstallationPath.Length > 0)
+            if (profile != null && profile.InstallationPath?.Length > 0)
             {
                 installPath = profile.InstallationPath;
             }
             string? gameExe = null;
-            if (profile != null && profile.GameExecutable.Length > 0)
+            if (profile != null && profile.GameExecutable?.Length > 0)
             {
                 gameExe = profile.GameExecutable;
             }
@@ -343,7 +344,7 @@ namespace MultiInstanceManager.Modules
                 Log.Debug("Handle: " + process.MainWindowHandle.ToString());
                 WindowHelper.SetWindowApplicationId(process.MainWindowHandle, "D2R" + accountName);
             }
-            if (profile != null && (profile.LaunchOptions.WindowX >= 0 || profile.LaunchOptions.WindowY >= 0))
+            if (profile != null && (profile.LaunchOptions?.WindowX >= 0 || profile.LaunchOptions?.WindowY >= 0))
             {
                 WindowHelper.SetWindowPosition(process.MainWindowHandle, profile.LaunchOptions.WindowX, profile.LaunchOptions.WindowY);
             }
@@ -375,7 +376,7 @@ namespace MultiInstanceManager.Modules
             if (ProcessManager.MatchProcess(process))
             {
                 Log.Debug("Process seems to be alive: " + process.Id);
-                if (profile != null && (profile.LaunchOptions.WindowX != 0 || profile.LaunchOptions.WindowY != 0))
+                if (profile != null && (profile.LaunchOptions?.WindowX >= 0 || profile.LaunchOptions?.WindowY >= 0))
                 {
                     WindowHelper.SetWindowPosition(process.MainWindowHandle, profile.LaunchOptions.WindowX, profile.LaunchOptions.WindowY);
                 }
@@ -396,7 +397,7 @@ namespace MultiInstanceManager.Modules
              * 
              */
             string? postLaunchCmds = null;
-            if (profile != null && profile.LaunchOptions.PostLaunchCommands.Length > 0)
+            if (profile != null && profile.LaunchOptions?.PostLaunchCommands?.Length > 0)
             {
                 postLaunchCmds = profile.LaunchOptions.PostLaunchCommands;
             }
@@ -471,11 +472,14 @@ namespace MultiInstanceManager.Modules
             profileStore.Clear();
             foreach (var profile in profiles)
             {
-                var fileName = profile.AccountName + " | " + profile.LastWriteTime.ToString();
-                Profile? a = FileHelper.LoadProfileConfiguration(profile.AccountName);
-                if (a != null)
-                    profileStore.Add(a);
-                accountList.Items.Add(fileName);
+                if (profile.AccountName != null)
+                {
+                    var fileName = profile.AccountName + " | " + profile.LastWriteTime.ToString();
+                    Profile? a = FileHelper.LoadProfileConfiguration(profile.AccountName);
+                    if (a != null)
+                        profileStore.Add(a);
+                    accountList.Items.Add(fileName);
+                }
             }
         }
         private void SetBnetLauncherPID(Process launcherProcess)
@@ -678,24 +682,28 @@ namespace MultiInstanceManager.Modules
                         {
                             foreach (var activeWindow in activeWindows)
                             {
-                                if (!ProcessManager.IsProcessRunning(activeWindow.Process))
+                                if (activeWindow.Process != null && !ProcessManager.IsProcessRunning(activeWindow.Process))
                                 {
-                                    Log.Debug("Window for profile: " + activeWindow.Profile.DisplayName + " has exited");
+                                    Log.Debug("Window for profile: " + activeWindow.Profile?.DisplayName + " has exited");
                                     // It has died, so we need to ask the user if we should restart it
                                     var confirmed = Prompt.ConfirmDialog("Restarting client in {timeout} seconds", "Client exited");
                                     if (confirmed)
                                     {
                                         // Restart the client
-                                        Log.Debug("Restarting client: " + activeWindow.Profile.DisplayName);
-                                        var profileName = activeWindow.Profile.DisplayName;
-                                        activeWindows.Remove(activeWindow);
-#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed, on purpose
-                                        LaunchWithAccount(profileName);
-#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed, on purpose
+                                        if (activeWindow.Profile != null && activeWindow.Profile.DisplayName != null)
+                                        {
+                                            Log.Debug("Restarting client: " + activeWindow.Profile?.DisplayName);
+                                            var profileName = activeWindow.Profile?.DisplayName;
+                                            activeWindows.Remove(activeWindow);
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+                                            if(profileName != null)
+                                                LaunchWithAccount(profileName);
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+                                        }
                                     }
                                     else
                                     {
-                                        Log.Debug("Profile: " + activeWindow.Profile.DisplayName + " exited, not restarting due to user request.");
+                                        Log.Debug("Profile: " + activeWindow.Profile?.DisplayName + " exited, not restarting due to user request.");
                                         activeWindows.Remove(activeWindow);
                                     }
                                 }
@@ -728,49 +736,50 @@ namespace MultiInstanceManager.Modules
                         {
                             foreach (var activeWindow in activeWindows)
                             {
-                                if (activeWindow == null || activeWindow.Profile.MuteWhenMinimized == false)
+                                if (activeWindow == null || activeWindow.Profile?.MuteWhenMinimized == false)
                                     continue;
 
                                 if (activeWindow.VolumeControl == null)
                                 {
-                                    Log.Debug("Fetching volume control for: " + activeWindow.Profile.DisplayName);
-                                    activeWindow.VolumeControl = AudioHelper.GetWindowAudioControl(activeWindow.Process);
+                                    Log.Debug("Fetching volume control for: " + activeWindow.Profile?.DisplayName);
+                                    if(activeWindow.Process != null)
+                                        activeWindow.VolumeControl = AudioHelper.GetWindowAudioControl(activeWindow.Process);
                                 }
-                                if (WindowHelper.IsMinimized(activeWindow.Process))
+                                if (activeWindow.Process != null && WindowHelper.IsMinimized(activeWindow.Process))
                                 {
+                                    bool isMuted = false;
                                     try
                                     {
-                                        bool isMuted;
                                         Guid bs = Guid.Empty;
-                                        activeWindow.VolumeControl.GetMute(out isMuted);
+                                        activeWindow.VolumeControl?.GetMute(out isMuted);
                                         if (!isMuted)
                                         {
-                                            Log.Debug("Muting window for: " + activeWindow.Profile.DisplayName);
-                                            activeWindow.VolumeControl.SetMute(true, bs);
+                                            Log.Debug("Muting window for: " + activeWindow.Profile?.DisplayName);
+                                            activeWindow.VolumeControl?.SetMute(true, bs);
                                         }
                                     }
                                     catch (Exception me)
                                     {
-                                        Log.Debug("Could not mute window for: " + activeWindow.Profile.DisplayName);
+                                        Log.Debug("Could not mute window for: " + activeWindow.Profile?.DisplayName);
                                         Log.Debug(me.ToString());
                                     }
                                 }
                                 else
                                 {
+                                    bool isMuted = false;
                                     try
                                     {
-                                        bool isMuted;
                                         Guid bs = Guid.Empty;
-                                        activeWindow.VolumeControl.GetMute(out isMuted);
+                                        activeWindow.VolumeControl?.GetMute(out isMuted);
                                         if (isMuted)
                                         {
-                                            Log.Debug("UnMuting window for: " + activeWindow.Profile.DisplayName);
-                                            activeWindow.VolumeControl.SetMute(false, bs);
+                                            Log.Debug("UnMuting window for: " + activeWindow.Profile?.DisplayName);
+                                            activeWindow.VolumeControl?.SetMute(false, bs);
                                         }
                                     }
                                     catch (Exception me)
                                     {
-                                        Log.Debug("Could not UnMute window for: " + activeWindow.Profile.DisplayName);
+                                        Log.Debug("Could not UnMute window for: " + activeWindow.Profile?.DisplayName);
                                         Log.Debug(me.ToString());
                                     }
                                 }
