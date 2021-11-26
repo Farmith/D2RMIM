@@ -314,9 +314,13 @@ namespace MultiInstanceManager.Modules
 
             int offset = IntPtr.Size * 2; // offset is based on 32/64bit OS
 
+#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
             string handleName = Marshal.PtrToStringUni(new IntPtr(baseAddress + offset));
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
 
+#pragma warning disable CS8603 // Possible null reference return.
             return handleName;
+#pragma warning restore CS8603 // Possible null reference return.
         }
         private static int GetHandleNameLength(UIntPtr handle)
         {

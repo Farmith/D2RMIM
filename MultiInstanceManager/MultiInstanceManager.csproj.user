@@ -10,4 +10,12 @@
     <FallbackCulture>en-US</FallbackCulture>
     <VerifyUploadedFiles>false</VerifyUploadedFiles>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Update="MultiInstanceManager.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="ProfileConfigurator.cs">
+      <SubType>Form</SubType>
+    </Compile>
+  </ItemGroup>
 </Project>

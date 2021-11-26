@@ -39,7 +39,21 @@ namespace MultiInstanceManager.Modules
 
             if (Directory.Exists(Constants.PluginFolderName))
             {
-                Log.Debug("PluginManager: Directory is fine");
+                if (Directory.Exists(Constants.PluginFolderName + "\\" + Constants.PluginLibReferenceFolder))
+                {
+                    Log.Debug("Loading all referenced libraries first");
+                    String[] references = Directory.GetFiles(Constants.PluginFolderName + "\\" + Constants.PluginLibReferenceFolder);
+                    foreach (string reference in references)
+                    {
+                        if (Path.GetExtension(reference).CompareTo(".dll") == 0)
+                        {
+                            Log.Debug("PluginManager: Loading ref => " + reference);
+                            Assembly.LoadFile(Path.GetFullPath(reference));
+                        }
+                    }
+                    Log.Debug("Done loading references");
+                }
+                Log.Debug("PluginManager: Directory is fine, references should be loaded, loading plugins");
                 String[] plugins = Directory.GetFiles(Constants.PluginFolderName);
                 foreach (string plugin in plugins)
                 {

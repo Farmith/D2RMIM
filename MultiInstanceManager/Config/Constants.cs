@@ -24,6 +24,7 @@ namespace MultiInstanceManager
         public static string clientSettingsJsonLocation = @"%UserProfile%\Saved Games\Diablo II Resurrected\";
         /* Plugin stuff */
         public static string PluginFolderName = "plugins";
+        public static string PluginLibReferenceFolder = "ref";
         /* Window classes */
         public static string gameClass = "OsWindow";
         public static string bnetLauncherClass = "Qt5QWindowIcon";

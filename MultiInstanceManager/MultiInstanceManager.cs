@@ -5,12 +5,10 @@ using MultiInstanceManager.Modules;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
-using System.Deployment.Application;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Linq;
 using static Dfust.Hotkeys.Enums;
 using System.Threading;
 
@@ -90,19 +88,6 @@ namespace MultiInstanceManager
             settings.LoadWindowKeys();
             Debug.WriteLine("Done with keybinds");
             MH.LoadProfiles();
-            try
-            {
-                var gn = ConfigurationManager.AppSettings.Get("gameExecutableName").ToString();
-                if (gn.Length > 5)
-                {
-                    MH.SetGameExecutableName(gn);
-                }
-            } 
-            catch (Exception e)
-            {
-                Debug.WriteLine("Game name config faulty: " + e.ToString());
-            }
-            
             /*
              * HotKey stuffs
              * 
@@ -133,12 +118,16 @@ namespace MultiInstanceManager
             if (CommandLineArguments.TryGetValue("autorefresh", out List<String> profs))
             {
                 Log.Debug("Refreshing: " + profs.Count + " profiles on start due to cmd-line request");
-                RefreshProfiles(profs,launchWhenAllRefreshed);
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+                RefreshProfiles(profs, launchWhenAllRefreshed);
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
             }
             if (CommandLineArguments.TryGetValue("autostart", out List<String> autostarts) && !launchWhenAllRefreshed)
             {
                 Log.Debug("Auto-starting: " + autostarts.Count + " profiles on start due to cmd-line request");
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
                 LaunchProfiles(autostarts);
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
             }
 
         }

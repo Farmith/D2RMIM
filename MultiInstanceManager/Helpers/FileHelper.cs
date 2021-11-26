@@ -19,7 +19,11 @@ namespace MultiInstanceManager.Helpers
             var ePath = Application.ExecutablePath;
             var path = Path.GetDirectoryName(ePath);
             var Accounts = new List<AccountBinary>();
-            var accounts = Directory.GetFiles(path, "*.bin");
+            if(path == null)
+            {
+                return Accounts;
+            }
+            var accounts = Directory.GetFiles(path: path, searchPattern: "*.bin");
             foreach (var account in accounts)
             {
                 var lastWrite = File.GetLastWriteTime(account);
@@ -97,6 +101,8 @@ namespace MultiInstanceManager.Helpers
         {
             var ePath = Application.ExecutablePath;
             var path = Path.GetDirectoryName(ePath);
+            if (path == null)
+                return;
             var profiles = Directory.GetFiles(path, "*.bincnf");
             foreach (var profile in profiles)
             {

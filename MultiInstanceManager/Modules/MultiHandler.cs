@@ -1,4 +1,6 @@
 ﻿#nullable enable
+#pragma warning disable CA1416 // Validate platform compatibility
+
 using Microsoft.Win32;
 using MultiInstanceManager.Helpers;
 using MultiInstanceManager.Structs;
@@ -407,7 +409,7 @@ namespace MultiInstanceManager.Modules
         private Process LaunchGame(string profile, string cmdArgs = "", string ? _installPath = null, string? _exeName = null)
         {
             _exeName = _exeName != null ? _exeName + Constants.executableFileExt : gameExecutableName;
-            _installPath = _installPath != null ? _installPath : (string)Registry.GetValue(Constants.gameInstallRegKey[0], Constants.gameInstallRegKey[1], "");
+            _installPath = _installPath ?? Registry.GetValue(Constants.gameInstallRegKey[0], Constants.gameInstallRegKey[1], "") as string;
             var forcedArgs = " -uid osi -launcher";
             var process = ProcessManager.DeElevatedProcess(_installPath + "\\" + _exeName + " " + cmdArgs + forcedArgs);
 
@@ -436,7 +438,7 @@ namespace MultiInstanceManager.Modules
         {
             var process = new Process();
             _exeName = _exeName != null ? _exeName + Constants.executableFileExt : gameExecutableName;
-            _installPath = _installPath != null ? _installPath : (string)Registry.GetValue(Constants.gameInstallRegKey[0], Constants.gameInstallRegKey[1], "");
+            _installPath = _installPath ?? Registry.GetValue(Constants.gameInstallRegKey[0], Constants.gameInstallRegKey[1], "") as string;
 
             process.StartInfo.FileName = _installPath + "\\" + _exeName;
             process.StartInfo.Arguments = cmdArgs;
@@ -537,15 +539,21 @@ namespace MultiInstanceManager.Modules
         }
         private Process LaunchLauncher()
         {
-            string installPath = (string)Registry.GetValue(Constants.gameInstallRegKey[0], Constants.gameInstallRegKey[1], "");
-            var p = Process.Start(installPath + "\\Diablo II Resurrected Launcher.exe");
-            lastWindowHandle = p.MainWindowHandle;
-            return p;
+            string? installPath = Registry.GetValue(Constants.gameInstallRegKey[0], Constants.gameInstallRegKey[1], "") as string;
+            if (installPath == null)
+            {
+                Log.Debug("Installation registry is broken, can not continue.");
+                throw (new Exception("D2R Installation broken, can not find registry value for installation path"));
+            }
+            else
+            {
+                var p = Process.Start(installPath + "\\Diablo II Resurrected Launcher.exe");
+                lastWindowHandle = p.MainWindowHandle;
+                return p;
+            }
         }
-        private void ChangeRealm(string realm)
-        {
-            Registry.SetValue(Constants.clientRegionKey[0], Constants.clientRegionKey[1], realm, RegistryValueKind.String);
-        }
+        private void ChangeRealm(string realm) => Registry.SetValue(Constants.clientRegionKey[0], Constants.clientRegionKey[1], realm, RegistryValueKind.String);
+
         private void WaitForNewToken(Process process, Boolean timeout = false)
         {
             if (!ProcessManager.IsProcessRunning(process))
@@ -554,9 +562,15 @@ namespace MultiInstanceManager.Modules
                 return;
             }
 
-            byte[] CurrentKey = new byte[20];
+            byte[]? CurrentKey = new byte[20];
 
-            CurrentKey = (byte[])Registry.GetValue(Constants.accountRegKey[0], Constants.accountRegKey[1], "");
+            CurrentKey = Registry.GetValue(Constants.accountRegKey[0], Constants.accountRegKey[1], "") as byte[];
+            if(CurrentKey == null)
+            {
+                // Something is severely messed up here, can't get the values from registry.
+                Log.Debug("Unable to get WEB-TOKEN from registry, registry corrupt?");
+                throw (new Exception("Unable to get WEB-TOKEN from registry"));
+            }
             var PrevKey = CurrentKey; //  new byte[50];
 
             long startTime = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
@@ -571,7 +585,7 @@ namespace MultiInstanceManager.Modules
                     Log.Debug("Client exited, aborting..");
                     return;
                 }
-                CurrentKey = (byte[])Registry.GetValue(Constants.accountRegKey[0], Constants.accountRegKey[1], "");
+                CurrentKey = Registry.GetValue(Constants.accountRegKey[0], Constants.accountRegKey[1], "") as byte[];
                 if (timeout == true)
                     elapsedTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) - startTime;
             }
@@ -592,7 +606,9 @@ namespace MultiInstanceManager.Modules
         private void ExportToken(string fileName)
         {
             Log.Debug("Writing to file: " + fileName);
-            File.WriteAllBytes(fileName, (byte[])Registry.GetValue(Constants.accountRegKey[0], Constants.accountRegKey[1], ""));
+            byte[]? registryBytes = Registry.GetValue(Constants.accountRegKey[0], Constants.accountRegKey[1], "") as byte[];
+            if(registryBytes != null) 
+                File.WriteAllBytes(fileName, registryBytes);
         }
         private void UseAccountToken(string accountName)
         {
@@ -673,7 +689,9 @@ namespace MultiInstanceManager.Modules
                                         Log.Debug("Restarting client: " + activeWindow.Profile.DisplayName);
                                         var profileName = activeWindow.Profile.DisplayName;
                                         activeWindows.Remove(activeWindow);
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed, on purpose
                                         LaunchWithAccount(profileName);
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed, on purpose
                                     }
                                     else
                                     {

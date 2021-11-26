@@ -23,7 +23,7 @@ namespace MultiInstanceManager.Helpers
         [DllImport("user32.dll", EntryPoint = "FindWindow", SetLastError = true)]
         public static extern IntPtr FindWindowByCaption(IntPtr ZeroOnly, string lpWindowName);
         [DllImport("user32.dll")]
-        public static extern IntPtr GetWindowRect(IntPtr hWnd, ref Rect rect);
+        public static extern IntPtr GetWindowRect(IntPtr hWnd, ref Modules.Rect rect);
         [DllImport("user32.dll")]
         private static extern int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
         [DllImport("user32.dll")]
@@ -101,7 +101,7 @@ namespace MultiInstanceManager.Helpers
         public static void SetWindowPosition(IntPtr handle, int x, int y,int w=-1, int h=-1)
         {
             // Set the window's position.
-            var rect = new Rect();
+            var rect = new Modules.Rect();
             GetWindowRect(handle, ref rect);
             if (w == -1)
             {

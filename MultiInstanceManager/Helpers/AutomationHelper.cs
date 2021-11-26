@@ -1,4 +1,6 @@
-﻿using MultiInstanceManager.Modules;
+﻿#pragma warning disable CA1416 // Validate platform compatibility
+
+using MultiInstanceManager.Modules;
 using System;
 using System.Diagnostics;
 using System.Drawing;
