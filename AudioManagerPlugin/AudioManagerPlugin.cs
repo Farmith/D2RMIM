@@ -8,6 +8,8 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using AudioManagerPlugin.Helpers;
+using System.Diagnostics;
 
 namespace AudioManagerPlugin
 {
@@ -16,16 +18,31 @@ namespace AudioManagerPlugin
         private CancellationToken ct;
         private CancellationTokenSource cts;
         private Task mainLoop;
-
+        private Dictionary<ActiveWindow, AudioHelper.ISimpleAudioVolume> volumeList;
         public void StartMainLoop()
         {
             cts = new CancellationTokenSource();
             ct = cts.Token;
+            volumeList = new Dictionary<ActiveWindow, AudioHelper.ISimpleAudioVolume>();
             mainLoop = Task.Factory.StartNew(() => this.MainLoop(ct), cts.Token);
         }
         public void Stop()
         {
             cts.Cancel();
+        }
+        private AudioHelper.ISimpleAudioVolume? GetVolumeControlForWindow(ActiveWindow window)
+        {
+            AudioHelper.ISimpleAudioVolume? currentAudio = null;
+
+            if(volumeList.TryGetValue(window,out currentAudio)){
+                if (currentAudio != null)
+                {
+                    return currentAudio;
+                }
+            }
+            currentAudio = AudioHelper.GetWindowAudioControl(window.Process);
+            volumeList.Add(window, currentAudio);
+            return currentAudio;
         }
         public void MainLoop(CancellationToken ct)
         {
@@ -49,15 +66,63 @@ namespace AudioManagerPlugin
                 }
                 else
                 {
-                    if (MultiHandler.activeWindows != null)
+                    try
                     {
-                        foreach (ActiveWindow window in MultiHandler.activeWindows)
+                        if (MultiHandler.activeWindows != null)
                         {
-                            Log.Debug("ExamplePlugin => Found an active window for: " + window.Profile.DisplayName);
+                            foreach (var activeWindow in MultiHandler.activeWindows)
+                            {
+                                if (activeWindow == null || activeWindow.Profile?.MuteWhenMinimized == false)
+                                    continue;
+                                var control = GetVolumeControlForWindow(activeWindow);
+                                if (activeWindow.Process != null && WindowHelper.IsMinimized(activeWindow.Process) && control != null)
+                                {
+                                    bool isMuted = false;
+                                    try
+                                    {
+                                        Guid bs = Guid.Empty;
+                                        control.GetMute(out isMuted);
+                                        if (!isMuted)
+                                        {
+                                            Log.Debug("Muting window for: " + activeWindow.Profile?.DisplayName);
+                                            control.SetMute(true, bs);
+                                        }
+                                    }
+                                    catch (Exception me)
+                                    {
+                                        Log.Debug("Could not mute window for: " + activeWindow.Profile?.DisplayName);
+                                        Log.Debug(me.ToString());
+                                    }
+                                }
+                                else
+                                {
+                                    bool isMuted = false;
+                                    try
+                                    {
+                                        Guid bs = Guid.Empty;
+                                        control?.GetMute(out isMuted);
+                                        if (isMuted)
+                                        {
+                                            Log.Debug("UnMuting window for: " + activeWindow.Profile?.DisplayName);
+                                            control?.SetMute(false, bs);
+                                        }
+                                    }
+                                    catch (Exception me)
+                                    {
+                                        Log.Debug("Could not UnMute window for: " + activeWindow.Profile?.DisplayName);
+                                        Log.Debug(me.ToString());
+                                    }
+                                }
+                                Thread.Sleep(50); // Small delay here too
+                            }
                         }
                     }
-                    Thread.Sleep(5000);
+                    catch (Exception e)
+                    {
+                        Log.Debug("Ammount of windows changed: " + e.ToString());
+                    }
                 }
+                Thread.Sleep(1000);
             }
         }
         public string Name

@@ -68,9 +68,13 @@ namespace MultiInstanceManager
             this.enableHotkeys = new System.Windows.Forms.CheckBox();
             this.saveConfig = new System.Windows.Forms.Button();
             this.grabXYTooltip = new System.Windows.Forms.ToolTip(this.components);
+            this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.label13 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
+            this.groupBox4.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBox1
@@ -151,7 +155,6 @@ namespace MultiInstanceManager
             // groupBox2
             // 
             this.groupBox2.Controls.Add(this.grabWindowXYButton);
-            this.groupBox2.Controls.Add(this.muteWhenMinimized);
             this.groupBox2.Controls.Add(this.separateJsonSettings);
             this.groupBox2.Controls.Add(this.separateTaskbarItems);
             this.groupBox2.Controls.Add(this.label12);
@@ -191,12 +194,12 @@ namespace MultiInstanceManager
             // muteWhenMinimized
             // 
             this.muteWhenMinimized.AutoSize = true;
-            this.muteWhenMinimized.Location = new System.Drawing.Point(201, 217);
+            this.muteWhenMinimized.Location = new System.Drawing.Point(7, 83);
             this.muteWhenMinimized.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.muteWhenMinimized.Name = "muteWhenMinimized";
-            this.muteWhenMinimized.Size = new System.Drawing.Size(177, 19);
+            this.muteWhenMinimized.Size = new System.Drawing.Size(267, 19);
             this.muteWhenMinimized.TabIndex = 17;
-            this.muteWhenMinimized.Text = "Mute client when minimized";
+            this.muteWhenMinimized.Text = "Mute client when minimized (requires plugin)";
             this.muteWhenMinimized.UseVisualStyleBackColor = true;
             // 
             // separateJsonSettings
@@ -391,11 +394,11 @@ namespace MultiInstanceManager
             this.groupBox3.Controls.Add(this.label10);
             this.groupBox3.Controls.Add(this.label9);
             this.groupBox3.Controls.Add(this.enableHotkeys);
-            this.groupBox3.Location = new System.Drawing.Point(15, 455);
+            this.groupBox3.Location = new System.Drawing.Point(476, 47);
             this.groupBox3.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.groupBox3.Size = new System.Drawing.Size(444, 107);
+            this.groupBox3.Size = new System.Drawing.Size(444, 141);
             this.groupBox3.TabIndex = 4;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Hot Key";
@@ -459,11 +462,45 @@ namespace MultiInstanceManager
             this.saveConfig.Text = "Save";
             this.saveConfig.UseVisualStyleBackColor = true;
             // 
+            // groupBox4
+            // 
+            this.groupBox4.Controls.Add(this.label13);
+            this.groupBox4.Controls.Add(this.checkBox1);
+            this.groupBox4.Controls.Add(this.muteWhenMinimized);
+            this.groupBox4.Location = new System.Drawing.Point(546, 194);
+            this.groupBox4.Name = "groupBox4";
+            this.groupBox4.Size = new System.Drawing.Size(360, 254);
+            this.groupBox4.TabIndex = 6;
+            this.groupBox4.TabStop = false;
+            this.groupBox4.Text = "Plugin settings";
+            // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Location = new System.Drawing.Point(7, 108);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(189, 19);
+            this.checkBox1.TabIndex = 18;
+            this.checkBox1.Text = "Restart client when crash/close";
+            this.checkBox1.UseVisualStyleBackColor = true;
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(21, 25);
+            this.label13.MaximumSize = new System.Drawing.Size(355, 0);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(310, 45);
+            this.label13.TabIndex = 19;
+            this.label13.Text = "The settings below are dependent on plugins, if you have removed any plugin from " +
+    "the plugin/ folder then the corresponding checkbox below has no functionality";
+            // 
             // AccountConfiguration
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(588, 586);
+            this.ClientSize = new System.Drawing.Size(933, 465);
+            this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.saveConfig);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.selectAccount);
@@ -480,6 +517,8 @@ namespace MultiInstanceManager
             this.groupBox2.PerformLayout();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
+            this.groupBox4.ResumeLayout(false);
+            this.groupBox4.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -524,5 +563,8 @@ namespace MultiInstanceManager
         private System.Windows.Forms.CheckBox muteWhenMinimized;
         private System.Windows.Forms.Button grabWindowXYButton;
         private System.Windows.Forms.ToolTip grabXYTooltip;
+        private System.Windows.Forms.GroupBox groupBox4;
+        private System.Windows.Forms.CheckBox checkBox1;
+        private System.Windows.Forms.Label label13;
     }
 }

@@ -32,9 +32,7 @@ namespace MultiInstanceManager.Modules
         private List<Profile> profileStore;
         public static List<ActiveWindow>? activeWindows;
         private CancellationTokenSource? processMonitorCTS;
-        private CancellationTokenSource? audioMonitorCTS;
         private Task? processMonitorTask;
-        private Task? audioMonitorTask;
         public MultiHandler(Form _parent, CheckedListBox _accountList)
         {
             parent = _parent;
@@ -638,12 +636,6 @@ namespace MultiInstanceManager.Modules
             CancellationToken processMonitorCT = processMonitorCTS.Token;
             processMonitorTask = Task.Factory.StartNew(() => ProcessMonitor(processMonitorCT), processMonitorCTS.Token);
         }
-        public void StartAudioMonitor()
-        {
-            audioMonitorCTS = new CancellationTokenSource();
-            CancellationToken audioMonitorCT = audioMonitorCTS.Token;
-            audioMonitorTask = Task.Factory.StartNew(() => AudioMonitor(audioMonitorCT), audioMonitorCTS.Token);
-        }
         public void StopProcessMonitor()
         {
             try
@@ -657,21 +649,6 @@ namespace MultiInstanceManager.Modules
             finally
             {
                 processMonitorCTS?.Dispose();
-            }
-        }
-        public void StopAudioMonitor()
-        {
-            try
-            {
-                audioMonitorCTS?.Cancel();
-            }
-            catch (OperationCanceledException e)
-            {
-                Debug.WriteLine("Stopped AudioMonitor: " + e);
-            }
-            finally
-            {
-                audioMonitorCTS?.Dispose();
             }
         }
         public void ProcessMonitor(CancellationToken ct)
@@ -724,82 +701,6 @@ namespace MultiInstanceManager.Modules
                     catch (Exception e)
                     {
                         Log.Debug("Iterating active windows failed: " + e.ToString());
-                    }
-                }
-                Thread.Sleep(1000);
-            }
-        }
-        public void AudioMonitor(CancellationToken ct)
-        {
-            ct.ThrowIfCancellationRequested();
-            var keepGoing = true;
-            while (keepGoing)
-            {
-                if (ct.IsCancellationRequested)
-                {
-                    keepGoing = false;
-                }
-                else
-                {
-                    try
-                    {
-                        if (activeWindows != null)
-                        {
-                            foreach (var activeWindow in activeWindows)
-                            {
-                                if (activeWindow == null || activeWindow.Profile?.MuteWhenMinimized == false)
-                                    continue;
-
-                                if (activeWindow.VolumeControl == null)
-                                {
-                                    Log.Debug("Fetching volume control for: " + activeWindow.Profile?.DisplayName);
-                                    if(activeWindow.Process != null)
-                                        activeWindow.VolumeControl = AudioHelper.GetWindowAudioControl(activeWindow.Process);
-                                }
-                                if (activeWindow.Process != null && WindowHelper.IsMinimized(activeWindow.Process))
-                                {
-                                    bool isMuted = false;
-                                    try
-                                    {
-                                        Guid bs = Guid.Empty;
-                                        activeWindow.VolumeControl?.GetMute(out isMuted);
-                                        if (!isMuted)
-                                        {
-                                            Log.Debug("Muting window for: " + activeWindow.Profile?.DisplayName);
-                                            activeWindow.VolumeControl?.SetMute(true, bs);
-                                        }
-                                    }
-                                    catch (Exception me)
-                                    {
-                                        Log.Debug("Could not mute window for: " + activeWindow.Profile?.DisplayName);
-                                        Log.Debug(me.ToString());
-                                    }
-                                }
-                                else
-                                {
-                                    bool isMuted = false;
-                                    try
-                                    {
-                                        Guid bs = Guid.Empty;
-                                        activeWindow.VolumeControl?.GetMute(out isMuted);
-                                        if (isMuted)
-                                        {
-                                            Log.Debug("UnMuting window for: " + activeWindow.Profile?.DisplayName);
-                                            activeWindow.VolumeControl?.SetMute(false, bs);
-                                        }
-                                    }
-                                    catch (Exception me)
-                                    {
-                                        Log.Debug("Could not UnMute window for: " + activeWindow.Profile?.DisplayName);
-                                        Log.Debug(me.ToString());
-                                    }
-                                }
-                                Thread.Sleep(50); // Small delay here too
-                            }
-                        }
-                    } catch (Exception e)
-                    {
-                        Log.Debug("Ammount of windows changed: " + e.ToString());
                     }
                 }
                 Thread.Sleep(1000);

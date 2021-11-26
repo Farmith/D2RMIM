@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MultiInstanceManager.Helpers
+namespace AudioManagerPlugin.Helpers
 {
     public static class AudioHelper
     {

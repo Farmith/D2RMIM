@@ -81,7 +81,6 @@ namespace MultiInstanceManager
             MH.SetCredentialMode(saveAccounInfo.Checked);
             // Start the Monitors early:
             MH.StartProcessMonitor();
-            MH.StartAudioMonitor();
 
             // Prepare keybinds
             Debug.WriteLine("Adding keybinds");
