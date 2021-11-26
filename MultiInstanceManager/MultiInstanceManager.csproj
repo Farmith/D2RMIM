@@ -240,8 +240,10 @@
       $(PostBuildEventDependsOn);
       PostBuildMacros;
     </PostBuildEventDependsOn>
-    <PostBuildEvent>copy /Y "$(SolutionDir)\\README.*" "$(TargetDir)"
+    <PostBuildEvent>if $SolutionName=="D2RMIM" (
+copy /Y "$(SolutionDir)\\README.*" "$(TargetDir)"
 if exist D2RMIM-Release-@(VersionNumber).zip ( Del D2RMIM-Release-@(VersionNumber).zip )
-powershell.exe -command Compress-Archive -Path plugins,*.dll,README.*,MultiInstanceManager.exe,MultiInstanceManager.exe.config -DestinationPath D2RMIM-Release-@(VersionNumber).zip</PostBuildEvent>
+powershell.exe -command Compress-Archive -Path plugins,*.dll,README.*,MultiInstanceManager.exe,MultiInstanceManager.exe.config -DestinationPath D2RMIM-Release-@(VersionNumber).zip
+)</PostBuildEvent>
   </PropertyGroup>
 </Project>

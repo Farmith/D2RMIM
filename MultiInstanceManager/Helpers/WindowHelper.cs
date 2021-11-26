@@ -73,6 +73,7 @@ namespace MultiInstanceManager.Helpers
         #endregion
         public static bool IsMinimized(Process process)
         {
+            var retVal = false;
             if (process.MainWindowHandle != IntPtr.Zero)
             {
                 WINDOWPLACEMENT placement = new WINDOWPLACEMENT();
@@ -84,14 +85,14 @@ namespace MultiInstanceManager.Helpers
                         break;
                     case 2:
                         // Console.WriteLine("Minimized");
-                        return true;
+                        retVal =  true;
                         break;
                     case 3:
                         // Console.WriteLine("Maximized");
                         break;
                 }
             }
-            return false;
+            return retVal;
         }
         public static void ShowMessage(string message)
         {
