@@ -14,7 +14,7 @@ namespace MultiInstanceManager.Helpers
             Form prompt = new Form()
             {
                 Width = 500,
-                Height = 150,
+                Height = 160,
                 FormBorderStyle = FormBorderStyle.FixedDialog,
                 Text = caption,
                 StartPosition = FormStartPosition.CenterScreen
@@ -22,7 +22,7 @@ namespace MultiInstanceManager.Helpers
             Label textLabel = new Label() { Left = 50, Top = 20, Text = text };
             textLabel.Width = TextRenderer.MeasureText(textLabel.Text, textLabel.Font).Width;
 
-            Button confirmation = new Button() { Text = "Continue", Left = 350, Width = 100, Top = 70, DialogResult = DialogResult.OK };
+            Button confirmation = new Button() { Text = "Continue", Left = 350, Width = 100, Top = 80, DialogResult = DialogResult.OK };
             confirmation.Click += (sender, e) => { prompt.Close(); };
 
             TextBox textBox = new TextBox();

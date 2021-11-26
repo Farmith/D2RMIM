@@ -149,6 +149,11 @@ namespace MultiInstanceManager.Modules
             if (displayName.Length == 0)
             {
                 displayName = Prompt.ShowDialog("Enter desired displayname for this account:", "Add Account");
+                if(displayName.Length == 0)
+                {
+                    WindowHelper.ShowMessage("Display name not entered, aborting setup.");
+                    return false;
+                }
             }
             Credentials? bNetCredentials = new Credentials(null, null);
             if (saveCredentials)
@@ -157,6 +162,12 @@ namespace MultiInstanceManager.Modules
                 bNetCredentials = CredentialHelper.GetVaultCredentials(displayName);
                 if (bNetCredentials != null)
                     Debug.WriteLine("User: " + bNetCredentials.User);
+                else
+                {
+                    // The user failed with username or password
+                    WindowHelper.ShowMessage("Either username or password was empty, aborting setup.");
+                    return false;
+                }
             }
             // Set the region
             Profile? profile = FileHelper.LoadProfileConfiguration(displayName);

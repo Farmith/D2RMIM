@@ -39,6 +39,7 @@ namespace MultiInstanceManager
             this.installationPath = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.grabWindowXYButton = new System.Windows.Forms.Button();
             this.muteWhenMinimized = new System.Windows.Forms.CheckBox();
             this.separateJsonSettings = new System.Windows.Forms.CheckBox();
             this.separateTaskbarItems = new System.Windows.Forms.CheckBox();
@@ -66,7 +67,6 @@ namespace MultiInstanceManager
             this.label9 = new System.Windows.Forms.Label();
             this.enableHotkeys = new System.Windows.Forms.CheckBox();
             this.saveConfig = new System.Windows.Forms.Button();
-            this.grabWindowXYButton = new System.Windows.Forms.Button();
             this.grabXYTooltip = new System.Windows.Forms.ToolTip(this.components);
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -81,9 +81,11 @@ namespace MultiInstanceManager
             this.groupBox1.Controls.Add(this.browseForInstallationButton);
             this.groupBox1.Controls.Add(this.installationPath);
             this.groupBox1.Controls.Add(this.label1);
-            this.groupBox1.Location = new System.Drawing.Point(13, 41);
+            this.groupBox1.Location = new System.Drawing.Point(15, 47);
+            this.groupBox1.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(381, 121);
+            this.groupBox1.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.groupBox1.Size = new System.Drawing.Size(444, 140);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Game Details";
@@ -91,9 +93,10 @@ namespace MultiInstanceManager
             // useDefaultGame
             // 
             this.useDefaultGame.AutoSize = true;
-            this.useDefaultGame.Location = new System.Drawing.Point(286, 90);
+            this.useDefaultGame.Location = new System.Drawing.Point(334, 104);
+            this.useDefaultGame.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.useDefaultGame.Name = "useDefaultGame";
-            this.useDefaultGame.Size = new System.Drawing.Size(82, 17);
+            this.useDefaultGame.Size = new System.Drawing.Size(86, 19);
             this.useDefaultGame.TabIndex = 5;
             this.useDefaultGame.Text = "Use Default";
             this.useDefaultGame.UseVisualStyleBackColor = true;
@@ -101,42 +104,47 @@ namespace MultiInstanceManager
             // 
             // gameExecutableName
             // 
-            this.gameExecutableName.Location = new System.Drawing.Point(9, 90);
+            this.gameExecutableName.Location = new System.Drawing.Point(10, 104);
+            this.gameExecutableName.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.gameExecutableName.Name = "gameExecutableName";
-            this.gameExecutableName.Size = new System.Drawing.Size(267, 20);
+            this.gameExecutableName.Size = new System.Drawing.Size(311, 23);
             this.gameExecutableName.TabIndex = 4;
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(9, 73);
+            this.label2.Location = new System.Drawing.Point(10, 84);
+            this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(191, 13);
+            this.label2.Size = new System.Drawing.Size(211, 15);
             this.label2.TabIndex = 3;
             this.label2.Text = "Game Executable Name (Without .exe)";
             // 
             // browseForInstallationButton
             // 
-            this.browseForInstallationButton.Location = new System.Drawing.Point(282, 44);
+            this.browseForInstallationButton.Location = new System.Drawing.Point(329, 51);
+            this.browseForInstallationButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.browseForInstallationButton.Name = "browseForInstallationButton";
-            this.browseForInstallationButton.Size = new System.Drawing.Size(75, 23);
+            this.browseForInstallationButton.Size = new System.Drawing.Size(88, 27);
             this.browseForInstallationButton.TabIndex = 2;
             this.browseForInstallationButton.Text = "browse";
             this.browseForInstallationButton.UseVisualStyleBackColor = true;
             // 
             // installationPath
             // 
-            this.installationPath.Location = new System.Drawing.Point(9, 46);
+            this.installationPath.Location = new System.Drawing.Point(10, 53);
+            this.installationPath.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.installationPath.Name = "installationPath";
-            this.installationPath.Size = new System.Drawing.Size(267, 20);
+            this.installationPath.Size = new System.Drawing.Size(311, 23);
             this.installationPath.TabIndex = 1;
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(6, 29);
+            this.label1.Location = new System.Drawing.Point(7, 33);
+            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(89, 13);
+            this.label1.Size = new System.Drawing.Size(101, 15);
             this.label1.TabIndex = 0;
             this.label1.Text = "Installation Folder";
             // 
@@ -161,19 +169,32 @@ namespace MultiInstanceManager
             this.groupBox2.Controls.Add(this.label5);
             this.groupBox2.Controls.Add(this.label4);
             this.groupBox2.Controls.Add(this.label3);
-            this.groupBox2.Location = new System.Drawing.Point(12, 168);
+            this.groupBox2.Location = new System.Drawing.Point(14, 194);
+            this.groupBox2.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(450, 220);
+            this.groupBox2.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.groupBox2.Size = new System.Drawing.Size(525, 254);
             this.groupBox2.TabIndex = 1;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Launch Settings";
             // 
+            // grabWindowXYButton
+            // 
+            this.grabWindowXYButton.Location = new System.Drawing.Point(420, 113);
+            this.grabWindowXYButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.grabWindowXYButton.Name = "grabWindowXYButton";
+            this.grabWindowXYButton.Size = new System.Drawing.Size(88, 27);
+            this.grabWindowXYButton.TabIndex = 18;
+            this.grabWindowXYButton.Text = "Grab X/Y";
+            this.grabWindowXYButton.UseVisualStyleBackColor = true;
+            // 
             // muteWhenMinimized
             // 
             this.muteWhenMinimized.AutoSize = true;
-            this.muteWhenMinimized.Location = new System.Drawing.Point(172, 188);
+            this.muteWhenMinimized.Location = new System.Drawing.Point(201, 217);
+            this.muteWhenMinimized.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.muteWhenMinimized.Name = "muteWhenMinimized";
-            this.muteWhenMinimized.Size = new System.Drawing.Size(155, 17);
+            this.muteWhenMinimized.Size = new System.Drawing.Size(177, 19);
             this.muteWhenMinimized.TabIndex = 17;
             this.muteWhenMinimized.Text = "Mute client when minimized";
             this.muteWhenMinimized.UseVisualStyleBackColor = true;
@@ -181,9 +202,10 @@ namespace MultiInstanceManager
             // separateJsonSettings
             // 
             this.separateJsonSettings.AutoSize = true;
-            this.separateJsonSettings.Location = new System.Drawing.Point(13, 188);
+            this.separateJsonSettings.Location = new System.Drawing.Point(15, 217);
+            this.separateJsonSettings.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.separateJsonSettings.Name = "separateJsonSettings";
-            this.separateJsonSettings.Size = new System.Drawing.Size(152, 17);
+            this.separateJsonSettings.Size = new System.Drawing.Size(162, 19);
             this.separateJsonSettings.TabIndex = 16;
             this.separateJsonSettings.Text = "Use Separate settings.json";
             this.separateJsonSettings.UseVisualStyleBackColor = true;
@@ -191,9 +213,10 @@ namespace MultiInstanceManager
             // separateTaskbarItems
             // 
             this.separateTaskbarItems.AutoSize = true;
-            this.separateTaskbarItems.Location = new System.Drawing.Point(172, 164);
+            this.separateTaskbarItems.Location = new System.Drawing.Point(201, 189);
+            this.separateTaskbarItems.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.separateTaskbarItems.Name = "separateTaskbarItems";
-            this.separateTaskbarItems.Size = new System.Drawing.Size(140, 17);
+            this.separateTaskbarItems.Size = new System.Drawing.Size(144, 19);
             this.separateTaskbarItems.TabIndex = 15;
             this.separateTaskbarItems.Text = "Separate Taskbar Icons";
             this.separateTaskbarItems.UseVisualStyleBackColor = true;
@@ -201,80 +224,90 @@ namespace MultiInstanceManager
             // label12
             // 
             this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(284, 103);
+            this.label12.Location = new System.Drawing.Point(331, 119);
+            this.label12.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(17, 13);
+            this.label12.Size = new System.Drawing.Size(17, 15);
             this.label12.TabIndex = 14;
             this.label12.Text = "Y:";
             // 
             // windowYposition
             // 
-            this.windowYposition.Location = new System.Drawing.Point(307, 100);
+            this.windowYposition.Location = new System.Drawing.Point(358, 115);
+            this.windowYposition.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.windowYposition.Name = "windowYposition";
-            this.windowYposition.Size = new System.Drawing.Size(47, 20);
+            this.windowYposition.Size = new System.Drawing.Size(54, 23);
             this.windowYposition.TabIndex = 13;
             // 
             // label11
             // 
             this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(190, 103);
+            this.label11.Location = new System.Drawing.Point(222, 119);
+            this.label11.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(17, 13);
+            this.label11.Size = new System.Drawing.Size(17, 15);
             this.label11.TabIndex = 12;
             this.label11.Text = "X:";
             // 
             // windowXposition
             // 
-            this.windowXposition.Location = new System.Drawing.Point(213, 100);
+            this.windowXposition.Location = new System.Drawing.Point(248, 115);
+            this.windowXposition.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.windowXposition.Name = "windowXposition";
-            this.windowXposition.Size = new System.Drawing.Size(47, 20);
+            this.windowXposition.Size = new System.Drawing.Size(54, 23);
             this.windowXposition.TabIndex = 11;
             // 
             // gameLaunchArgs
             // 
-            this.gameLaunchArgs.Location = new System.Drawing.Point(176, 71);
+            this.gameLaunchArgs.Location = new System.Drawing.Point(205, 82);
+            this.gameLaunchArgs.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.gameLaunchArgs.Name = "gameLaunchArgs";
-            this.gameLaunchArgs.Size = new System.Drawing.Size(181, 20);
+            this.gameLaunchArgs.Size = new System.Drawing.Size(210, 23);
             this.gameLaunchArgs.TabIndex = 10;
             // 
             // postLaunchCmd
             // 
-            this.postLaunchCmd.Location = new System.Drawing.Point(176, 45);
+            this.postLaunchCmd.Location = new System.Drawing.Point(205, 52);
+            this.postLaunchCmd.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.postLaunchCmd.Name = "postLaunchCmd";
-            this.postLaunchCmd.Size = new System.Drawing.Size(181, 20);
+            this.postLaunchCmd.Size = new System.Drawing.Size(210, 23);
             this.postLaunchCmd.TabIndex = 9;
             // 
             // preLaunchCmd
             // 
-            this.preLaunchCmd.Location = new System.Drawing.Point(176, 19);
+            this.preLaunchCmd.Location = new System.Drawing.Point(205, 22);
+            this.preLaunchCmd.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.preLaunchCmd.Name = "preLaunchCmd";
-            this.preLaunchCmd.Size = new System.Drawing.Size(181, 20);
+            this.preLaunchCmd.Size = new System.Drawing.Size(210, 23);
             this.preLaunchCmd.TabIndex = 8;
             // 
             // selectedRegion
             // 
             this.selectedRegion.FormattingEnabled = true;
-            this.selectedRegion.Location = new System.Drawing.Point(219, 136);
+            this.selectedRegion.Location = new System.Drawing.Point(255, 157);
+            this.selectedRegion.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.selectedRegion.Name = "selectedRegion";
-            this.selectedRegion.Size = new System.Drawing.Size(58, 21);
+            this.selectedRegion.Size = new System.Drawing.Size(67, 23);
             this.selectedRegion.TabIndex = 7;
             this.selectedRegion.SelectedIndexChanged += new System.EventHandler(this.selectedRegion_SelectedIndexChanged);
             // 
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(169, 140);
+            this.label7.Location = new System.Drawing.Point(197, 162);
+            this.label7.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(44, 13);
+            this.label7.Size = new System.Drawing.Size(47, 15);
             this.label7.TabIndex = 6;
             this.label7.Text = "Region:";
             // 
             // modifyWindowTitles
             // 
             this.modifyWindowTitles.AutoSize = true;
-            this.modifyWindowTitles.Location = new System.Drawing.Point(13, 164);
+            this.modifyWindowTitles.Location = new System.Drawing.Point(15, 189);
+            this.modifyWindowTitles.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.modifyWindowTitles.Name = "modifyWindowTitles";
-            this.modifyWindowTitles.Size = new System.Drawing.Size(127, 17);
+            this.modifyWindowTitles.Size = new System.Drawing.Size(141, 19);
             this.modifyWindowTitles.TabIndex = 5;
             this.modifyWindowTitles.Text = "Modify Window Titles";
             this.modifyWindowTitles.UseVisualStyleBackColor = true;
@@ -282,9 +315,10 @@ namespace MultiInstanceManager
             // skipIntroVideos
             // 
             this.skipIntroVideos.AutoSize = true;
-            this.skipIntroVideos.Location = new System.Drawing.Point(13, 138);
+            this.skipIntroVideos.Location = new System.Drawing.Point(15, 159);
+            this.skipIntroVideos.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.skipIntroVideos.Name = "skipIntroVideos";
-            this.skipIntroVideos.Size = new System.Drawing.Size(106, 17);
+            this.skipIntroVideos.Size = new System.Drawing.Size(114, 19);
             this.skipIntroVideos.TabIndex = 4;
             this.skipIntroVideos.Text = "Skip Intro Videos";
             this.skipIntroVideos.UseVisualStyleBackColor = true;
@@ -293,54 +327,60 @@ namespace MultiInstanceManager
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(53, 100);
+            this.label6.Location = new System.Drawing.Point(62, 115);
+            this.label6.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(117, 13);
+            this.label6.Size = new System.Drawing.Size(131, 15);
             this.label6.TabIndex = 3;
             this.label6.Text = "Game Window Position";
             // 
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(45, 75);
+            this.label5.Location = new System.Drawing.Point(52, 87);
+            this.label5.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(125, 13);
+            this.label5.Size = new System.Drawing.Size(140, 15);
             this.label5.TabIndex = 2;
             this.label5.Text = "Game launch arguments:";
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(81, 49);
+            this.label4.Location = new System.Drawing.Point(94, 57);
+            this.label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(89, 13);
+            this.label4.Size = new System.Drawing.Size(101, 15);
             this.label4.TabIndex = 1;
             this.label4.Text = "Post-launch cmd:";
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(86, 23);
+            this.label3.Location = new System.Drawing.Point(100, 27);
+            this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(84, 13);
+            this.label3.Size = new System.Drawing.Size(95, 15);
             this.label3.TabIndex = 0;
             this.label3.Text = "Pre-launch cmd:";
             // 
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(22, 17);
+            this.label8.Location = new System.Drawing.Point(26, 20);
+            this.label8.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(72, 13);
+            this.label8.Size = new System.Drawing.Size(78, 15);
             this.label8.TabIndex = 2;
             this.label8.Text = "Select Profile:";
             // 
             // selectAccount
             // 
             this.selectAccount.FormattingEnabled = true;
-            this.selectAccount.Location = new System.Drawing.Point(112, 13);
+            this.selectAccount.Location = new System.Drawing.Point(131, 15);
+            this.selectAccount.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.selectAccount.Name = "selectAccount";
-            this.selectAccount.Size = new System.Drawing.Size(177, 21);
+            this.selectAccount.Size = new System.Drawing.Size(206, 23);
             this.selectAccount.TabIndex = 3;
             this.selectAccount.SelectedIndexChanged += new System.EventHandler(this.selectAccount_SelectedIndexChanged);
             // 
@@ -351,9 +391,11 @@ namespace MultiInstanceManager
             this.groupBox3.Controls.Add(this.label10);
             this.groupBox3.Controls.Add(this.label9);
             this.groupBox3.Controls.Add(this.enableHotkeys);
-            this.groupBox3.Location = new System.Drawing.Point(13, 394);
+            this.groupBox3.Location = new System.Drawing.Point(15, 455);
+            this.groupBox3.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(381, 93);
+            this.groupBox3.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.groupBox3.Size = new System.Drawing.Size(444, 107);
             this.groupBox3.TabIndex = 4;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Hot Key";
@@ -361,70 +403,67 @@ namespace MultiInstanceManager
             // currentHotKey
             // 
             this.currentHotKey.Enabled = false;
-            this.currentHotKey.Location = new System.Drawing.Point(248, 20);
+            this.currentHotKey.Location = new System.Drawing.Point(289, 23);
+            this.currentHotKey.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.currentHotKey.Name = "currentHotKey";
-            this.currentHotKey.Size = new System.Drawing.Size(120, 20);
+            this.currentHotKey.Size = new System.Drawing.Size(139, 23);
             this.currentHotKey.TabIndex = 5;
             // 
             // hotKeyKey
             // 
-            this.hotKeyKey.Location = new System.Drawing.Point(248, 53);
+            this.hotKeyKey.Location = new System.Drawing.Point(289, 61);
+            this.hotKeyKey.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.hotKeyKey.MaxLength = 40;
             this.hotKeyKey.Name = "hotKeyKey";
-            this.hotKeyKey.Size = new System.Drawing.Size(120, 20);
+            this.hotKeyKey.Size = new System.Drawing.Size(139, 23);
             this.hotKeyKey.TabIndex = 4;
             // 
             // label10
             // 
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(172, 56);
+            this.label10.Location = new System.Drawing.Point(201, 65);
+            this.label10.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(70, 13);
+            this.label10.Size = new System.Drawing.Size(76, 15);
             this.label10.TabIndex = 3;
             this.label10.Text = "New HotKey:";
             // 
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(160, 23);
+            this.label9.Location = new System.Drawing.Point(187, 27);
+            this.label9.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(82, 13);
+            this.label9.Size = new System.Drawing.Size(92, 15);
             this.label9.TabIndex = 1;
             this.label9.Text = "Current HotKey:";
             // 
             // enableHotkeys
             // 
             this.enableHotkeys.AutoSize = true;
-            this.enableHotkeys.Location = new System.Drawing.Point(7, 20);
+            this.enableHotkeys.Location = new System.Drawing.Point(8, 23);
+            this.enableHotkeys.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.enableHotkeys.Name = "enableHotkeys";
-            this.enableHotkeys.Size = new System.Drawing.Size(135, 17);
+            this.enableHotkeys.Size = new System.Drawing.Size(147, 19);
             this.enableHotkeys.TabIndex = 0;
             this.enableHotkeys.Text = "Enable Hotkey (Global)";
             this.enableHotkeys.UseVisualStyleBackColor = true;
             // 
             // saveConfig
             // 
-            this.saveConfig.Location = new System.Drawing.Point(319, 12);
+            this.saveConfig.Location = new System.Drawing.Point(372, 14);
+            this.saveConfig.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.saveConfig.Name = "saveConfig";
-            this.saveConfig.Size = new System.Drawing.Size(75, 23);
+            this.saveConfig.Size = new System.Drawing.Size(88, 27);
             this.saveConfig.TabIndex = 5;
             this.saveConfig.Text = "Save";
             this.saveConfig.UseVisualStyleBackColor = true;
             // 
-            // grabWindowXYButton
-            // 
-            this.grabWindowXYButton.Location = new System.Drawing.Point(360, 98);
-            this.grabWindowXYButton.Name = "grabWindowXYButton";
-            this.grabWindowXYButton.Size = new System.Drawing.Size(75, 23);
-            this.grabWindowXYButton.TabIndex = 18;
-            this.grabWindowXYButton.Text = "Grab X/Y";
-            this.grabWindowXYButton.UseVisualStyleBackColor = true;
-            // 
             // AccountConfiguration
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(504, 508);
+            this.ClientSize = new System.Drawing.Size(588, 586);
             this.Controls.Add(this.saveConfig);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.selectAccount);
@@ -432,6 +471,7 @@ namespace MultiInstanceManager
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.Name = "AccountConfiguration";
             this.Text = "Profile Configuration";
             this.groupBox1.ResumeLayout(false);
