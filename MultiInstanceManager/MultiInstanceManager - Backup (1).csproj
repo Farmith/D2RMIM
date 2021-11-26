@@ -1,0 +1,106 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <OutputType>WinExe</OutputType>
+    <LangVersion>9.0</LangVersion>
+    <Deterministic>false</Deterministic>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <UseWindowsForms>true</UseWindowsForms>
+    <UseWPF>true</UseWPF>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <OutputPath>bin\x64\Debug\</OutputPath>
+	<PlatformTarget>x64</PlatformTarget>
+    <LangVersion>9.0</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+	<PlatformTarget>x64</PlatformTarget>
+    <LangVersion>9.0</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Resources\D2R_102-6-blue.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.7.2 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="plugins\" />
+  </ItemGroup>
+  <ItemGroup>
+	<PackageReference Include="CredentialManagement" Version="1.0.2">
+		<NoWarn>NU1701</NoWarn>
+	</PackageReference>
+    <PackageReference Include="Dfust.Hotkeys" Version="1.2.6206.24906">
+		<NoWarn>NU1701</NoWarn>
+	</PackageReference>
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0">
+		<NoWarn>NU1701</NoWarn>
+	</PackageReference>
+    <PackageReference Include="MouseKeyHook" Version="5.6.0">
+		<NoWarn>NU1701</NoWarn>
+	</PackageReference>
+    <PackageReference Include="protobuf-net" Version="3.0.101" />
+    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
+    <PackageReference Include="WindowsAPICodePack-Core" Version="1.1.2">
+		<NoWarn>NU1701</NoWarn>
+	</PackageReference>
+    <PackageReference Include="WindowsAPICodePack-Shell" Version="1.1.1">
+		<NoWarn>NU1701</NoWarn>
+	</PackageReference>
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="6.0.0" />
+    <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.3.256001">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Windows.Compatibility" Version="6.0.0" />
+  </ItemGroup>
+  <PropertyGroup>
+    <StartupObject>MultiInstanceManager.Program</StartupObject>
+    <PlatformTarget>x64</PlatformTarget>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\.editorconfig" Link=".editorconfig" />
+  </ItemGroup>
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+		<GetAssemblyIdentity AssemblyFiles="$(TargetPath)">
+			<Output TaskParameter="Assemblies" ItemName="Targets" />
+		</GetAssemblyIdentity>
+		<PropertyGroup>
+			<my_version>$([System.Text.RegularExpressions.Regex]::Replace("%(Targets.Version)", "^([^\.]+)\.([^\.]+).([^\.]+)(.*)$", "$1.$2.$3"))</my_version>
+		</PropertyGroup>
+		<Exec Condition="'$(ConfigurationName)'=='Debug' AND '$(SolutionName)'=='D2RMIM'" Command="echo &quot;$(SolutionName) built $(my_version) successfully&quot;;&#xD;&#xA;copy /Y &quot;$(SolutionDir)\\README.*&quot; &quot;$(TargetDir)&quot;&#xD;&#xA;if exist $(TargetPath)D2RMIM-Release-$(my_version).zip ( Del $(TargetPath)D2RMIM-Release-$(my_version).zip )&#xD;&#xA;powershell.exe -command Compress-Archive -Path '$(TargetDir)plugins','$(TargetDir)*.dll','$(TargetDir)README.*','$(TargetDir)MultiInstanceManager.exe','$(TargetDir)MultiInstanceManager.dll.config' -DestinationPath $(TargetPath)D2RMIM-Release-$(my_version).zip" />
+		<Exec Condition="'$(ConfigurationName)'=='Release' AND '$(SolutionName)'=='D2RMIM'" Command="if exist D2RMIM-Release-@(VersionNumber).zip ( Del D2RMIM-Release-@(VersionNumber).zip )" />
+	</Target>
+</Project>

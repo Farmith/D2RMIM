@@ -1,0 +1,4 @@
+﻿[*.cs]
+
+# CS8605: Unboxing a possibly null value.
+dotnet_diagnostic.CS8605.severity = suggestion
