@@ -6,6 +6,34 @@ namespace MultiInstanceManager.Helpers
     public class ProcessHelper
     {
         [Flags]
+        public enum ProcessAccessFlags : uint
+        {
+            All = 0x001F0FFF,
+            Terminate = 0x00000001,
+            CreateThread = 0x00000002,
+            VMOperation = 0x00000008,
+            VMRead = 0x00000010,
+            VMWrite = 0x00000020,
+            DupHandle = 0x00000040,
+            SetInformation = 0x00000200,
+            QueryInformation = 0x00000400,
+            Synchronize = 0x00100000
+        }
+        [Flags]
+        public enum ThreadAccess : uint
+        {
+            TERMINATE = (0x0001),
+            SUSPEND_RESUME = (0x0002),
+            GET_CONTEXT = (0x0008),
+            SET_CONTEXT = (0x0010),
+            SET_INFORMATION = (0x0020),
+            QUERY_INFORMATION = (0x0040),
+            SET_THREAD_TOKEN = (0x0080),
+            IMPERSONATE = (0x0100),
+            DIRECT_IMPERSONATION = (0x0200)
+        }
+
+        [Flags]
         public enum SaferLevels : uint
         {
             Disallowed = 0,
@@ -192,6 +220,18 @@ namespace MultiInstanceManager.Helpers
                     string StringSid,
                     out IntPtr ptrSid
                     );
-
+        [DllImport("kernel32.dll")]
+        public static extern UIntPtr OpenProcess(ProcessAccessFlags dwDesiredAccess,
+        [MarshalAs(UnmanagedType.Bool)] bool bInheritHandle, uint dwProcessID);
+        
+        [DllImport("kernel32.dll")]
+        public static extern UIntPtr OpenThread(ThreadAccess dwDesiredAccess, bool bInheritHandle, uint dwThreadId);
+        
+        [DllImport("kernel32.dll")]
+        public static extern uint SuspendThread(UIntPtr hThread);
+        [DllImport("kernel32.dll")]
+        public static extern uint ResumeThread(UIntPtr hThread);
+        [DllImport("kernel32", CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern bool CloseHandle(UIntPtr handle);
     }
 }

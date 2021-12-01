@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MultiInstanceManager.Helpers;
 using MultiInstanceManager.Interfaces;
+using MultiInstanceManager.Structs;
 
 namespace MultiInstanceManager.Modules
 {
@@ -28,8 +29,36 @@ namespace MultiInstanceManager.Modules
                     keepGoing = false;
                 }
                 Log.Debug("So far we have: " + Plugins?.Count + " plugins");
+
+                if (Plugins?.Count > 0)
+                {
+                    foreach (IPlugin plugin in Plugins)
+                    {
+                        Log.Debug("Name: " + plugin.Name);
+                    }
+                }
                 Thread.Sleep(10000); // Just since we aren't actually doing anything here, yet
             }
+        }
+        /*
+         * PluginHandledLaunch Returns null if no plugin handled the launch
+         * 
+         */
+        public GameInstance? PluginHandledLaunch(string accountName, string cmdArgs, string installPath, string gameExe)
+        {
+            GameInstance? thisInstance = null;
+            if (Plugins != null)
+            {
+                foreach (IPlugin plugin in Plugins)
+                {
+                    if (plugin.LaunchOverride == true)
+                    {
+                        thisInstance = plugin.LaunchGame(accountName, cmdArgs, installPath, gameExe);
+                        break;  // We only allow ONE plugin at a time to override the launch sequence.
+                    }
+                }
+            }
+            return thisInstance;
         }
         public void LoadPlugins()
         {
@@ -39,6 +68,7 @@ namespace MultiInstanceManager.Modules
 
             if (Directory.Exists(Constants.PluginFolderName))
             {
+                /*
                 if (Directory.Exists(Constants.PluginFolderName + "\\" + Constants.PluginLibReferenceFolder))
                 {
                     Log.Debug("Loading all referenced libraries first");
@@ -53,6 +83,7 @@ namespace MultiInstanceManager.Modules
                     }
                     Log.Debug("Done loading references");
                 }
+                */
                 Log.Debug("PluginManager: Directory is fine, references should be loaded, loading plugins");
                 String[] plugins = Directory.GetFiles(Constants.PluginFolderName);
                 foreach (string plugin in plugins)
@@ -82,7 +113,9 @@ namespace MultiInstanceManager.Modules
                 Log.Debug("Loading all plugins main-loop");
                 foreach (IPlugin plugin in Plugins)
                 {
+                    Log.Debug("Starting mainloop of: " + plugin.Name);
                     plugin.StartMainLoop();
+                    Log.Debug("Started..");
                 }
             } catch (ReflectionTypeLoadException ex)
             {

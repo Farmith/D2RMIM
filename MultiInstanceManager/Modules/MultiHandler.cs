@@ -33,7 +33,8 @@ namespace MultiInstanceManager.Modules
         public static List<ActiveWindow>? activeWindows;
         private CancellationTokenSource? processMonitorCTS;
         private Task? processMonitorTask;
-        public MultiHandler(Form _parent, CheckedListBox _accountList)
+        private PluginManager pluginManager;
+        public MultiHandler(Form _parent, CheckedListBox _accountList, PluginManager pM)
         {
             parent = _parent;
             accountList = _accountList;
@@ -44,6 +45,7 @@ namespace MultiInstanceManager.Modules
             saveCredentials = false;
             profileStore = new List<Profile>();
             activeWindows = new List<ActiveWindow>();
+            pluginManager = pM;
         }
         public ActiveWindow? GetActiveWindow(string displayname)
         {
@@ -336,8 +338,27 @@ namespace MultiInstanceManager.Modules
             {
                 gameExe = profile.GameExecutable;
             }
+            gameExe = gameExe != null ? gameExe + Constants.executableFileExt : gameExecutableName;
+            installPath = installPath ?? Registry.GetValue(Constants.gameInstallRegKey[0], Constants.gameInstallRegKey[1], "") as string;
+
+            if (installPath == null)
+            { 
+                Prompt.ShowDialog("Can not find install path for D2R", "ERROR");
+                return;
+            }
             Log.Debug("Launching game with: " + installPath + gameExe + Constants.executableFileExt);
-            var process = LaunchGame(accountName, cmdArgs, installPath, gameExe);
+            GameInstance? pluginStartedClient = pluginManager.PluginHandledLaunch(accountName, cmdArgs, installPath, gameExe);
+            Process process;
+            if(pluginStartedClient == null || pluginStartedClient.process == null)
+            {
+                Log.Debug("No plugin claimed ownership of launch");
+                process = LaunchGame(accountName, cmdArgs, installPath, gameExe);
+            } else
+            {
+                Log.Debug("Launch was overridden by plugin");
+                instances.Add((GameInstance)pluginStartedClient);
+                process = pluginStartedClient.process;
+            }
             Log.Debug("Process should be: " + process.Id);
 
             // Start the handle killer early
@@ -416,10 +437,8 @@ namespace MultiInstanceManager.Modules
             }
             Log.Debug("All done, exiting this thread");
         }
-        private Process LaunchGame(string profile, string cmdArgs = "", string ? _installPath = null, string? _exeName = null)
+        private Process LaunchGame(string profile, string cmdArgs, string _installPath, string _exeName)
         {
-            _exeName = _exeName != null ? _exeName + Constants.executableFileExt : gameExecutableName;
-            _installPath = _installPath ?? Registry.GetValue(Constants.gameInstallRegKey[0], Constants.gameInstallRegKey[1], "") as string;
             var forcedArgs = " -uid osi -launcher";
             var process = ProcessManager.DeElevatedProcess(_installPath + "\\" + _exeName + " " + cmdArgs + forcedArgs);
 
@@ -589,10 +608,11 @@ namespace MultiInstanceManager.Modules
             long startTime = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
             long elapsedTime = 0;
             var maxWaitTime = 60000; // 60s.
+            Log.Debug("Waiting for Token to update (" + elapsedTime + "/" + maxWaitTime + ")");
 
             while (StructuralComparisons.StructuralEqualityComparer.Equals(CurrentKey, PrevKey) && (elapsedTime < maxWaitTime))
             {
-                Log.Debug("Waiting for Token to update (" + elapsedTime + "/" + maxWaitTime + ")");
+                // Log.Debug("Waiting for Token to update (" + elapsedTime + "/" + maxWaitTime + ")");
                 if (!ProcessManager.IsProcessRunning(process))
                 {
                     Log.Debug("Client exited, aborting..");

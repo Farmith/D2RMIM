@@ -77,7 +77,7 @@ namespace MultiInstanceManager
             accountConfig.Disposed += new EventHandler(accountConfig_Disposed);
 
             forceExitToolTip.SetToolTip(forceExit, "ForceExit means, kill the game client once the tokens are set when 'refreshing'");
-            MH = new MultiHandler(this, accountList);
+            MH = new MultiHandler(this, accountList,pluginManager);
             MH.SetCredentialMode(saveAccounInfo.Checked);
             // Start the Monitors early:
             MH.StartProcessMonitor();

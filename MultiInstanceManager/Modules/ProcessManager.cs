@@ -48,20 +48,6 @@ namespace MultiInstanceManager.Modules
             public int dwThreadId;
         }
         [Flags]
-        private enum ProcessAccessFlags : uint
-        {
-            All = 0x001F0FFF,
-            Terminate = 0x00000001,
-            CreateThread = 0x00000002,
-            VMOperation = 0x00000008,
-            VMRead = 0x00000010,
-            VMWrite = 0x00000020,
-            DupHandle = 0x00000040,
-            SetInformation = 0x00000200,
-            QueryInformation = 0x00000400,
-            Synchronize = 0x00100000
-        }
-        [Flags]
         private enum NTSTATUS : uint
         {
             STATUS_SUCCESS = 0x00000000,
@@ -123,9 +109,6 @@ namespace MultiInstanceManager.Modules
         }
         #endregion
         #region Native (Extern) Methods
-        [DllImport("kernel32.dll")]
-        private static extern UIntPtr OpenProcess(ProcessAccessFlags dwDesiredAccess,
-            [MarshalAs(UnmanagedType.Bool)] bool bInheritHandle, uint dwProcessID);
 
         [DllImport("ntdll.dll")]
         private static extern NTSTATUS NtQueryObject(UIntPtr ObjectHandle, OBJECT_INFORMATION_CLASS ObjectInformationClass,
@@ -170,7 +153,7 @@ namespace MultiInstanceManager.Modules
         }
         private static bool CloseHandleEx(uint processID, IntPtr handleToClose)
         {
-            UIntPtr hProcess = OpenProcess(ProcessAccessFlags.All, false, processID);
+            UIntPtr hProcess = ProcessHelper.OpenProcess(ProcessHelper.ProcessAccessFlags.All, false, processID);
 
             UIntPtr x;
             bool success = DuplicateHandle(hProcess, handleToClose, IntPtr.Zero,
@@ -257,7 +240,7 @@ namespace MultiInstanceManager.Modules
 
             Marshal.FreeHGlobal(pSysHandles);
 
-            UIntPtr hProcess = OpenProcess(ProcessAccessFlags.DupHandle, false, (uint)process.Id);
+            UIntPtr hProcess = ProcessHelper.OpenProcess(ProcessHelper.ProcessAccessFlags.DupHandle, false, (uint)process.Id);
             foreach (SYSTEM_HANDLE_INFORMATION handleInfo in processHandles)
             {
                 string name = GetHandleName(handleInfo, hProcess);
@@ -465,7 +448,7 @@ namespace MultiInstanceManager.Modules
             uint shellProcessId;
             WindowHelper.GetWindowThreadProcessId(shellWnd, out shellProcessId);
 
-            var hShellProcess = OpenProcess(ProcessAccessFlags.QueryInformation, false, shellProcessId);
+            var hShellProcess = ProcessHelper.OpenProcess(ProcessHelper.ProcessAccessFlags.QueryInformation, false, shellProcessId);
 
             var hShellToken = UIntPtr.Zero;
             if (!ProcessHelper.OpenProcessToken(hShellProcess, 2 /* TOKEN_DUPLICATE */, out hShellToken))
