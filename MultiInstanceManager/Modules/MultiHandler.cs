@@ -127,7 +127,7 @@ namespace MultiInstanceManager.Modules
             }
             return activeWindow;
         }
-        public bool Setup(string displayName = "", Boolean killProcessesWhenDone = true)
+        public bool Setup(string displayName = "", Boolean killProcessesWhenDone = true, Boolean FreshSetup = false)
         {
             Log.Clear();
             // Zero out everything
@@ -161,7 +161,25 @@ namespace MultiInstanceManager.Modules
                 Debug.WriteLine("Fixing credentials");
                 bNetCredentials = CredentialHelper.GetVaultCredentials(displayName);
                 if (bNetCredentials != null)
-                    Debug.WriteLine("User: " + bNetCredentials.User);
+                {
+                    if(FreshSetup)
+                    {
+                        var answer = Prompt.ConfirmDialog("This profilename already has saved credentials.\nDo you wish to re-use the old credentials (Yes) ?", "Credentials already found", 15);
+                        if(answer == false)
+                        {
+                            CredentialHelper.RemoveVaultCredentials(displayName);
+                            bNetCredentials = CredentialHelper.GetVaultCredentials(displayName);
+                            if(bNetCredentials != null)
+                                Debug.WriteLine("User: " + bNetCredentials.User);
+                            else
+                            {
+                                // The user failed with username or password
+                                WindowHelper.ShowMessage("Either username or password was empty, aborting setup.");
+                                return false;
+                            }
+                        }
+                    }
+                }
                 else
                 {
                     // The user failed with username or password

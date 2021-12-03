@@ -248,7 +248,7 @@ namespace MultiInstanceManager
         private async void addAccountButton_Click(object? sender, EventArgs e)
         {
             DisableButtons();
-            var task = Task.Factory.StartNew(() => MH.Setup());
+            var task = Task.Factory.StartNew(() => MH.Setup("",forceExit.Checked,true));
             var result = await task;
             EnableButtons();
             MH.LoadProfiles();
@@ -346,7 +346,11 @@ namespace MultiInstanceManager
                         if (checkedItem == null)
                             continue;
                         DisableButtons();
-                        var task = Task.Factory.StartNew(() => MH.Setup(checkedItem[0].Trim(' '), true));
+                        var killAfter = true;
+                        if (x == accountList.CheckedItems.Count)
+                            killAfter = forceExit.Checked;
+                           
+                        var task = Task.Factory.StartNew(() => MH.Setup(checkedItem[0].Trim(' '), killAfter));
                         var result = await task;
                         EnableButtons();
                     }
