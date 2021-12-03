@@ -76,6 +76,10 @@ namespace MultiInstanceManager
             // launchButton
             // 
             this.launchButton.BackColor = System.Drawing.Color.Green;
+            this.launchButton.Cursor = System.Windows.Forms.Cursors.AppStarting;
+            this.launchButton.FlatAppearance.BorderColor = System.Drawing.Color.GreenYellow;
+            this.launchButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.launchButton.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.launchButton.ForeColor = System.Drawing.Color.WhiteSmoke;
             this.launchButton.Location = new System.Drawing.Point(298, 190);
             this.launchButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
@@ -87,17 +91,25 @@ namespace MultiInstanceManager
             // 
             // refreshButton
             // 
+            this.refreshButton.BackColor = System.Drawing.Color.Gray;
+            this.refreshButton.FlatAppearance.BorderColor = System.Drawing.Color.DimGray;
+            this.refreshButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.refreshButton.ForeColor = System.Drawing.Color.WhiteSmoke;
             this.refreshButton.Location = new System.Drawing.Point(298, 224);
             this.refreshButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.refreshButton.Name = "refreshButton";
             this.refreshButton.Size = new System.Drawing.Size(133, 27);
             this.refreshButton.TabIndex = 3;
             this.refreshButton.Text = "Refresh";
-            this.refreshButton.UseVisualStyleBackColor = true;
+            this.refreshButton.UseVisualStyleBackColor = false;
             // 
             // removeButton
             // 
             this.removeButton.BackColor = System.Drawing.Color.Crimson;
+            this.removeButton.Cursor = System.Windows.Forms.Cursors.No;
+            this.removeButton.FlatAppearance.BorderColor = System.Drawing.Color.Red;
+            this.removeButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.removeButton.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.removeButton.ForeColor = System.Drawing.Color.WhiteSmoke;
             this.removeButton.Location = new System.Drawing.Point(298, 275);
             this.removeButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
@@ -170,23 +182,32 @@ namespace MultiInstanceManager
             // 
             // addAccountButton
             // 
+            this.addAccountButton.BackColor = System.Drawing.Color.Gray;
+            this.addAccountButton.Cursor = System.Windows.Forms.Cursors.Cross;
+            this.addAccountButton.FlatAppearance.BorderColor = System.Drawing.Color.DimGray;
+            this.addAccountButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.addAccountButton.ForeColor = System.Drawing.Color.Transparent;
             this.addAccountButton.Location = new System.Drawing.Point(298, 123);
             this.addAccountButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.addAccountButton.Name = "addAccountButton";
             this.addAccountButton.Size = new System.Drawing.Size(133, 27);
             this.addAccountButton.TabIndex = 10;
             this.addAccountButton.Text = "Add Profile";
-            this.addAccountButton.UseVisualStyleBackColor = true;
+            this.addAccountButton.UseVisualStyleBackColor = false;
             // 
             // dumpRegKeyButton
             // 
+            this.dumpRegKeyButton.BackColor = System.Drawing.Color.Gray;
+            this.dumpRegKeyButton.FlatAppearance.BorderColor = System.Drawing.Color.DimGray;
+            this.dumpRegKeyButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.dumpRegKeyButton.ForeColor = System.Drawing.Color.WhiteSmoke;
             this.dumpRegKeyButton.Location = new System.Drawing.Point(299, 320);
             this.dumpRegKeyButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.dumpRegKeyButton.Name = "dumpRegKeyButton";
             this.dumpRegKeyButton.Size = new System.Drawing.Size(132, 27);
             this.dumpRegKeyButton.TabIndex = 14;
             this.dumpRegKeyButton.Text = "Dump RegKey";
-            this.dumpRegKeyButton.UseVisualStyleBackColor = true;
+            this.dumpRegKeyButton.UseVisualStyleBackColor = false;
             // 
             // forceExit
             // 
@@ -216,13 +237,18 @@ namespace MultiInstanceManager
             // 
             // configureAccountsButton
             // 
+            this.configureAccountsButton.BackColor = System.Drawing.Color.Gray;
+            this.configureAccountsButton.Cursor = System.Windows.Forms.Cursors.Help;
+            this.configureAccountsButton.FlatAppearance.BorderColor = System.Drawing.Color.DimGray;
+            this.configureAccountsButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.configureAccountsButton.ForeColor = System.Drawing.Color.WhiteSmoke;
             this.configureAccountsButton.Location = new System.Drawing.Point(299, 157);
             this.configureAccountsButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.configureAccountsButton.Name = "configureAccountsButton";
             this.configureAccountsButton.Size = new System.Drawing.Size(132, 27);
             this.configureAccountsButton.TabIndex = 19;
             this.configureAccountsButton.Text = "Configure";
-            this.configureAccountsButton.UseVisualStyleBackColor = true;
+            this.configureAccountsButton.UseVisualStyleBackColor = false;
             // 
             // appVersion
             // 

@@ -63,6 +63,17 @@ namespace MultiInstanceManager.Helpers
 
             return new Point(0, 0);
         }
+        private static double CompareColors(Color one, Color two)
+        {
+            var argbA = one.ToArgb();
+            var argbB = two.ToArgb();
+
+            var GrayA = .11 * one.B + .59 * one.G + .30 * one.R;
+            var GrayB = .11 * two.B + .59 * two.G + .30 * two.R;
+
+            var difference = (GrayA - GrayB) * 100.0 / 255.0;
+            return difference;
+        }
         public static Point FindLoginButton(int xline, int yline)
         {
             var rect = GetForegroundWindowRect();
@@ -76,7 +87,10 @@ namespace MultiInstanceManager.Helpers
             for (var i = 0; i < lineMax; i++)
             {
                 var color = bitmap.GetPixel(lineA, i);
-                if (color == findColor)
+                var diff = CompareColors(color, findColor);
+                Log.Debug("Color Difference: " + diff);
+                if(diff == 0 || (diff < 0 && diff > -2) || (diff > 0 && diff < 2))
+                // if (color == findColor)
                 {
                     return new Point(rect.Left + lineA, rect.Top + i);
                 }

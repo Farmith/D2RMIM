@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using static Dfust.Hotkeys.Enums;
 using System.Threading;
+using System.Drawing;
 
 namespace MultiInstanceManager
 {
@@ -20,6 +21,13 @@ namespace MultiInstanceManager
         Settings settings;
         AccountConfiguration? accountConfig;
         PluginManager pluginManager;
+
+        private Cursor deleteCursor = CustomCursor.FromByteArray(Properties.Resources.TrashcanCursor);
+        private Cursor addCursor = CustomCursor.FromByteArray(Properties.Resources.AddCursor);
+        private Cursor configureCursor = CustomCursor.FromByteArray(Properties.Resources.ConfigureCursor);
+        private Cursor playCursor = CustomCursor.FromByteArray(Properties.Resources.PlayCursor);
+        private Cursor refreshCursor = CustomCursor.FromByteArray(Properties.Resources.RefreshCursor);
+        private Cursor saveCursor = CustomCursor.FromByteArray(Properties.Resources.SaveCursor);
 
         public MultiInstanceManager()
         {
@@ -45,11 +53,16 @@ namespace MultiInstanceManager
             var pluginHandlerTask = Task.Factory.StartNew(() => pluginManager.MessageHandler(pluginHandlerCT), pluginHandlerCTS.Token);
 
             addAccountButton.Click += new EventHandler(addAccountButton_Click);
+            addAccountButton.Cursor = addCursor;
             launchButton.Click += new EventHandler(launchButton_Click);
+            launchButton.Cursor = playCursor;
             removeButton.Click += new EventHandler(removeButton_Click);
+            removeButton.Cursor = deleteCursor;
             refreshButton.Click += new EventHandler(refreshButton_Click);
+            refreshButton.Cursor = refreshCursor;
             readmeLink.Click += new EventHandler(readmeLink_Click);
             dumpRegKeyButton.Click += new EventHandler(dumpRegKeyButton_Click);
+            dumpRegKeyButton.Cursor = saveCursor;
             forceExit.CheckedChanged += new EventHandler(forceExit_Changed);
             toggleAllProfiles.CheckedChanged += new EventHandler(toggleAllProfiles_Changed);
             forceExit.Checked = ConfigurationManager.AppSettings.Get("forceExitClients")?.ToString() == "true" ? true : false;
@@ -74,6 +87,7 @@ namespace MultiInstanceManager
              * 
              */
             configureAccountsButton.Click += new EventHandler(configureAccountsButton_Click);
+            configureAccountsButton.Cursor = configureCursor;
             accountConfig = new AccountConfiguration();
             accountConfig.Disposed += new EventHandler(accountConfig_Disposed);
 
