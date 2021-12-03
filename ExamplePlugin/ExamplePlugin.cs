@@ -16,7 +16,6 @@ namespace ExamplePlugin
         private CancellationToken ct;
         private CancellationTokenSource cts;
         private Task mainLoop;
-
         public void StartMainLoop()
         {
             cts = new CancellationTokenSource();
@@ -27,9 +26,9 @@ namespace ExamplePlugin
         {
             cts.Cancel();
         }
-        public void MainLoop(CancellationToken ct)
+        public void MainLoop(CancellationToken? ct)
         {
-            ct.ThrowIfCancellationRequested();
+            ct?.ThrowIfCancellationRequested();
             var keepGoing = true;
             // Things outside of any infinite loop, can just be executed as-is
             foreach (IPlugin plugin in PluginManager.Plugins)
@@ -43,7 +42,7 @@ namespace ExamplePlugin
              */
             while (keepGoing)
             {
-                if (ct.IsCancellationRequested)
+                if (ct?.IsCancellationRequested == true)
                 {
                     keepGoing = false;
                 }

@@ -49,7 +49,7 @@ namespace MultiInstanceManager.Modules
             GameInstance? thisInstance = null;
             if (Plugins != null)
             {
-                foreach (IPlugin plugin in Plugins)
+                foreach (IPluginWithLauncher plugin in Plugins)
                 {
                     if (plugin.LaunchOverride == true)
                     {

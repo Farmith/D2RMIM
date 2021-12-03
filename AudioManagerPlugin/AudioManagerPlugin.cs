@@ -44,9 +44,9 @@ namespace AudioManagerPlugin
             volumeList.Add(window, currentAudio);
             return currentAudio;
         }
-        public void MainLoop(CancellationToken ct)
+        public void MainLoop(CancellationToken? ct)
         {
-            ct.ThrowIfCancellationRequested();
+            ct?.ThrowIfCancellationRequested();
             var keepGoing = true;
             // Things outside of any infinite loop, can just be executed as-is
             foreach (IPlugin plugin in PluginManager.Plugins)
@@ -60,7 +60,7 @@ namespace AudioManagerPlugin
              */
             while (keepGoing)
             {
-                if (ct.IsCancellationRequested)
+                if (ct?.IsCancellationRequested == true)
                 {
                     keepGoing = false;
                 }

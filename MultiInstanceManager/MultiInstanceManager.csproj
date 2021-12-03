@@ -62,6 +62,7 @@
 		<PackageReference Include="Dfust.Hotkeys" Version="1.2.6206.24906">
 			<NoWarn>NU1701</NoWarn>
 		</PackageReference>
+		<PackageReference Include="DotLiquid" Version="2.2.585" />
 		<PackageReference Include="Microsoft.CSharp" Version="4.7.0">
 			<NoWarn>NU1701</NoWarn>
 		</PackageReference>
@@ -124,7 +125,21 @@
 		<PropertyGroup>
 			<my_version>$([System.Text.RegularExpressions.Regex]::Replace("%(Targets.Version)", "^([^\.]+)\.([^\.]+).([^\.]+)(.*)$", "$1.$2.$3"))</my_version>
 		</PropertyGroup>
-		<Exec Condition="'$(ConfigurationName)'=='Debug' AND '$(SolutionName)'=='D2RMIM'" Command="echo &quot;$(SolutionName) built $(my_version) successfully&quot;;&#xD;&#xA;copy /Y &quot;$(SolutionDir)\\README.*&quot; &quot;$(TargetDir)&quot;&#xD;&#xA;echo &quot;Moving all dlls to lib folder&quot;&#xD;&#xA;move /Y $(TargetDir)*.dll $(TargetDir)\lib\&#xD;&#xA;echo &quot;Moving back required files&quot;&#xD;&#xA;move /Y $(TargetDir)\lib\MultiInstanceManager* $(TargetDir)\&#xD;&#xA;if exist $(TargetDir)D2RMIM-Release-$(my_version).zip ( Del $(TargetDir)D2RMIM-Release-$(my_version).zip )&#xD;&#xA;powershell.exe -command Compress-Archive -Path '$(TargetDir)plugins','$(TargetDir)lib','$(TargetDir)README.*','$(TargetDir)MultiInstanceManager.exe','$(TargetDir)MultiInstanceManager.dll.config' -DestinationPath $(TargetDir)D2RMIM-Release-$(my_version).zip" />
+		<Exec Condition="'$(ConfigurationName)'=='Debug' AND '$(SolutionName)'=='D2RMIM'" Command="echo &quot;$(SolutionName) built $(my_version) successfully&quot;" />
+		<Exec Condition="'$(ConfigurationName)'=='Debug' AND '$(SolutionName)'=='D2RMIM'" Command="rmdir -Force /Y '$(TargetDir)plugins'"  />
+		<Exec Condition="'$(ConfigurationName)'=='Debug' AND '$(SolutionName)'=='D2RMIM'" Command="md -Force '$(TargetDir)plugins\ref'" />
+		<Exec Condition="'$(ConfigurationName)'=='Debug' AND '$(SolutionName)'=='D2RMIM'" Command="md -Force '$(TargetDir)lib\'" />
+		<Exec Condition="'$(ConfigurationName)'=='Debug' AND '$(SolutionName)'=='D2RMIM'" Command="copy /Y &quot;$(SolutionDir)\README.*&quot; &quot;$(TargetDir)&quot;" />
+		<Exec Condition="'$(ConfigurationName)'=='Debug' AND '$(SolutionName)'=='D2RMIM'" Command="echo &quot;Moving all dlls to lib folder" />
+		<Exec Condition="'$(ConfigurationName)'=='Debug' AND '$(SolutionName)'=='D2RMIM'" Command="move /Y $(TargetDir)*.dll $(TargetDir)lib\" />
+		<Exec Condition="'$(ConfigurationName)'=='Debug' AND '$(SolutionName)'=='D2RMIM'" Command="echo &quot;Moving back required files&quot;" />
+		<Exec Condition="'$(ConfigurationName)'=='Debug' AND '$(SolutionName)'=='D2RMIM'" Command="move /Y $(TargetDir)lib\MultiInstanceManager* $(TargetDir)" />
+		<Exec Condition="'$(ConfigurationName)'=='Debug' AND '$(SolutionName)'=='D2RMIM'" Command="if exist $(TargetDir)D2RMIM-Release-$(my_version).zip ( Del $(TargetDir)D2RMIM-Release-$(my_version).zip )" />
+		<Exec Condition="'$(ConfigurationName)'=='Debug' AND '$(SolutionName)'=='D2RMIM'" Command="powershell.exe -command Compress-Archive -Path '$(TargetDir)plugins','$(TargetDir)lib','$(TargetDir)README.*','$(TargetDir)MultiInstanceManager.exe','$(TargetDir)MultiInstanceManager.dll.config' -DestinationPath $(TargetDir)D2RMIM-Release-$(my_version).zip" />
 		<Exec Condition="'$(ConfigurationName)'=='Release' AND '$(SolutionName)'=='D2RMIM'" Command="if exist D2RMIM-Release-@(VersionNumber).zip ( Del D2RMIM-Release-@(VersionNumber).zip )" />
+	</Target>
+	<Target Name="RemoveDirectories">
+		<RemoveDir
+            Directories="$(OutputDirectory);$(DebugDirectory)" />
 	</Target>
 </Project>
