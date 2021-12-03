@@ -53,71 +53,83 @@ namespace MultiInstanceManager
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(13, 90);
+            this.label1.Location = new System.Drawing.Point(15, 104);
+            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(44, 13);
+            this.label1.Size = new System.Drawing.Size(49, 15);
             this.label1.TabIndex = 0;
             this.label1.Text = "Profiles:";
             // 
             // accountList
             // 
             this.accountList.FormattingEnabled = true;
-            this.accountList.Location = new System.Drawing.Point(16, 107);
+            this.accountList.Location = new System.Drawing.Point(19, 123);
+            this.accountList.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.accountList.Name = "accountList";
-            this.accountList.Size = new System.Drawing.Size(233, 199);
+            this.accountList.Size = new System.Drawing.Size(271, 220);
             this.accountList.TabIndex = 1;
             // 
             // launchButton
             // 
-            this.launchButton.Location = new System.Drawing.Point(255, 165);
+            this.launchButton.BackColor = System.Drawing.Color.Green;
+            this.launchButton.ForeColor = System.Drawing.Color.WhiteSmoke;
+            this.launchButton.Location = new System.Drawing.Point(298, 190);
+            this.launchButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.launchButton.Name = "launchButton";
-            this.launchButton.Size = new System.Drawing.Size(114, 23);
+            this.launchButton.Size = new System.Drawing.Size(133, 27);
             this.launchButton.TabIndex = 2;
             this.launchButton.Text = "Launch";
-            this.launchButton.UseVisualStyleBackColor = true;
+            this.launchButton.UseVisualStyleBackColor = false;
             // 
             // refreshButton
             // 
-            this.refreshButton.Location = new System.Drawing.Point(255, 194);
+            this.refreshButton.Location = new System.Drawing.Point(298, 224);
+            this.refreshButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.refreshButton.Name = "refreshButton";
-            this.refreshButton.Size = new System.Drawing.Size(114, 23);
+            this.refreshButton.Size = new System.Drawing.Size(133, 27);
             this.refreshButton.TabIndex = 3;
             this.refreshButton.Text = "Refresh";
             this.refreshButton.UseVisualStyleBackColor = true;
             // 
             // removeButton
             // 
-            this.removeButton.Location = new System.Drawing.Point(255, 238);
+            this.removeButton.BackColor = System.Drawing.Color.Crimson;
+            this.removeButton.ForeColor = System.Drawing.Color.WhiteSmoke;
+            this.removeButton.Location = new System.Drawing.Point(298, 275);
+            this.removeButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.removeButton.Name = "removeButton";
-            this.removeButton.Size = new System.Drawing.Size(114, 23);
+            this.removeButton.Size = new System.Drawing.Size(133, 27);
             this.removeButton.TabIndex = 4;
             this.removeButton.Text = "Remove";
-            this.removeButton.UseVisualStyleBackColor = true;
+            this.removeButton.UseVisualStyleBackColor = false;
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(16, 13);
+            this.label2.Location = new System.Drawing.Point(19, 15);
+            this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(305, 13);
+            this.label2.Size = new System.Drawing.Size(334, 15);
             this.label2.TabIndex = 5;
             this.label2.Text = "This application has the ability to launch several D2R instances";
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(16, 37);
+            this.label3.Location = new System.Drawing.Point(19, 43);
+            this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(113, 13);
+            this.label3.Size = new System.Drawing.Size(121, 15);
             this.label3.TabIndex = 6;
             this.label3.Text = "Note: Please read the ";
             // 
             // readmeLink
             // 
             this.readmeLink.AutoSize = true;
-            this.readmeLink.Location = new System.Drawing.Point(124, 37);
+            this.readmeLink.Location = new System.Drawing.Point(145, 43);
+            this.readmeLink.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.readmeLink.Name = "readmeLink";
-            this.readmeLink.Size = new System.Drawing.Size(53, 13);
+            this.readmeLink.Size = new System.Drawing.Size(53, 15);
             this.readmeLink.TabIndex = 7;
             this.readmeLink.TabStop = true;
             this.readmeLink.Text = "README";
@@ -125,35 +137,39 @@ namespace MultiInstanceManager
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(175, 37);
+            this.label4.Location = new System.Drawing.Point(204, 43);
+            this.label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(148, 13);
+            this.label4.Size = new System.Drawing.Size(166, 15);
             this.label4.TabIndex = 8;
             this.label4.Text = "it explains how to use this app";
             // 
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(242, 367);
+            this.label5.Location = new System.Drawing.Point(282, 423);
+            this.label5.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(131, 13);
+            this.label5.Size = new System.Drawing.Size(146, 15);
             this.label5.TabIndex = 9;
             this.label5.Text = "Created by: Farmith - 2021";
             // 
             // addAccountButton
             // 
-            this.addAccountButton.Location = new System.Drawing.Point(255, 107);
+            this.addAccountButton.Location = new System.Drawing.Point(298, 123);
+            this.addAccountButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.addAccountButton.Name = "addAccountButton";
-            this.addAccountButton.Size = new System.Drawing.Size(114, 23);
+            this.addAccountButton.Size = new System.Drawing.Size(133, 27);
             this.addAccountButton.TabIndex = 10;
             this.addAccountButton.Text = "Add Profile";
             this.addAccountButton.UseVisualStyleBackColor = true;
             // 
             // dumpRegKeyButton
             // 
-            this.dumpRegKeyButton.Location = new System.Drawing.Point(256, 277);
+            this.dumpRegKeyButton.Location = new System.Drawing.Point(299, 320);
+            this.dumpRegKeyButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.dumpRegKeyButton.Name = "dumpRegKeyButton";
-            this.dumpRegKeyButton.Size = new System.Drawing.Size(113, 23);
+            this.dumpRegKeyButton.Size = new System.Drawing.Size(132, 27);
             this.dumpRegKeyButton.TabIndex = 14;
             this.dumpRegKeyButton.Text = "Dump RegKey";
             this.dumpRegKeyButton.UseVisualStyleBackColor = true;
@@ -161,9 +177,10 @@ namespace MultiInstanceManager
             // forceExit
             // 
             this.forceExit.AutoSize = true;
-            this.forceExit.Location = new System.Drawing.Point(16, 312);
+            this.forceExit.Location = new System.Drawing.Point(19, 360);
+            this.forceExit.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.forceExit.Name = "forceExit";
-            this.forceExit.Size = new System.Drawing.Size(73, 17);
+            this.forceExit.Size = new System.Drawing.Size(77, 19);
             this.forceExit.TabIndex = 16;
             this.forceExit.Text = "Force Exit";
             this.forceExit.UseVisualStyleBackColor = true;
@@ -171,18 +188,20 @@ namespace MultiInstanceManager
             // saveAccounInfo
             // 
             this.saveAccounInfo.AutoSize = true;
-            this.saveAccounInfo.Location = new System.Drawing.Point(16, 335);
+            this.saveAccounInfo.Location = new System.Drawing.Point(19, 387);
+            this.saveAccounInfo.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.saveAccounInfo.Name = "saveAccounInfo";
-            this.saveAccounInfo.Size = new System.Drawing.Size(111, 17);
+            this.saveAccounInfo.Size = new System.Drawing.Size(119, 19);
             this.saveAccounInfo.TabIndex = 18;
             this.saveAccounInfo.Text = "Save Accountinfo";
             this.saveAccounInfo.UseVisualStyleBackColor = true;
             // 
             // configureAccountsButton
             // 
-            this.configureAccountsButton.Location = new System.Drawing.Point(256, 136);
+            this.configureAccountsButton.Location = new System.Drawing.Point(299, 157);
+            this.configureAccountsButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.configureAccountsButton.Name = "configureAccountsButton";
-            this.configureAccountsButton.Size = new System.Drawing.Size(113, 23);
+            this.configureAccountsButton.Size = new System.Drawing.Size(132, 27);
             this.configureAccountsButton.TabIndex = 19;
             this.configureAccountsButton.Text = "Configure";
             this.configureAccountsButton.UseVisualStyleBackColor = true;
@@ -190,17 +209,18 @@ namespace MultiInstanceManager
             // appVersion
             // 
             this.appVersion.AutoSize = true;
-            this.appVersion.Location = new System.Drawing.Point(13, 367);
+            this.appVersion.Location = new System.Drawing.Point(15, 423);
+            this.appVersion.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.appVersion.Name = "appVersion";
-            this.appVersion.Size = new System.Drawing.Size(48, 13);
+            this.appVersion.Size = new System.Drawing.Size(51, 15);
             this.appVersion.TabIndex = 20;
             this.appVersion.Text = "Version: ";
             // 
             // MultiInstanceManager
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(392, 392);
+            this.ClientSize = new System.Drawing.Size(457, 452);
             this.Controls.Add(this.appVersion);
             this.Controls.Add(this.configureAccountsButton);
             this.Controls.Add(this.saveAccounInfo);
@@ -218,6 +238,7 @@ namespace MultiInstanceManager
             this.Controls.Add(this.accountList);
             this.Controls.Add(this.label1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.Name = "MultiInstanceManager";
             this.Text = "Diablo II : Resurrected - Multi Instance Manager";
             this.ResumeLayout(false);
