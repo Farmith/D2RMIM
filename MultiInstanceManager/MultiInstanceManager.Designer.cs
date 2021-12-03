@@ -66,6 +66,7 @@ namespace MultiInstanceManager
             // 
             // accountList
             // 
+            this.accountList.CheckOnClick = true;
             this.accountList.FormattingEnabled = true;
             this.accountList.Location = new System.Drawing.Point(19, 123);
             this.accountList.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);

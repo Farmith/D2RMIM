@@ -167,7 +167,7 @@ namespace MultiInstanceManager.Helpers
                 else
                     SendKeys.SendWait(c.ToString());
 
-                Thread.Sleep(2);
+                Thread.Sleep(1);
             }
         }
         public static void FillLauncherCredentials(Process launcher, string user, string pass)
@@ -180,12 +180,12 @@ namespace MultiInstanceManager.Helpers
                 // We should be in the text-box now, we hope
                 SendKeys.SendWait("^(a)");
                 SendString(user);   // Wrapper for a sanitized SendKeys loop of a string.
-                Thread.Sleep(100);
+                Thread.Sleep(50);
                 SendKeys.SendWait("{TAB}");
                 Debug.WriteLine("Filling out password");
                 Thread.Sleep(5);
                 SendString(pass);   // Wrapper for a sanitized SendKeys loop of a string.
-                Thread.Sleep(100);
+                Thread.Sleep(50);
                 Debug.WriteLine("Finding login button");
                 var button = AutomationHelper.FindLoginButton(where.X, where.Y);
                 while (button.X == 0)

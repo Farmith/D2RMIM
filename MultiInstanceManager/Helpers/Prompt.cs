@@ -49,17 +49,18 @@ namespace MultiInstanceManager.Helpers
             Form prompt = new Form()
             {
                 Width = 500,
-                Height = 150,
+                Height = 250,
                 FormBorderStyle = FormBorderStyle.FixedDialog,
                 Text = caption,
                 StartPosition = FormStartPosition.CenterScreen
             };
             Label textLabel = new Label() { Left = 50, Top = 20, Text = showText };
             textLabel.Width = TextRenderer.MeasureText(textLabel.Text, textLabel.Font).Width;
+            textLabel.Height = TextRenderer.MeasureText(textLabel.Text, textLabel.Font).Height;
 
-            Button yesButton = new Button() { Text = "Yes", Left = 250, Width = 100, Top = 70, DialogResult = DialogResult.Yes };
+            Button yesButton = new Button() { Text = "Yes", Left = 250, Width = 100, Top = 170, DialogResult = DialogResult.Yes };
             yesButton.Click += (sender, e) => { prompt.Close(); };
-            Button noButton = new Button() { Text = "No", Left = 350, Width = 100, Top = 70, DialogResult = DialogResult.No };
+            Button noButton = new Button() { Text = "No", Left = 350, Width = 100, Top = 170, DialogResult = DialogResult.No };
             yesButton.Click += (sender, e) => { prompt.Close(); };
 
             prompt.Controls.Add(yesButton);
