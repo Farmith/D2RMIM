@@ -1,5 +1,15 @@
 # ﻿Diablo II : Resurrected - Multi Instance Manager README
 
+## Release 2.0+ Instructions
+
+To run D2RMIM 2.0+ (i.e any version after 2.0.0) you will need to visit:
+https://dotnet.microsoft.com/download/dotnet/6.0/runtime?utm_source=getdotnetcore&utm_medium=referral
+and install the 64-bit versions of all 3 packages (console, desktop and hostingbundle).
+This is due to the fact that 2.0+ run on .NET 6.0 and they have split things up rather unfortunately so 
+the application needs bits and pieces from all three packages.
+
+
+
 ## Credits:
 
 > Huge credits to the original work of [@Sunblood](https://github.com/Sunblood/) for creating the work upon this project is based, a very nice tool written in AutoIT
@@ -20,6 +30,8 @@ https://discord.gg/fCRxGXQWcP
 ## Preparation:
 ~~If you have never used the accompanying handle64.exe you need to manually run that executable once, and accept the terms of use for it before beginning.~~
 No unneccessary preparations needed, maybe a soft drink and a sandwich?
+
+
 
 ## Tutorial:
 
