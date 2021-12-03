@@ -48,17 +48,21 @@ namespace MultiInstanceManager
             this.saveAccounInfo = new System.Windows.Forms.CheckBox();
             this.configureAccountsButton = new System.Windows.Forms.Button();
             this.appVersion = new System.Windows.Forms.Label();
+            this.toggleAllProfiles = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(15, 104);
+            this.label1.BackColor = System.Drawing.Color.Transparent;
+            this.label1.ForeColor = System.Drawing.Color.WhiteSmoke;
+            this.label1.Location = new System.Drawing.Point(15, 100);
             this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(49, 15);
             this.label1.TabIndex = 0;
             this.label1.Text = "Profiles:";
+            this.label1.Click += new System.EventHandler(this.label1_Click);
             // 
             // accountList
             // 
@@ -106,6 +110,8 @@ namespace MultiInstanceManager
             // label2
             // 
             this.label2.AutoSize = true;
+            this.label2.BackColor = System.Drawing.Color.Transparent;
+            this.label2.ForeColor = System.Drawing.Color.WhiteSmoke;
             this.label2.Location = new System.Drawing.Point(19, 15);
             this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label2.Name = "label2";
@@ -116,6 +122,8 @@ namespace MultiInstanceManager
             // label3
             // 
             this.label3.AutoSize = true;
+            this.label3.BackColor = System.Drawing.Color.Transparent;
+            this.label3.ForeColor = System.Drawing.Color.WhiteSmoke;
             this.label3.Location = new System.Drawing.Point(19, 43);
             this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label3.Name = "label3";
@@ -126,6 +134,8 @@ namespace MultiInstanceManager
             // readmeLink
             // 
             this.readmeLink.AutoSize = true;
+            this.readmeLink.BackColor = System.Drawing.Color.Transparent;
+            this.readmeLink.LinkColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(128)))), ((int)(((byte)(255)))));
             this.readmeLink.Location = new System.Drawing.Point(145, 43);
             this.readmeLink.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.readmeLink.Name = "readmeLink";
@@ -137,6 +147,8 @@ namespace MultiInstanceManager
             // label4
             // 
             this.label4.AutoSize = true;
+            this.label4.BackColor = System.Drawing.Color.Transparent;
+            this.label4.ForeColor = System.Drawing.Color.WhiteSmoke;
             this.label4.Location = new System.Drawing.Point(204, 43);
             this.label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label4.Name = "label4";
@@ -147,6 +159,8 @@ namespace MultiInstanceManager
             // label5
             // 
             this.label5.AutoSize = true;
+            this.label5.BackColor = System.Drawing.Color.Transparent;
+            this.label5.ForeColor = System.Drawing.Color.WhiteSmoke;
             this.label5.Location = new System.Drawing.Point(282, 423);
             this.label5.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label5.Name = "label5";
@@ -177,24 +191,28 @@ namespace MultiInstanceManager
             // forceExit
             // 
             this.forceExit.AutoSize = true;
+            this.forceExit.BackColor = System.Drawing.Color.Transparent;
+            this.forceExit.ForeColor = System.Drawing.Color.WhiteSmoke;
             this.forceExit.Location = new System.Drawing.Point(19, 360);
             this.forceExit.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.forceExit.Name = "forceExit";
             this.forceExit.Size = new System.Drawing.Size(77, 19);
             this.forceExit.TabIndex = 16;
             this.forceExit.Text = "Force Exit";
-            this.forceExit.UseVisualStyleBackColor = true;
+            this.forceExit.UseVisualStyleBackColor = false;
             // 
             // saveAccounInfo
             // 
             this.saveAccounInfo.AutoSize = true;
+            this.saveAccounInfo.BackColor = System.Drawing.Color.Transparent;
+            this.saveAccounInfo.ForeColor = System.Drawing.Color.WhiteSmoke;
             this.saveAccounInfo.Location = new System.Drawing.Point(19, 387);
             this.saveAccounInfo.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.saveAccounInfo.Name = "saveAccounInfo";
             this.saveAccounInfo.Size = new System.Drawing.Size(119, 19);
             this.saveAccounInfo.TabIndex = 18;
             this.saveAccounInfo.Text = "Save Accountinfo";
-            this.saveAccounInfo.UseVisualStyleBackColor = true;
+            this.saveAccounInfo.UseVisualStyleBackColor = false;
             // 
             // configureAccountsButton
             // 
@@ -209,6 +227,8 @@ namespace MultiInstanceManager
             // appVersion
             // 
             this.appVersion.AutoSize = true;
+            this.appVersion.BackColor = System.Drawing.Color.Transparent;
+            this.appVersion.ForeColor = System.Drawing.Color.WhiteSmoke;
             this.appVersion.Location = new System.Drawing.Point(15, 423);
             this.appVersion.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.appVersion.Name = "appVersion";
@@ -216,11 +236,25 @@ namespace MultiInstanceManager
             this.appVersion.TabIndex = 20;
             this.appVersion.Text = "Version: ";
             // 
+            // toggleAllProfiles
+            // 
+            this.toggleAllProfiles.AutoSize = true;
+            this.toggleAllProfiles.BackColor = System.Drawing.Color.Transparent;
+            this.toggleAllProfiles.ForeColor = System.Drawing.Color.WhiteSmoke;
+            this.toggleAllProfiles.Location = new System.Drawing.Point(125, 100);
+            this.toggleAllProfiles.Name = "toggleAllProfiles";
+            this.toggleAllProfiles.Size = new System.Drawing.Size(165, 19);
+            this.toggleAllProfiles.TabIndex = 21;
+            this.toggleAllProfiles.Text = "Select/Deselect All Profiles";
+            this.toggleAllProfiles.UseVisualStyleBackColor = false;
+            // 
             // MultiInstanceManager
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
             this.ClientSize = new System.Drawing.Size(457, 452);
+            this.Controls.Add(this.toggleAllProfiles);
             this.Controls.Add(this.appVersion);
             this.Controls.Add(this.configureAccountsButton);
             this.Controls.Add(this.saveAccounInfo);
@@ -265,6 +299,7 @@ namespace MultiInstanceManager
         private System.Windows.Forms.CheckBox saveAccounInfo;
         private System.Windows.Forms.Button configureAccountsButton;
         private System.Windows.Forms.Label appVersion;
+        private System.Windows.Forms.CheckBox toggleAllProfiles;
     }
 }
 

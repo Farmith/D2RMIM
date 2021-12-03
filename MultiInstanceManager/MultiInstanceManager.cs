@@ -51,6 +51,7 @@ namespace MultiInstanceManager
             readmeLink.Click += new EventHandler(readmeLink_Click);
             dumpRegKeyButton.Click += new EventHandler(dumpRegKeyButton_Click);
             forceExit.CheckedChanged += new EventHandler(forceExit_Changed);
+            toggleAllProfiles.CheckedChanged += new EventHandler(toggleAllProfiles_Changed);
             forceExit.Checked = ConfigurationManager.AppSettings.Get("forceExitClients")?.ToString() == "true" ? true : false;
             saveAccounInfo.Checked = ConfigurationManager.AppSettings.Get("saveCredentials")?.ToString() == "true" ? true : false;
             saveAccounInfo.CheckedChanged += new EventHandler(saveAccounInfo_Changed);
@@ -264,6 +265,18 @@ namespace MultiInstanceManager
                 MH.LoadProfiles();
             }
         }
+        private void toggleAllProfiles_Changed(object? sender, EventArgs e)
+        {
+            var toggle = toggleAllProfiles.Checked;
+
+            for(var i = 0; i < accountList.Items.Count; i++)
+            {
+                if(accountList.GetItemChecked(i) != toggle)
+                {
+                    accountList.SetItemChecked(i, toggle);
+                }
+            }
+        }
         private void removeButton_Click(object? sender, System.EventArgs e)
         {
             if (accountList.CheckedItems.Count > 0)
@@ -338,5 +351,9 @@ namespace MultiInstanceManager
             Process.Start(path + "\\README.md");
         }
 
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
