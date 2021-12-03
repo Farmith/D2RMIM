@@ -17,8 +17,8 @@ namespace MultiInstanceManager.Structs
         [ProtoMember(3)]
         public string? LaunchArguments { get; set; }
         [ProtoMember(4)]
-        public int WindowX { get; set; }
+        public int? WindowX { get; set; }
         [ProtoMember(5)]
-        public int WindowY { get; set; }
+        public int? WindowY { get; set; }
     }
 }

@@ -392,9 +392,13 @@ namespace MultiInstanceManager.Modules
                 Log.Debug("Handle: " + process.MainWindowHandle.ToString());
                 WindowHelper.SetWindowApplicationId(process.MainWindowHandle, "D2R" + accountName);
             }
-            if (profile != null && (profile.LaunchOptions?.WindowX >= 0 || profile.LaunchOptions?.WindowY >= 0))
+            if ((profile != null && profile.LaunchOptions?.WindowX != null && profile.LaunchOptions?.WindowY != null) && 
+                ((int)profile.LaunchOptions.WindowX >= 0 || (int)profile.LaunchOptions.WindowY >= 0))
             {
-                WindowHelper.SetWindowPosition(process.MainWindowHandle, profile.LaunchOptions.WindowX, profile.LaunchOptions.WindowY);
+                var winx = profile?.LaunchOptions?.WindowX;
+                var winy = profile?.LaunchOptions?.WindowY;
+                if(winx != null && winy != null)
+                    WindowHelper.SetWindowPosition(process.MainWindowHandle, (int)winx, (int)winy);
             }
             // Add a way to abort the frenetic clicking
             Log.Debug("Clicking away");
@@ -424,9 +428,13 @@ namespace MultiInstanceManager.Modules
             if (ProcessManager.MatchProcess(process))
             {
                 Log.Debug("Process seems to be alive: " + process.Id);
-                if (profile != null && (profile.LaunchOptions?.WindowX >= 0 || profile.LaunchOptions?.WindowY >= 0))
+                if ((profile != null && profile.LaunchOptions?.WindowX != null && profile.LaunchOptions?.WindowY != null) &&
+                    ((int)profile.LaunchOptions.WindowX >= 0 || (int)profile.LaunchOptions.WindowY >= 0))
                 {
-                    WindowHelper.SetWindowPosition(process.MainWindowHandle, profile.LaunchOptions.WindowX, profile.LaunchOptions.WindowY);
+                    var winx = profile?.LaunchOptions?.WindowX;
+                    var winy = profile?.LaunchOptions?.WindowY;
+                    if (winx != null && winy != null)
+                        WindowHelper.SetWindowPosition(process.MainWindowHandle, (int)winx, (int)winy);
                 }
                 ExportToken(accountName + ".bin");
                 // Log.Debug("Closing mutex handles");

@@ -101,8 +101,8 @@ namespace MultiInstanceManager
                 installationPath.Text = _Profile.InstallationPath;
                 useDefaultGame.Checked = _Profile.UseDefaultGameInstallation;
                 separateTaskbarItems.Checked = _Profile.SeparateTaskbarIcons;
-                windowXposition.Text = _Profile.LaunchOptions?.WindowX.ToString();
-                windowYposition.Text = _Profile.LaunchOptions?.WindowY.ToString();
+                windowXposition.Text = _Profile.LaunchOptions?.WindowX?.ToString();
+                windowYposition.Text = _Profile.LaunchOptions?.WindowY?.ToString();
                 gameLaunchArgs.Text = _Profile.LaunchOptions?.LaunchArguments;
                 preLaunchCmd.Text = _Profile.LaunchOptions?.PreLaunchCommands;
                 postLaunchCmd.Text = _Profile.LaunchOptions?.PostLaunchCommands;
@@ -175,10 +175,16 @@ namespace MultiInstanceManager
             if(int.TryParse(windowXposition.Text,out int x))
             {
                 launchSettings.WindowX = x;
+            } else
+            {
+                launchSettings.WindowX = null;
             }
             if (int.TryParse(windowYposition.Text, out int y))
             {
                 launchSettings.WindowY = y;
+            } else
+            {
+                launchSettings.WindowY = null;
             }
             config.LaunchOptions = launchSettings;
 
