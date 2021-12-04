@@ -446,7 +446,11 @@ namespace MultiInstanceManager
             t.SetApartmentState(ApartmentState.STA);
             t.Start();
             t.Join();
+            if(selectedPath.Substring(selectedPath.Length -1,1) != "\\")
+                selectedPath += "\\";
             installationPath.Text = selectedPath;
+            if (selectedExecutableName.Substring(selectedExecutableName.Length - 4).ToLower() == ".exe")
+                selectedExecutableName = selectedExecutableName.Substring(0, selectedExecutableName.Length - 4);
             gameExecutableName.Text = selectedExecutableName;
         }
         private void grabWindowXYButton_Click(object? sender, EventArgs e)
