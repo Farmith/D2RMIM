@@ -133,6 +133,11 @@
 		</GetAssemblyIdentity>
 		<PropertyGroup>
 			<my_version>$([System.Text.RegularExpressions.Regex]::Replace("%(Targets.Version)", "^([^\.]+)\.([^\.]+).([^\.]+)(.*)$", "$1.$2.$3"))</my_version>
+			<major_number>$([System.Text.RegularExpressions.Regex]::Replace("%(Targets.Version)", "^([^\.]+)\.([^\.]+).([^\.]+).([^\.]+)(.*)$", "$1"))</major_number>
+			<minor_number>$([System.Text.RegularExpressions.Regex]::Replace("%(Targets.Version)", "^([^\.]+)\.([^\.]+).([^\.]+).([^\.]+)(.*)$", "$2"))</minor_number>
+			<sp_number>$([System.Text.RegularExpressions.Regex]::Replace("%(Targets.Version)", "^([^\.]+)\.([^\.]+).([^\.]+).([^\.]+)(.*)$", "$3"))</sp_number>
+			<build_number>$([System.Text.RegularExpressions.Regex]::Replace("%(Targets.Version)", "^([^\.]+)\.([^\.]+).([^\.]+).([^\.]+)(.*)$", "$4"))</build_number>
+			<next_build>$([MSBuild]::Add($(build_number),1))</next_build>
 		</PropertyGroup>
 		<Exec Condition="'$(ConfigurationName)'=='Debug' AND '$(SolutionName)'=='D2RMIM'" Command="echo &quot;Cleaning Build dir of $(SolutionDir)&quot;" />
 		<Exec Condition="'$(ConfigurationName)'=='Debug' AND '$(SolutionName)'=='D2RMIM'" Command="RD /S /Q $(TargetDir)lib\" />
@@ -163,8 +168,55 @@
 		<Exec Condition="'$(ConfigurationName)'=='Release' AND '$(SolutionName)'=='D2RMIM'" Command="move /Y $(TargetDir)lib\MultiInstanceManager* $(TargetDir)" />
 		<Exec Condition="'$(ConfigurationName)'=='Release' AND '$(SolutionName)'=='D2RMIM'" Command="if exist $(TargetDir)D2RMIM-Release-$(my_version).zip ( Del $(TargetDir)D2RMIM-Release-$(my_version).zip )" />
 		<Exec Condition="'$(ConfigurationName)'=='Release' AND '$(SolutionName)'=='D2RMIM'" Command="powershell.exe -command Compress-Archive -Path '$(TargetDir)plugins','$(TargetDir)lib','$(TargetDir)README.*','$(TargetDir)MultiInstanceManager.exe','$(TargetDir)MultiInstanceManager.dll.config' -DestinationPath $(TargetDir)D2RMIM-Release-$(my_version).zip" />
+		<Message Text="AfterBuild: Version: $(my_version) Build: $(build_number) => $(next_build)" Importance="High" />
+		<!--
+		<FileUpdate Files="$(ProjectDir)Properties\AssemblyInfo.cs"
+			Regex="(\d+)\.(\d+)\.(\d+)\.(\d+)"
+			ReplacementText="$(major_number).$(minor_number).$(sp_number).$(next_build)" />
+			-->
 	</Target>
 	<Target Name="RemoveDirectories">
 		<RemoveDir Directories="$(PluginRefDirectory);$(PluginDirectory);" />
+	</Target>
+	<Target Name="MyBeforeBuild" BeforeTargets="InitializeBuildStatus">
+		<Message Text="###HI###" Importance="High" />
+	</Target>
+	<Target Name="AfterBuild">
+		<PropertyGroup>
+			<my_version>$([System.Text.RegularExpressions.Regex]::Replace("%(Targets.Version)", "^([^\.]+)\.([^\.]+).([^\.]+)(.*)$", "$1.$2.$3"))</my_version>
+			
+		</PropertyGroup>
+		
+		<!--
+		<ReplaceFileText
+		  InputFilename="$(OutputPath)File.exe.config"
+		  OutputFilename="$(OutputPath)File.exe.config"
+		  MatchExpression="\$version\$"
+		  ReplacementText="1.0.0.2" />
+		-->
+	</Target>
+	<Target Name="Replace" AfterTargets="PostBuild">
+		<GetAssemblyIdentity AssemblyFiles="$(TargetPath)">
+			<Output TaskParameter="Assemblies" ItemName="Targets" />
+		</GetAssemblyIdentity>
+		<PropertyGroup>
+			<my_version>$([System.Text.RegularExpressions.Regex]::Replace("%(Targets.Version)", "^([^\.]+)\.([^\.]+).([^\.]+).([^\.]+)(.*)$", "$1.$2.$3.$4"))</my_version>
+			<major_number>$([System.Text.RegularExpressions.Regex]::Replace("%(Targets.Version)", "^([^\.]+)\.([^\.]+).([^\.]+).([^\.]+)(.*)$", "$1"))</major_number>
+			<minor_number>$([System.Text.RegularExpressions.Regex]::Replace("%(Targets.Version)", "^([^\.]+)\.([^\.]+).([^\.]+).([^\.]+)(.*)$", "$2"))</minor_number>
+			<sp_number>$([System.Text.RegularExpressions.Regex]::Replace("%(Targets.Version)", "^([^\.]+)\.([^\.]+).([^\.]+).([^\.]+)(.*)$", "$3"))</sp_number>
+			<build_number>$([System.Text.RegularExpressions.Regex]::Replace("%(Targets.Version)", "^([^\.]+)\.([^\.]+).([^\.]+).([^\.]+)(.*)$", "$4"))</build_number>
+			<next_build>$([MSBuild]::Add($(build_number),1))</next_build>
+			<next_version>$(major_number).$(minor_number).$(sp_number).$(next_build)</next_version>
+			<InputFile>$(ProjectDir)Properties\AssemblyInfo.cs</InputFile>
+			<OutputFile>$(ProjectDir)Properties\AssemblyInfo.cs</OutputFile>
+		</PropertyGroup>
+		<Message Text="Replace: Version: $(my_version) Build: $(build_number) => $(next_build) ($(next_version)) in file: $(OutputFile)" Importance="High" />
+		
+		<WriteLinesToFile
+			File="$(OutputFile)"
+			Lines="$([System.IO.File]::ReadAllText($(InputFile)).Replace($(my_version),$(next_version))))"
+			Overwrite="true"
+			Encoding="Unicode"/>
+			
 	</Target>
 </Project>
