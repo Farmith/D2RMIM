@@ -144,7 +144,7 @@ namespace MultiInstanceManager.Modules
             if (activeWindows?.Count > 0)
             {
                 WindowHelper.ShowMessage("Can't setup/refresh accounts with game clients active, aborting.");
-                return;
+                return false;
             }
             if (ProcessManager.blizzardProcessesExists())
             {

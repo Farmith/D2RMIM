@@ -24,7 +24,7 @@ namespace MultiInstanceManager
         private HotKey? _HotKey;
         private Profile? _Profile;
         private MultiHandler? MH;
-
+        private String? preSelectedAccount;
         public AccountConfiguration()
         {
             InitializeComponent();
@@ -43,6 +43,10 @@ namespace MultiInstanceManager
             grabWindowXYButton.Click += grabWindowXYButton_Click;
             grabXYTooltip.SetToolTip(grabWindowXYButton, "Grabs the current x/y coordinates of this profiles game window\r\nrequires that the client is started.");
         }
+        public void SetPreselectedAccount(string preSelected)
+        {
+            preSelectedAccount = preSelected;
+        }
         public void SetMultiHandler(MultiHandler handler)
         {
             MH = handler;
@@ -53,6 +57,10 @@ namespace MultiInstanceManager
             resetRegion();
             FillAccounts();
             DefaultSettings();
+            if(preSelectedAccount?.Length > 0)
+            {
+                LoadProfile();
+            }
         }
         private void DefaultSettings()
         {
@@ -73,15 +81,23 @@ namespace MultiInstanceManager
         }
         private void LoadProfile()
         {
+            Log.Debug("Loading profile..");
             DefaultSettings();
             if (selectAccount.SelectedItem == null)
+            {
+                Log.Debug("We seem to be calling load without a selecteditem");
                 return;
+            }
             var selection = selectAccount.SelectedItem.ToString();
             if (selection == null)
+            {
+                Log.Debug("Selection seems to be empty?");
                 return;
+            }
             _Profile = FileHelper.LoadProfileConfiguration(selection);
             if (_Profile != null)
             {
+                Log.Debug("Profile available");
                 modifyWindowTitles.Checked = _Profile.ModifyWindowtitles;
                 skipIntroVideos.Checked = _Profile.SkipCinematics;
                 if (_Profile.WindowHotKey != null)
@@ -114,13 +130,13 @@ namespace MultiInstanceManager
                     // Make sure there is a JSON file to use for Settings.
                     FileHelper.CreateJSONSettings(_Profile?.DisplayName);
                 }
-                SelecteRegion(_Profile?.Region);
+                SelectedRegion(_Profile?.Region);
             } else
             {
                 Log.Debug("Previous config is null");
             }
         }
-        private void SelecteRegion(string? region)
+        private void SelectedRegion(string? region)
         {
             if (region == null || selectedRegion == null || selectedRegion.Items.Count < 1)
                 return;
@@ -141,6 +157,17 @@ namespace MultiInstanceManager
             foreach(var profile in Profiles)
             {
                 selectAccount.Items.Add(profile.AccountName);
+            }
+            if (preSelectedAccount?.Length > 0)
+            {
+                for (var i = 0; i < selectAccount.Items.Count; i++)
+                {
+                    if (selectAccount.Items[i].ToString() == preSelectedAccount)
+                    {
+                        selectAccount.SelectedIndex = i;
+                        break;
+                    }
+                }
             }
         }
         private void SaveConfiguration(object? sender, EventArgs e)
@@ -199,6 +226,7 @@ namespace MultiInstanceManager
                 // Make sure there is a JSON file to use for Settings.
                 FileHelper.CreateJSONSettings(config.DisplayName);
             }
+            Log.Debug("Saving config");
             FileHelper.SaveAccountConfiguration(config);
 
         }

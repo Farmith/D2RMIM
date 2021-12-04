@@ -148,6 +148,7 @@ namespace MultiInstanceManager
             }
 
         }
+
         public async Task LaunchProfiles(List<String> profiles)
         {
             foreach (var profile in profiles)
@@ -229,6 +230,13 @@ namespace MultiInstanceManager
             {
                 accountConfig.Shown += accountConfig.OnShown;
                 accountConfig.SetMultiHandler(MH);
+                if(accountList.CheckedItems.Count > 0)
+                {
+                    var preselectAccount = accountList.CheckedItems[0].ToString()?.Split('|')[0].Trim(' ');
+                    if(preselectAccount != null)
+                        accountConfig.SetPreselectedAccount( preselectAccount );
+
+                }
                 accountConfig.Show();
             }
         }

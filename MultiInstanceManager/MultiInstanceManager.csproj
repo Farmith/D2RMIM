@@ -214,7 +214,7 @@
 		
 		<WriteLinesToFile
 			File="$(OutputFile)"
-			Lines="$([System.IO.File]::ReadAllText($(InputFile)).Replace($(my_version),$(next_version))))"
+			Lines="$([System.IO.File]::ReadAllText($(InputFile)).Replace($(my_version),$(next_version)))"
 			Overwrite="true"
 			Encoding="Unicode"/>
 			
