@@ -41,6 +41,36 @@ namespace MultiInstanceManager.Helpers
             }
             return false;
         }
+        public static void DeleteProfileConfiguration(string? name)
+        {
+            var file = name + ".cnf";
+            Log.Debug("Deleting file: " + file);
+            if (File.Exists(file))
+            {
+                File.Delete(file);
+            }
+        }
+        public static void DeleteProfileTokenStorage(string? name)
+        {
+            var file = name + ".bin";
+            Log.Debug("Deleting file: " + file);
+            if (File.Exists(file))
+            {
+                File.Delete(file);
+            }
+        }
+        public static void DeleteJSONSettings(string? name)
+        {
+            if (name == null)
+                return;
+
+            var outJson = name + Constants.clientSettingsAppendName;
+            
+            if (JSONSettingsExist(outJson))
+            {
+                File.Delete(outJson);
+            }
+        }
         public static void CreateJSONSettings(string? name)
         {
             if (name == null)

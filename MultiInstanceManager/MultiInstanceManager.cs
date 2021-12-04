@@ -295,25 +295,32 @@ namespace MultiInstanceManager
         {
             if (accountList.CheckedItems.Count > 0)
             {
-                for (var x = 0; x < accountList.CheckedItems.Count; x++)
+                var ensure = Prompt.ConfirmDialog("Are you sure you want to delete " + accountList.CheckedItems.Count + " profiles? this can not be undone", "Confirm delete");
+                if (ensure)
                 {
-                    try
+
+                    for (var x = 0; x < accountList.CheckedItems.Count; x++)
                     {
-                        var checkedItem = accountList.CheckedItems[x].ToString()?.Split('|')[0].Trim(' ');
-                        if (checkedItem == null)
-                            continue;
-                        accountList.Items.Remove(accountList.CheckedItems[x]);
-                        Log.Debug("Removing Vault credentials for: " + checkedItem);
-                        CredentialHelper.RemoveVaultCredentials(checkedItem);
-                        Log.Debug("Deleting file: " + checkedItem + ".bin");
-                        File.Delete(checkedItem + ".bin");
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Debug("Something went wrong while removing profiles:");
-                        Log.Debug(ex.ToString());
-                        Debug.WriteLine(ex);
-                        // Something went terribly wrong.. 
+                        try
+                        {
+                            var checkedItem = accountList.CheckedItems[x].ToString()?.Split('|')[0].Trim(' ');
+                            if (checkedItem == null)
+                                continue;
+                            accountList.Items.Remove(accountList.CheckedItems[x]);
+                            Log.Debug("Removing Vault credentials for: " + checkedItem);
+                            CredentialHelper.RemoveVaultCredentials(checkedItem);
+                            FileHelper.DeleteJSONSettings(checkedItem);
+                            FileHelper.DeleteProfileConfiguration(checkedItem);
+                            FileHelper.DeleteProfileTokenStorage(checkedItem);
+
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Debug("Something went wrong while removing profiles:");
+                            Log.Debug(ex.ToString());
+                            Debug.WriteLine(ex);
+                            // Something went terribly wrong.. 
+                        }
                     }
                 }
             }
