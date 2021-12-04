@@ -167,7 +167,7 @@
 		<Exec Condition="'$(ConfigurationName)'=='Release' AND '$(SolutionName)'=='D2RMIM'" Command="echo &quot;Moving back required files&quot;" />
 		<Exec Condition="'$(ConfigurationName)'=='Release' AND '$(SolutionName)'=='D2RMIM'" Command="move /Y $(TargetDir)lib\MultiInstanceManager* $(TargetDir)" />
 		<Exec Condition="'$(ConfigurationName)'=='Release' AND '$(SolutionName)'=='D2RMIM'" Command="if exist $(TargetDir)D2RMIM-Release-$(my_version).zip ( Del $(TargetDir)D2RMIM-Release-$(my_version).zip )" />
-		<Exec Condition="'$(ConfigurationName)'=='Release' AND '$(SolutionName)'=='D2RMIM'" Command="powershell.exe -command Compress-Archive -Path '$(TargetDir)plugins','$(TargetDir)lib','$(TargetDir)README.*','$(TargetDir)MultiInstanceManager.exe','$(TargetDir)MultiInstanceManager.dll.config' -DestinationPath $(TargetDir)D2RMIM-Release-$(my_version).zip" />
+		<Exec Condition="'$(ConfigurationName)'=='Release' AND '$(SolutionName)'=='D2RMIM'" Command="powershell.exe -command Compress-Archive -Path '$(TargetDir)MultiInstanceManager.runtimeconfig.json','$(TargetDir)MultiInstanceManager.deps.json','$(TargetDir)MultiInstanceManager.dll','$(TargetDir)plugins','$(TargetDir)lib','$(TargetDir)README.*','$(TargetDir)MultiInstanceManager.exe','$(TargetDir)MultiInstanceManager.dll.config' -DestinationPath $(TargetDir)D2RMIM-Release-$(my_version).zip" />
 		<Message Text="AfterBuild: Version: $(my_version) Build: $(build_number) => $(next_build)" Importance="High" />
 		<!--
 		<FileUpdate Files="$(ProjectDir)Properties\AssemblyInfo.cs"
