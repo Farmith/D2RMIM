@@ -40,7 +40,6 @@ namespace MultiInstanceManager
             this.label1 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.grabWindowXYButton = new System.Windows.Forms.Button();
-            this.muteWhenMinimized = new System.Windows.Forms.CheckBox();
             this.separateJsonSettings = new System.Windows.Forms.CheckBox();
             this.separateTaskbarItems = new System.Windows.Forms.CheckBox();
             this.label12 = new System.Windows.Forms.Label();
@@ -58,6 +57,7 @@ namespace MultiInstanceManager
             this.label5 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
+            this.muteWhenMinimized = new System.Windows.Forms.CheckBox();
             this.label8 = new System.Windows.Forms.Label();
             this.selectAccount = new System.Windows.Forms.ComboBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
@@ -69,8 +69,11 @@ namespace MultiInstanceManager
             this.saveConfig = new System.Windows.Forms.Button();
             this.grabXYTooltip = new System.Windows.Forms.ToolTip(this.components);
             this.groupBox4 = new System.Windows.Forms.GroupBox();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.label13 = new System.Windows.Forms.Label();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.copySettingsFrom = new System.Windows.Forms.ComboBox();
+            this.label14 = new System.Windows.Forms.Label();
+            this.CopySettingsButton = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -190,17 +193,6 @@ namespace MultiInstanceManager
             this.grabWindowXYButton.TabIndex = 18;
             this.grabWindowXYButton.Text = "Grab X/Y";
             this.grabWindowXYButton.UseVisualStyleBackColor = true;
-            // 
-            // muteWhenMinimized
-            // 
-            this.muteWhenMinimized.AutoSize = true;
-            this.muteWhenMinimized.Location = new System.Drawing.Point(7, 83);
-            this.muteWhenMinimized.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.muteWhenMinimized.Name = "muteWhenMinimized";
-            this.muteWhenMinimized.Size = new System.Drawing.Size(267, 19);
-            this.muteWhenMinimized.TabIndex = 17;
-            this.muteWhenMinimized.Text = "Mute client when minimized (requires plugin)";
-            this.muteWhenMinimized.UseVisualStyleBackColor = true;
             // 
             // separateJsonSettings
             // 
@@ -367,6 +359,17 @@ namespace MultiInstanceManager
             this.label3.TabIndex = 0;
             this.label3.Text = "Pre-launch cmd:";
             // 
+            // muteWhenMinimized
+            // 
+            this.muteWhenMinimized.AutoSize = true;
+            this.muteWhenMinimized.Location = new System.Drawing.Point(7, 83);
+            this.muteWhenMinimized.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.muteWhenMinimized.Name = "muteWhenMinimized";
+            this.muteWhenMinimized.Size = new System.Drawing.Size(267, 19);
+            this.muteWhenMinimized.TabIndex = 17;
+            this.muteWhenMinimized.Text = "Mute client when minimized (requires plugin)";
+            this.muteWhenMinimized.UseVisualStyleBackColor = true;
+            // 
             // label8
             // 
             this.label8.AutoSize = true;
@@ -454,13 +457,17 @@ namespace MultiInstanceManager
             // 
             // saveConfig
             // 
-            this.saveConfig.Location = new System.Drawing.Point(372, 14);
+            this.saveConfig.BackColor = System.Drawing.Color.Green;
+            this.saveConfig.FlatAppearance.BorderColor = System.Drawing.Color.GreenYellow;
+            this.saveConfig.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.saveConfig.ForeColor = System.Drawing.Color.WhiteSmoke;
+            this.saveConfig.Location = new System.Drawing.Point(832, 8);
             this.saveConfig.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.saveConfig.Name = "saveConfig";
             this.saveConfig.Size = new System.Drawing.Size(88, 27);
             this.saveConfig.TabIndex = 5;
             this.saveConfig.Text = "Save";
-            this.saveConfig.UseVisualStyleBackColor = true;
+            this.saveConfig.UseVisualStyleBackColor = false;
             // 
             // groupBox4
             // 
@@ -474,16 +481,6 @@ namespace MultiInstanceManager
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Plugin settings";
             // 
-            // checkBox1
-            // 
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(7, 108);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(189, 19);
-            this.checkBox1.TabIndex = 18;
-            this.checkBox1.Text = "Restart client when crash/close";
-            this.checkBox1.UseVisualStyleBackColor = true;
-            // 
             // label13
             // 
             this.label13.AutoSize = true;
@@ -495,11 +492,52 @@ namespace MultiInstanceManager
             this.label13.Text = "The settings below are dependent on plugins, if you have removed any plugin from " +
     "the plugin/ folder then the corresponding checkbox below has no functionality";
             // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Location = new System.Drawing.Point(7, 108);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(189, 19);
+            this.checkBox1.TabIndex = 18;
+            this.checkBox1.Text = "Restart client when crash/close";
+            this.checkBox1.UseVisualStyleBackColor = true;
+            // 
+            // copySettingsFrom
+            // 
+            this.copySettingsFrom.FormattingEnabled = true;
+            this.copySettingsFrom.Location = new System.Drawing.Point(476, 12);
+            this.copySettingsFrom.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.copySettingsFrom.Name = "copySettingsFrom";
+            this.copySettingsFrom.Size = new System.Drawing.Size(206, 23);
+            this.copySettingsFrom.TabIndex = 8;
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(357, 15);
+            this.label14.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(111, 15);
+            this.label14.TabIndex = 7;
+            this.label14.Text = "Copy settings from:";
+            // 
+            // CopySettingsButton
+            // 
+            this.CopySettingsButton.Location = new System.Drawing.Point(689, 12);
+            this.CopySettingsButton.Name = "CopySettingsButton";
+            this.CopySettingsButton.Size = new System.Drawing.Size(75, 23);
+            this.CopySettingsButton.TabIndex = 9;
+            this.CopySettingsButton.Text = "Copy";
+            this.CopySettingsButton.UseVisualStyleBackColor = true;
+            // 
             // AccountConfiguration
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(933, 465);
+            this.Controls.Add(this.CopySettingsButton);
+            this.Controls.Add(this.copySettingsFrom);
+            this.Controls.Add(this.label14);
             this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.saveConfig);
             this.Controls.Add(this.groupBox3);
@@ -566,5 +604,8 @@ namespace MultiInstanceManager
         private System.Windows.Forms.GroupBox groupBox4;
         private System.Windows.Forms.CheckBox checkBox1;
         private System.Windows.Forms.Label label13;
+        private System.Windows.Forms.ComboBox copySettingsFrom;
+        private System.Windows.Forms.Label label14;
+        private System.Windows.Forms.Button CopySettingsButton;
     }
 }

@@ -131,6 +131,17 @@ namespace MultiInstanceManager.Helpers
             }
             return null;
         }
+        public static bool CopyProfileConfigurationFrom(string fromName, string toName)
+        {
+            var fromfilename = fromName + ".cnf";
+            var tofilename = toName + ".cnf";
+            if (File.Exists(fromfilename))
+            {
+                File.Copy(fromfilename, tofilename);
+                return true;
+            }
+            return false;
+        }
         public static void MoveOldProfileConfigurations()
         {
             var ePath = Application.ExecutablePath;

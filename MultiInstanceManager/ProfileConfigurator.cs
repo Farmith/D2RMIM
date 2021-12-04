@@ -29,7 +29,7 @@ namespace MultiInstanceManager
         {
             InitializeComponent();
             selectAccount.SelectedIndexChanged += new EventHandler(selectAccount_SelectedIndexChanged);
-
+            CopySettingsButton.Click += new EventHandler(copySettingsFromButton_Click);
             // These below may not be neccessary because: Save Button
             useDefaultGame.CheckedChanged += new EventHandler(useDefaultGame_CheckedChanged);
             skipIntroVideos.CheckedChanged += new EventHandler(skipIntroVideos_CheckedChanged);
@@ -157,6 +157,8 @@ namespace MultiInstanceManager
             foreach(var profile in Profiles)
             {
                 selectAccount.Items.Add(profile.AccountName);
+                if(preSelectedAccount == null || preSelectedAccount.Length < 1 || preSelectedAccount?.CompareTo(profile.AccountName)!=0)
+                    copySettingsFrom.Items.Add(profile.AccountName);
             }
             if (preSelectedAccount?.Length > 0)
             {
@@ -228,6 +230,7 @@ namespace MultiInstanceManager
             }
             Log.Debug("Saving config");
             FileHelper.SaveAccountConfiguration(config);
+            Prompt.ShowMessage("Configuration saved", "Save Success");
 
         }
         private void resetRegion()
@@ -396,6 +399,22 @@ namespace MultiInstanceManager
         private void selectedRegion_SelectedIndexChanged(object? sender, EventArgs e)
         {
 
+        }
+        private void copySettingsFromButton_Click(object? sender, EventArgs e)
+        {
+            Log.Debug("Trying to copy profile settings");
+            // If no profile is selected, return
+            if (copySettingsFrom.SelectedIndex == -1)
+                return;
+            var fromName = copySettingsFrom.SelectedItem.ToString();
+            var toName = selectAccount.SelectedItem.ToString();
+            if(fromName == null || toName == null)
+            {
+                WindowHelper.ShowMessage("ERROR: You need to select both current profile, and profile to copy from");
+                return;
+            }
+            FileHelper.CopyProfileConfigurationFrom(fromName,toName);
+            LoadProfile();
         }
         private void browseForInstallationButton_Click(object? sender, EventArgs e)
         {

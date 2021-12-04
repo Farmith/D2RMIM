@@ -9,6 +9,10 @@ namespace MultiInstanceManager.Helpers
 {
     public static class Prompt
     {
+        public static void ShowMessage(string text, string caption)
+        {
+            MessageBox.Show(text, caption);
+        }
         public static string ShowDialog(string text, string caption, bool isPassword = false)
         {
             Form prompt = new Form()
