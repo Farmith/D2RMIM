@@ -140,7 +140,12 @@ namespace MultiInstanceManager.Modules
             IntPtr bnetClientHandle = IntPtr.Zero;
 
             // Initialize the processCounter so we know how many we're at.
-
+            // Check if any active windows are available, if so, we can't proceed
+            if (activeWindows?.Count > 0)
+            {
+                WindowHelper.ShowMessage("Can't setup/refresh accounts with game clients active, aborting.");
+                return;
+            }
             if (ProcessManager.blizzardProcessesExists())
             {
                 WindowHelper.ShowMessage("Close all D2R/Battle.net related programs first.");
@@ -162,7 +167,7 @@ namespace MultiInstanceManager.Modules
                 bNetCredentials = CredentialHelper.GetVaultCredentials(displayName);
                 if (bNetCredentials != null)
                 {
-                    if(FreshSetup)
+                    if(FreshSetup && bNetCredentials.User?.Length > 0 && bNetCredentials.Pass?.Length > 0)
                     {
                         var answer = Prompt.ConfirmDialog("This profilename already has saved credentials.\nDo you wish to re-use the old credentials (Yes) ?", "Credentials already found", 15);
                         if(answer == false)

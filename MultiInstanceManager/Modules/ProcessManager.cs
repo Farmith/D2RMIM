@@ -330,7 +330,7 @@ namespace MultiInstanceManager.Modules
         {
             var launchers = Process.GetProcessesByName(Constants.launcherExecutableName);
             var battlenets = Process.GetProcessesByName(Constants.battleNetExecutableName);
-
+            
             if (launchers.Length > 0 || battlenets.Length > 0)
                 return true;
             return false;
