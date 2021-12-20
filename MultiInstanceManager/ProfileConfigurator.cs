@@ -437,7 +437,7 @@ namespace MultiInstanceManager
                     string? path = Path.GetDirectoryName(filepath);
                     string file = Path.GetFileNameWithoutExtension(filepath);
 
-                    selectedPath = path;
+                    selectedPath = path != null ? path : "";
                     selectedExecutableName = file;
                 }
                 Console.WriteLine(size); // <-- Shows file size in debugging mode.

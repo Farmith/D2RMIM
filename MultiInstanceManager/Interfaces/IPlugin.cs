@@ -1,4 +1,5 @@
-﻿using MultiInstanceManager.Structs;
+﻿using MultiInstanceManager.Modules;
+using MultiInstanceManager.Structs;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

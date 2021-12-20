@@ -32,7 +32,14 @@ namespace MultiInstanceManager
         public MultiInstanceManager()
         {
             InitializeComponent();
-
+            accountListView.View = View.Details;
+            /*
+            ColumnHeader header1 = new ColumnHeader { Text = "Profile Name", Name = "name" }; 
+            accountListView.Columns.Add(header1);
+            
+            ColumnHeader header2 = new ColumnHeader { Text = "Last Updated", Name = "lastmodified" };
+            accountListView.Columns.Add(header2);
+            */
             // Fetch the commandline arguments first and foremost:
             var CommandLineArguments = CMDLineHelper.GetArguments();
 
@@ -92,7 +99,7 @@ namespace MultiInstanceManager
             accountConfig.Disposed += new EventHandler(accountConfig_Disposed);
 
             forceExitToolTip.SetToolTip(forceExit, "ForceExit means, kill the game client once the tokens are set when 'refreshing'");
-            MH = new MultiHandler(this, accountList,pluginManager);
+            MH = new MultiHandler(this, accountListView, pluginManager);
             MH.SetCredentialMode(saveAccounInfo.Checked);
             // Start the Monitors early:
             MH.StartProcessMonitor();
@@ -230,9 +237,9 @@ namespace MultiInstanceManager
             {
                 accountConfig.Shown += accountConfig.OnShown;
                 accountConfig.SetMultiHandler(MH);
-                if(accountList.CheckedItems.Count > 0)
+                if(accountListView.CheckedItems.Count > 0)
                 {
-                    var preselectAccount = accountList.CheckedItems[0].ToString()?.Split('|')[0].Trim(' ');
+                    var preselectAccount = accountListView.CheckedItems[0].Text;
                     if(preselectAccount != null)
                         accountConfig.SetPreselectedAccount( preselectAccount );
 
@@ -264,13 +271,19 @@ namespace MultiInstanceManager
         private async void launchButton_Click(object? sender, EventArgs e)
         {
             MH.ResetSessions();
-            if(accountList.CheckedItems.Count != 0)
+            if(accountListView.CheckedItems.Count != 0)
             {
-                for(var x = 0; x < accountList.CheckedItems.Count; x++)
+                Log.Debug("Launching " + accountListView.CheckedItems.Count + " profiles");
+                bool launchOverride = pluginManager.PluginBasedLaunchHandler(accountListView.CheckedItems);
+                if(launchOverride) 
+                    return;
+                
+                for(var x = 0; x < accountListView.CheckedItems.Count; x++)
                 {
                     try
                     {
-                        var checkedItem = accountList.CheckedItems[x].ToString()?.Split('|')[0].Trim(' ');
+                        var item = accountListView.CheckedItems[x];
+                        var checkedItem = accountListView.CheckedItems[x].Text;
                         if (checkedItem == null)
                             continue;
                         // Doing this in a task makes sure the UI doesn't freeze
@@ -291,36 +304,36 @@ namespace MultiInstanceManager
         {
             var toggle = toggleAllProfiles.Checked;
 
-            for(var i = 0; i < accountList.Items.Count; i++)
+            for(var i = 0; i < accountListView.Items.Count; i++)
             {
-                if(accountList.GetItemChecked(i) != toggle)
+                if (accountListView.Items[i].Checked != toggle)
                 {
-                    accountList.SetItemChecked(i, toggle);
+                    accountListView.Items[i].Checked = toggle;
                 }
             }
         }
         private void removeButton_Click(object? sender, System.EventArgs e)
         {
-            if (accountList.CheckedItems.Count > 0)
+            if (accountListView.CheckedItems.Count > 0)
             {
-                var ensure = Prompt.ConfirmDialog("Are you sure you want to delete " + accountList.CheckedItems.Count + " profiles? this can not be undone", "Confirm delete");
+                var ensure = Prompt.ConfirmDialog("Are you sure you want to delete " + accountListView.CheckedItems.Count + " profiles? this can not be undone", "Confirm delete");
                 if (ensure)
                 {
 
-                    for (var x = 0; x < accountList.CheckedItems.Count; x++)
+                    for (var x = 0; x < accountListView.CheckedItems.Count; x++)
                     {
                         try
                         {
-                            var checkedItem = accountList.CheckedItems[x].ToString()?.Split('|')[0].Trim(' ');
+                            var checkedItem = accountListView.CheckedItems[x].Text;
+                            MessageBox.Show("Item: " + checkedItem);
                             if (checkedItem == null)
                                 continue;
-                            accountList.Items.Remove(accountList.CheckedItems[x]);
+                            accountListView.Items.Remove(accountListView.CheckedItems[x]);
                             Log.Debug("Removing Vault credentials for: " + checkedItem);
                             CredentialHelper.RemoveVaultCredentials(checkedItem);
                             FileHelper.DeleteJSONSettings(checkedItem);
                             FileHelper.DeleteProfileConfiguration(checkedItem);
                             FileHelper.DeleteProfileTokenStorage(checkedItem);
-
                         }
                         catch (Exception ex)
                         {
@@ -351,21 +364,21 @@ namespace MultiInstanceManager
         private async void refreshButton_Click(object? sender, System.EventArgs e)
         {
             Log.Clear();
-            if (accountList.CheckedItems.Count != 0)
+            if (accountListView.CheckedItems.Count != 0)
             {
-                for (var x = 0; x < accountList.CheckedItems.Count; x++)
+                for (var x = 0; x < accountListView.CheckedItems.Count; x++)
                 {
                     try
                     {
-                        var checkedItem = accountList.CheckedItems[x].ToString()?.Split('|');
+                        var checkedItem = accountListView.CheckedItems[x].Text;
                         if (checkedItem == null)
                             continue;
                         DisableButtons();
                         var killAfter = true;
-                        if (x == accountList.CheckedItems.Count)
+                        if (x == accountListView.CheckedItems.Count)
                             killAfter = forceExit.Checked;
                            
-                        var task = Task.Factory.StartNew(() => MH.Setup(checkedItem[0].Trim(' '), killAfter));
+                        var task = Task.Factory.StartNew(() => MH.Setup(checkedItem, killAfter));
                         var result = await task;
                         EnableButtons();
                     }

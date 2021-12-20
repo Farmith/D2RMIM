@@ -132,21 +132,18 @@ namespace MultiInstanceManager.Modules
         public static uint NAMEDPIPEMASK = 0x0012019F;
         public static string MUTEX_STRING = "Instances";
 
-        public static bool CloseExternalHandles(string name)
+        public static bool CloseExternalHandles(Process process)
         {
             bool success = false;
 
-            Process[] processList = Process.GetProcesses();
-
-            foreach (Process i in processList)
+            if (KillHandle(process, MUTEX_STRING))
             {
-                if (i.ProcessName.Equals(name, StringComparison.OrdinalIgnoreCase))
-                {
-                    if (KillHandle(i, MUTEX_STRING))
-                    {
-                        success = true;
-                    }
-                }
+                Log.Debug("We should have closed the handles by now");
+                success = true;
+            }
+            else
+            {
+                Log.Debug("Could not close the handles?");
             }
 
             return success;
@@ -271,7 +268,7 @@ namespace MultiInstanceManager.Modules
 
             int bufferSize = GetHandleNameLength(handle);
 
-            Debug.WriteLine("Trying to allocate: " + bufferSize.ToString() + " bytes of memory");
+            // Debug.WriteLine("Trying to allocate: " + bufferSize.ToString() + " bytes of memory");
             try
             {
                 IntPtr pStringBuffer = Marshal.AllocHGlobal(bufferSize);
@@ -491,13 +488,21 @@ namespace MultiInstanceManager.Modules
             try
             {
                 var id = Process.GetProcessById(process.Id);
+                if(process.HasExited)
+                {
+                    return false;
+                }
+                if(id.Id == process.Id)
+                {
+                    return true;
+                }
             }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex);
                 return false;
             }
-            return true;
+            return false;
         }
     }
 }

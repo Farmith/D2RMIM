@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -9,6 +10,7 @@ using System.Threading.Tasks;
 using MultiInstanceManager.Helpers;
 using MultiInstanceManager.Interfaces;
 using MultiInstanceManager.Structs;
+using static System.Windows.Forms.ListView;
 
 namespace MultiInstanceManager.Modules
 {
@@ -28,17 +30,52 @@ namespace MultiInstanceManager.Modules
                 {
                     keepGoing = false;
                 }
-                Log.Debug("So far we have: " + Plugins?.Count + " plugins");
+                // Log.Debug("So far we have: " + Plugins?.Count + " plugins");
 
                 if (Plugins?.Count > 0)
                 {
                     foreach (IPlugin plugin in Plugins)
                     {
-                        Log.Debug("Name: " + plugin.Name);
+                        // Log.Debug("Name: " + plugin.Name);
                     }
                 }
                 Thread.Sleep(10000); // Just since we aren't actually doing anything here, yet
             }
+        }
+        public bool PluginBasedLaunchHandler(CheckedListViewItemCollection profiles)
+        {
+            if ( Plugins != null )
+            {
+                foreach(IPluginWithLauncher plugin in Plugins)
+                {
+                    if ( plugin.LaunchHandlerOverride == true)
+                    {
+                        plugin.LaunchHandler(profiles);
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+        public List<string>? PluginBasedTokenLocation(Process process)
+        {
+            List<string>? tokenLocation = null;
+            if ( Plugins != null )
+            {
+                Log.Debug("We have some plugins to check for an altered token location");
+                foreach (IPluginWithLauncher plugin in Plugins)
+                {
+                    Log.Debug("Checking if plugin: " + plugin.Name + " has a token location override");
+                    if (plugin.TokenOverride == true)
+                    {
+                        Log.Debug("It does, repsonding with the new location:");
+                        tokenLocation = plugin.TokenLocation(process);
+                        Log.Debug("Location: " + tokenLocation[0] + " Name: " + tokenLocation[1]);
+                        break; // Only one plugin may supply a tokenlocation at a time.
+                    }
+                }
+            }
+            return tokenLocation;
         }
         /*
          * PluginHandledLaunch Returns null if no plugin handled the launch
@@ -49,16 +86,34 @@ namespace MultiInstanceManager.Modules
             GameInstance? thisInstance = null;
             if (Plugins != null)
             {
+                Log.Debug("We have atleast some plugins");
                 foreach (IPluginWithLauncher plugin in Plugins)
                 {
+                    Log.Debug("Checking if plugin has override");
                     if (plugin.LaunchOverride == true)
                     {
+                        Log.Debug("Plugin has override, attempting to launch");
                         thisInstance = plugin.LaunchGame(accountName, cmdArgs, installPath, gameExe);
                         break;  // We only allow ONE plugin at a time to override the launch sequence.
                     }
                 }
             }
+            Log.Debug("Returning instance");
             return thisInstance;
+        }
+        public void SetMultiHandler(MultiHandler mh)
+        {
+            if (Plugins != null)
+            {
+                foreach (IPluginWithLauncher plugin in Plugins)
+                {
+                    if (plugin.LaunchOverride == true)
+                    {
+                        Log.Debug("Setting  multihandler of: " + plugin.Name);
+                        plugin.SetMultiHandler(mh);
+                    }
+                }
+            }
         }
         public void LoadPlugins()
         {
@@ -68,22 +123,6 @@ namespace MultiInstanceManager.Modules
 
             if (Directory.Exists(Constants.PluginFolderName))
             {
-                /*
-                if (Directory.Exists(Constants.PluginFolderName + "\\" + Constants.PluginLibReferenceFolder))
-                {
-                    Log.Debug("Loading all referenced libraries first");
-                    String[] references = Directory.GetFiles(Constants.PluginFolderName + "\\" + Constants.PluginLibReferenceFolder);
-                    foreach (string reference in references)
-                    {
-                        if (Path.GetExtension(reference).CompareTo(".dll") == 0)
-                        {
-                            Log.Debug("PluginManager: Loading ref => " + reference);
-                            Assembly.LoadFile(Path.GetFullPath(reference));
-                        }
-                    }
-                    Log.Debug("Done loading references");
-                }
-                */
                 Log.Debug("PluginManager: Directory is fine, references should be loaded, loading plugins");
                 String[] plugins = Directory.GetFiles(Constants.PluginFolderName);
                 foreach (string plugin in plugins)

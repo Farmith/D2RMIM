@@ -24,7 +24,7 @@ namespace MultiInstanceManager.Modules
         private int processCounter;
         private List<Process> gameProcesses;
         private uint bnetLauncherPID;
-        private CheckedListBox accountList;
+        private ListView accountListView;
         private List<GameInstance> instances;
         private bool modifyWindowTitles;
         private string gameExecutableName;
@@ -34,10 +34,11 @@ namespace MultiInstanceManager.Modules
         private CancellationTokenSource? processMonitorCTS;
         private Task? processMonitorTask;
         private PluginManager pluginManager;
-        public MultiHandler(Form _parent, CheckedListBox _accountList, PluginManager pM)
+        public static readonly object activeWindowLock = new object();
+        public MultiHandler(Form _parent, ListView _accountL, PluginManager pM)
         {
             parent = _parent;
-            accountList = _accountList;
+            accountListView = _accountL;
             gameProcesses = new List<Process>();
             instances = new List<GameInstance>();
             modifyWindowTitles = false;
@@ -46,6 +47,7 @@ namespace MultiInstanceManager.Modules
             profileStore = new List<Profile>();
             activeWindows = new List<ActiveWindow>();
             pluginManager = pM;
+            pluginManager.SetMultiHandler(this);
         }
         public ActiveWindow? GetActiveWindow(string displayname)
         {
@@ -369,7 +371,9 @@ namespace MultiInstanceManager.Modules
                 Prompt.ShowDialog("Can not find install path for D2R", "ERROR");
                 return;
             }
-            Log.Debug("Launching game with: " + installPath + gameExe + Constants.executableFileExt);
+            if (installPath.Substring(installPath.Length - 1, 1) != "\\")
+                installPath += "\\";
+            Log.Debug("Launching game with: " + installPath + gameExe );
             GameInstance? pluginStartedClient = pluginManager.PluginHandledLaunch(accountName, cmdArgs, installPath, gameExe);
             Process process;
             if(pluginStartedClient == null || pluginStartedClient.process == null)
@@ -378,15 +382,20 @@ namespace MultiInstanceManager.Modules
                 process = LaunchGame(accountName, cmdArgs, installPath, gameExe);
             } else
             {
-                Log.Debug("Launch was overridden by plugin");
+                Log.Debug("Launch was overridden by plugin for profile: " + profile?.DisplayName);
                 instances.Add((GameInstance)pluginStartedClient);
                 process = pluginStartedClient.process;
             }
             Log.Debug("Process should be: " + process.Id);
-
+            List<string>? tokenLocation = pluginManager.PluginBasedTokenLocation(process);
+            UseAccountToken(accountName, tokenLocation);
             // Start the handle killer early
             // ProcessManager.CloseExternalHandles(process.ProcessName); // kill all D2R mutex handles
-            var handleKillerTask = Task.Factory.StartNew(() => ProcessManager.CloseExternalHandles(process.ProcessName));
+            //            var handleKillerTask = Task.Factory.StartNew(() => ProcessManager.CloseExternalHandles(process));
+            // Task<bool> handleKillerTask = ProcessManager.CloseExternalHandles(process); // doesn't work, became synchronous
+            bool handleBeenKilled = false;
+            Thread thr1 = new Thread(() => handleBeenKilled = ProcessManager.CloseExternalHandles(process));
+            thr1.Start();
 
             if (profile != null && profile.ModifyWindowtitles)
             {
@@ -414,9 +423,10 @@ namespace MultiInstanceManager.Modules
             // var task = Task.Factory.StartNew(() => AutomationHelper.ClickFreneticallyInsideWindow(freneticClickingCT, process, 2), freneticClickingCTS.Token);
             var task = Task.Factory.StartNew(() => AutomationHelper.SpaceMan(freneticClickingCT, process, 2), freneticClickingCTS.Token);
             // Wait for a new token
-            WaitForNewToken(process);
+
+            WaitForNewToken(process, false, tokenLocation);
             // Then wait again incase it changes in any forseeable future
-            WaitForNewToken(process, true); // Specify that we do want the 30s timeout, just incase
+            WaitForNewToken(process, true, tokenLocation); // Specify that we do want the 30s timeout, just incase
             try
             {
                 freneticClickingCTS.Cancel();
@@ -429,7 +439,7 @@ namespace MultiInstanceManager.Modules
             {
                 freneticClickingCTS.Dispose();
             }
-
+            Log.Debug("Matching process");
             if (ProcessManager.MatchProcess(process))
             {
                 Log.Debug("Process seems to be alive: " + process.Id);
@@ -443,10 +453,29 @@ namespace MultiInstanceManager.Modules
                 }
                 ExportToken(accountName + ".bin");
                 // Log.Debug("Closing mutex handles");
-                activeWindows?.Add(new ActiveWindow { Process = process, Profile = profile });
+                if(activeWindows == null)
+                {
+                    activeWindows = new List<ActiveWindow>();
+                }
                 // ProcessManager.CloseExternalHandles(process.ProcessName); // kill all D2R mutex handles
                 // Thread.Sleep(500); // Small delay added
-                var handleKillerResult = await handleKillerTask; // Wait for the handlekiller to finish at this point, it should already be done.
+                Log.Debug("Waiting for handlekiller to finish");
+                //                var handleresult = await handleKillerTask.ConfigureAwait(continueOnCapturedContext: true);
+                // bool taskresult = handleKillerTask.Result;
+                try
+                {
+                    thr1.Join();
+                } catch (Exception e) {
+                    Log.Debug("Error joining handle killer: ");
+                    Log.Debug(e.ToString());
+                }
+                Log.Debug("HandleResult: " + handleBeenKilled);
+                //                 var handleKillerResult = await handleKillerTask; // Wait for the handlekiller to finish at this point, it should already be done.
+                Log.Debug("Handle should be killed");
+                lock (activeWindowLock)
+                {
+                    activeWindows.Add(new ActiveWindow { Process = process, Profile = profile });
+                }
                 gameProcesses.Add(process);
             }
             else
@@ -526,6 +555,21 @@ namespace MultiInstanceManager.Modules
         }
         public void LoadProfiles()
         {
+            accountListView.Items.Clear();
+            var profiles = FileHelper.GetProfilesByFolder();
+            profileStore.Clear();
+            foreach(var profile in profiles)
+            {
+                if(profile.AccountName != null)
+                {
+                    Profile? a = FileHelper.LoadProfileConfiguration(profile.AccountName);
+                    if (a != null)
+                        profileStore.Add(a);
+                    ListViewItem item1 = new ListViewItem( new[] { profile.AccountName, profile.LastWriteTime.ToString() });
+                    accountListView.Items.Add(item1);
+                }
+            }
+            /*
             accountList.Items.Clear();
             var profiles = FileHelper.GetProfilesByFolder();
             profileStore.Clear();
@@ -534,12 +578,18 @@ namespace MultiInstanceManager.Modules
                 if (profile.AccountName != null)
                 {
                     var fileName = profile.AccountName + " | " + profile.LastWriteTime.ToString();
+                    ProfileListItem item = new ProfileListItem
+                    {
+                        Name = fileName,
+                        LastModified = profile.LastWriteTime.ToString()
+                    };
                     Profile? a = FileHelper.LoadProfileConfiguration(profile.AccountName);
                     if (a != null)
                         profileStore.Add(a);
-                    accountList.Items.Add(fileName);
+                    accountList.Items.Add(item);
                 }
             }
+            */
         }
         private void SetBnetLauncherPID(Process launcherProcess)
         {
@@ -617,7 +667,7 @@ namespace MultiInstanceManager.Modules
         }
         private void ChangeRealm(string realm) => Registry.SetValue(Constants.clientRegionKey[0], Constants.clientRegionKey[1], realm, RegistryValueKind.String);
 
-        private void WaitForNewToken(Process process, Boolean timeout = false)
+        private void WaitForNewToken(Process process, Boolean timeout = false, List<string>? tokenLocation = null)
         {
             if (!ProcessManager.IsProcessRunning(process))
             {
@@ -627,7 +677,10 @@ namespace MultiInstanceManager.Modules
 
             byte[]? CurrentKey = new byte[20];
 
-            CurrentKey = Registry.GetValue(Constants.accountRegKey[0], Constants.accountRegKey[1], "") as byte[];
+            if (tokenLocation == null)
+                tokenLocation = Constants.accountRegKey;
+
+            CurrentKey = Registry.GetValue(tokenLocation[0], tokenLocation[1], "") as byte[];
             if(CurrentKey == null)
             {
                 // Something is severely messed up here, can't get the values from registry.
@@ -649,7 +702,7 @@ namespace MultiInstanceManager.Modules
                     Log.Debug("Client exited, aborting..");
                     return;
                 }
-                CurrentKey = Registry.GetValue(Constants.accountRegKey[0], Constants.accountRegKey[1], "") as byte[];
+                CurrentKey = Registry.GetValue(tokenLocation[0], tokenLocation[1], "") as byte[];
                 if (timeout == true)
                     elapsedTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) - startTime;
             }
@@ -674,11 +727,14 @@ namespace MultiInstanceManager.Modules
             if(registryBytes != null) 
                 File.WriteAllBytes(fileName, registryBytes);
         }
-        private void UseAccountToken(string accountName)
+        private void UseAccountToken(string accountName,List<string>? tokenLocation = null)
         {
             Log.Debug("Reading from file: " + accountName + ".bin");
             var data = File.ReadAllBytes(accountName + ".bin");
-            Registry.SetValue(Constants.accountRegKey[0], Constants.accountRegKey[1], data, RegistryValueKind.Binary);
+            if (tokenLocation != null)
+                Registry.SetValue(tokenLocation[0], tokenLocation[1], data, RegistryValueKind.Binary); // Prime the registry for the altered key
+            else
+                Registry.SetValue(Constants.accountRegKey[0], Constants.accountRegKey[1], data, RegistryValueKind.Binary); // Set the normal key
         }
 
         public void StartProcessMonitor()
@@ -717,35 +773,52 @@ namespace MultiInstanceManager.Modules
                     // Iterate all windows we SHOULD have:
                     try
                     {
+                        // Log.Debug("We still trying to monitor processes");
                         if (activeWindows != null)
                         {
-                            foreach (var activeWindow in activeWindows)
+                            InnerLoop:
+                            try
                             {
-                                if (activeWindow.Process != null && !ProcessManager.IsProcessRunning(activeWindow.Process))
+                                // Log.Debug("We have: " + activeWindows.Count + " active windows");
+                                lock (activeWindowLock)
                                 {
-                                    Log.Debug("Window for profile: " + activeWindow.Profile?.DisplayName + " has exited");
-                                    // It has died, so we need to ask the user if we should restart it
-                                    var confirmed = Prompt.ConfirmDialog("Restarting client in {timeout} seconds", "Client exited");
-                                    if (confirmed)
+                                    foreach (var activeWindow in activeWindows)
                                     {
-                                        // Restart the client
-                                        if (activeWindow.Profile != null && activeWindow.Profile.DisplayName != null)
+                                        // Log.Debug("Iterating active windows to find dead clients.. " + activeWindow?.Profile?.DisplayName + " active: " + ProcessManager.IsProcessRunning(activeWindow.Process));
+                                        if (activeWindow.Process != null && !ProcessManager.IsProcessRunning(activeWindow.Process))
                                         {
-                                            Log.Debug("Restarting client: " + activeWindow.Profile?.DisplayName);
-                                            var profileName = activeWindow.Profile?.DisplayName;
-                                            activeWindows.Remove(activeWindow);
+                                            // Log.Debug("Window for profile: " + activeWindow.Profile?.DisplayName + " has exited");
+                                            // It has died, so we need to ask the user if we should restart it
+                                            var confirmed = true;
+                                            var needConfirmation = true;
+                                            if (needConfirmation)
+                                                confirmed = Prompt.ConfirmDialog("Restarting client in {timeout} seconds", "Client exited");
+                                            if (confirmed)
+                                            {
+                                                // Restart the client
+                                                if (activeWindow.Profile != null && activeWindow.Profile.DisplayName != null)
+                                                {
+                                                    Log.Debug("Restarting client: " + activeWindow.Profile?.DisplayName);
+                                                    var profileName = activeWindow.Profile?.DisplayName;
+                                                    activeWindows.Remove(activeWindow);
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-                                            if(profileName != null)
-                                                LaunchWithAccount(profileName);
+                                                    if (profileName != null)
+                                                        LaunchWithAccount(profileName);
 #pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+                                                }
+                                            }
+                                            else
+                                            {
+                                                Log.Debug("Profile: " + activeWindow.Profile?.DisplayName + " exited, not restarting due to user request.");
+                                                activeWindows.Remove(activeWindow);
+                                            }
                                         }
                                     }
-                                    else
-                                    {
-                                        Log.Debug("Profile: " + activeWindow.Profile?.DisplayName + " exited, not restarting due to user request.");
-                                        activeWindows.Remove(activeWindow);
-                                    }
                                 }
+                            } catch
+                            {
+                                Log.Debug("Collection changed, iteration restarted in ProcessManager (MultiHandler.cs:804)");
+                                goto InnerLoop;
                             }
                         }
                     }

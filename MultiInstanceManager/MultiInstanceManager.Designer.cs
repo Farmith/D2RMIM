@@ -30,9 +30,9 @@ namespace MultiInstanceManager
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.Windows.Forms.ColumnHeader ProfileNameHeader;
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MultiInstanceManager));
             this.label1 = new System.Windows.Forms.Label();
-            this.accountList = new System.Windows.Forms.CheckedListBox();
             this.launchButton = new System.Windows.Forms.Button();
             this.refreshButton = new System.Windows.Forms.Button();
             this.removeButton = new System.Windows.Forms.Button();
@@ -49,7 +49,16 @@ namespace MultiInstanceManager
             this.configureAccountsButton = new System.Windows.Forms.Button();
             this.appVersion = new System.Windows.Forms.Label();
             this.toggleAllProfiles = new System.Windows.Forms.CheckBox();
+            this.accountListView = new System.Windows.Forms.ListView();
+            this.lastUpdatedHeader = new System.Windows.Forms.ColumnHeader();
+            ProfileNameHeader = new System.Windows.Forms.ColumnHeader();
             this.SuspendLayout();
+            // 
+            // ProfileNameHeader
+            // 
+            ProfileNameHeader.Tag = "profileName";
+            ProfileNameHeader.Text = "Profile Name";
+            ProfileNameHeader.Width = 130;
             // 
             // label1
             // 
@@ -63,16 +72,6 @@ namespace MultiInstanceManager
             this.label1.TabIndex = 0;
             this.label1.Text = "Profiles:";
             this.label1.Click += new System.EventHandler(this.label1_Click);
-            // 
-            // accountList
-            // 
-            this.accountList.CheckOnClick = true;
-            this.accountList.FormattingEnabled = true;
-            this.accountList.Location = new System.Drawing.Point(19, 123);
-            this.accountList.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.accountList.Name = "accountList";
-            this.accountList.Size = new System.Drawing.Size(271, 220);
-            this.accountList.TabIndex = 1;
             // 
             // launchButton
             // 
@@ -275,12 +274,31 @@ namespace MultiInstanceManager
             this.toggleAllProfiles.Text = "Select/Deselect All Profiles";
             this.toggleAllProfiles.UseVisualStyleBackColor = false;
             // 
+            // accountListView
+            // 
+            this.accountListView.CheckBoxes = true;
+            this.accountListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            ProfileNameHeader,
+            this.lastUpdatedHeader});
+            this.accountListView.FullRowSelect = true;
+            this.accountListView.Location = new System.Drawing.Point(19, 125);
+            this.accountListView.Name = "accountListView";
+            this.accountListView.Size = new System.Drawing.Size(265, 222);
+            this.accountListView.TabIndex = 22;
+            this.accountListView.UseCompatibleStateImageBehavior = false;
+            // 
+            // lastUpdatedHeader
+            // 
+            this.lastUpdatedHeader.Text = "Last Updated";
+            this.lastUpdatedHeader.Width = 130;
+            // 
             // MultiInstanceManager
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
             this.ClientSize = new System.Drawing.Size(457, 452);
+            this.Controls.Add(this.accountListView);
             this.Controls.Add(this.toggleAllProfiles);
             this.Controls.Add(this.appVersion);
             this.Controls.Add(this.configureAccountsButton);
@@ -296,7 +314,6 @@ namespace MultiInstanceManager
             this.Controls.Add(this.removeButton);
             this.Controls.Add(this.refreshButton);
             this.Controls.Add(this.launchButton);
-            this.Controls.Add(this.accountList);
             this.Controls.Add(this.label1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
@@ -310,7 +327,6 @@ namespace MultiInstanceManager
         #endregion
 
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.CheckedListBox accountList;
         private System.Windows.Forms.Button launchButton;
         private System.Windows.Forms.Button refreshButton;
         private System.Windows.Forms.Button removeButton;
@@ -327,6 +343,9 @@ namespace MultiInstanceManager
         private System.Windows.Forms.Button configureAccountsButton;
         private System.Windows.Forms.Label appVersion;
         private System.Windows.Forms.CheckBox toggleAllProfiles;
+        private System.Windows.Forms.ListView accountListView;
+        private System.Windows.Forms.ColumnHeader ProfileNameHeader;
+        private System.Windows.Forms.ColumnHeader lastUpdatedHeader;
     }
 }
 
