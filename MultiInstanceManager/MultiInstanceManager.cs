@@ -239,8 +239,9 @@ namespace MultiInstanceManager
         private async void addAccountButton_Click(object sender, EventArgs e)
         {
             DisableButtons();
-            var task = Task.Factory.StartNew(() => MH.Setup());
-            var result = await task;
+            //var task = Task.Factory.StartNew(() => MH.Setup());
+            //var result = await task;
+            MH.SetupWithBrowser();
             EnableButtons();
             MH.LoadProfiles();
         }

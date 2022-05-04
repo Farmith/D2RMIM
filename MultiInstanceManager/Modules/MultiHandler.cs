@@ -8,6 +8,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -124,6 +126,28 @@ namespace MultiInstanceManager.Modules
             }
             return activeWindow;
         }
+
+        private static readonly byte[] Entropy = { 0xc8, 0x76, 0xf4, 0xae, 0x4c, 0x95, 0x2e, 0xfe, 0xf2, 0xfa, 0x0f, 0x54, 0x19, 0xc0, 0x9c, 0x43 };
+
+        public bool SetupWithBrowser()
+        {
+            Log.Clear();
+            RefreshAccountToken refresher = new RefreshAccountToken();
+            var result = refresher.ShowDialog();
+            if (result == DialogResult.OK)
+            {
+                Credentials? bNetCredentials = new Credentials(refresher.Token, refresher.Token);
+                //this is what we store in WEB_TOKEN
+                byte[] protectedKey = ProtectedData.Protect(Encoding.UTF8.GetBytes(refresher.Token), Entropy, DataProtectionScope.CurrentUser);
+                File.WriteAllBytes("player.bin", protectedKey);
+            }
+            else
+            {
+                MessageBox.Show("No login token found.", "Login Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            }
+            return result == DialogResult.OK;
+        }
+
         public bool Setup(string displayName = "", Boolean killProcessesWhenDone = true)
         {
             Log.Clear();

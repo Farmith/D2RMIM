@@ -54,7 +54,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>if $(ConfigurationName)==Debug (
+    <PostBuildEvent>if not exist "$(TargetDir)\plugins" mkdir "$(TargetDir)\plugins"
+if $(ConfigurationName)==Debug (
 echo "Copying to Debug"
 if exist "$(TargetDir)\..\\..\\..\\..\\MultiInstanceManager\\bin\\x64\\Debug\\plugins\\ExamplePlugin.dll" ( Del "$(TargetDir)\..\\..\\..\\..\\MultiInstanceManager\\bin\\x64\\Debug\\plugins\\ExamplePlugin.dll" )
 copy /Y "$(TargetDir)\\ExamplePlugin.dll" "$(TargetDir)\\..\\..\\..\\..\\MultiInstanceManager\\bin\\x64\\Debug\\plugins\\"
