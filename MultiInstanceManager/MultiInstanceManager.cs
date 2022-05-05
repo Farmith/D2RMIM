@@ -234,7 +234,7 @@ namespace MultiInstanceManager
         }
         private void dumpRegKeyButton_Click(object sender, EventArgs e)
         {
-            MH.DumpCurrentRegKey();
+            //MH.DumpCurrentRegKey();
         }
         private async void addAccountButton_Click(object sender, EventArgs e)
         {

@@ -129,17 +129,20 @@ namespace MultiInstanceManager.Modules
 
         private static readonly byte[] Entropy = { 0xc8, 0x76, 0xf4, 0xae, 0x4c, 0x95, 0x2e, 0xfe, 0xf2, 0xfa, 0x0f, 0x54, 0x19, 0xc0, 0x9c, 0x43 };
 
-        public bool SetupWithBrowser()
+        public bool SetupWithBrowser(string displayName = "")
         {
             Log.Clear();
+            if (displayName.Length == 0)
+            {
+                displayName = Prompt.ShowDialog("Enter desired displayname for this account:", "Add Account");
+            }
             RefreshAccountToken refresher = new RefreshAccountToken();
             var result = refresher.ShowDialog();
             if (result == DialogResult.OK)
             {
-                Credentials? bNetCredentials = new Credentials(refresher.Token, refresher.Token);
                 //this is what we store in WEB_TOKEN
                 byte[] protectedKey = ProtectedData.Protect(Encoding.UTF8.GetBytes(refresher.Token), Entropy, DataProtectionScope.CurrentUser);
-                File.WriteAllBytes("player.bin", protectedKey);
+                File.WriteAllBytes($"{displayName}.bin", protectedKey);
             }
             else
             {
@@ -256,7 +259,7 @@ namespace MultiInstanceManager.Modules
                 freneticClickingCTS.Dispose();
             }
             // Export the received key using the name of the recipient
-            ExportToken(displayName + ".bin");
+            //ExportToken(displayName + ".bin");
             Log.Debug("Successfully saved new token for " + displayName);
 
             Log.Debug("Closing launcher and client mutex handles");
@@ -401,7 +404,7 @@ namespace MultiInstanceManager.Modules
                 {
                     WindowHelper.SetWindowPosition(process.MainWindowHandle, profile.LaunchOptions.WindowX, profile.LaunchOptions.WindowY);
                 }
-                ExportToken(accountName + ".bin");
+                //ExportToken(accountName + ".bin");
                 // Log.Debug("Closing mutex handles");
                 activeWindows?.Add(new ActiveWindow { Process = process, Profile = profile });
                 // ProcessManager.CloseExternalHandles(process.ProcessName); // kill all D2R mutex handles
@@ -609,15 +612,7 @@ namespace MultiInstanceManager.Modules
                 Log.Debug("Token remains the same");
             }
         }
-        public void DumpCurrentRegKey()
-        {
-            ExportToken("dump.bin");
-        }
-        private void ExportToken(string fileName)
-        {
-            Log.Debug("Writing to file: " + fileName);
-            File.WriteAllBytes(fileName, (byte[])Registry.GetValue(Constants.accountRegKey[0], Constants.accountRegKey[1], ""));
-        }
+
         private void UseAccountToken(string accountName)
         {
             Log.Debug("Reading from file: " + accountName + ".bin");
