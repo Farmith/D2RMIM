@@ -320,8 +320,7 @@ namespace MultiInstanceManager
                     {
                         var checkedItem = accountList.CheckedItems[x].ToString().Split('|');
                         DisableButtons();
-                        var task = Task.Factory.StartNew(() => MH.Setup(checkedItem[0].Trim(' '), true));
-                        var result = await task;
+                        MH.SetupWithBrowser(checkedItem[0].Trim(' '));
                         EnableButtons();
                     }
                     catch (Exception ex)
